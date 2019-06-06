@@ -1,0 +1,128 @@
+<style>
+    textarea {
+        border: 1px solid #e89f10;
+        overflow: hidden;
+        padding: 0;
+        outline: none;
+        background-color: #f9f0c2;
+        width: 400px;
+        display: block;
+        margin: 10px 0;
+    }
+    #send_message {
+        border: 1px solid #e89f10;
+        background-color: #f9f0c2;
+        width: 400px;
+        display: block;
+    }
+    #messages {
+        width: 400px;
+        min-height: 100px;
+        border: 1px solid yellowgreen;
+    }
+    #messages:empty::after {
+       background-color: #e89f10;
+       content: "Окно для вывода входящих сообщений в формате JSON";
+       text-align: center;
+       color: white;
+       display: block;
+    }
+    #send_message {
+        font-size: 14px;
+    }
+    .submit_message {
+        padding-bottom: 10px; 
+        width: 400px;
+    }
+    .submit_message .buttons {
+        text-align: right;
+    }
+
+    .buttons button {
+        background: #e89f10;
+        color: white;
+    }
+</style>
+<h1>
+    <div style="width: 32px; height: 32px; display: inline-block;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54">
+            <g fill="none" fill-rule="evenodd">
+                <path fill="#36C5F0"
+                    d="M19.712.133a5.381 5.381 0 0 0-5.376 5.387 5.381 5.381 0 0 0 5.376 5.386h5.376V5.52A5.381 5.381 0 0 0 19.712.133m0 14.365H5.376A5.381 5.381 0 0 0 0 19.884a5.381 5.381 0 0 0 5.376 5.387h14.336a5.381 5.381 0 0 0 5.376-5.387 5.381 5.381 0 0 0-5.376-5.386" />
+                <path fill="#2EB67D"
+                    d="M53.76 19.884a5.381 5.381 0 0 0-5.376-5.386 5.381 5.381 0 0 0-5.376 5.386v5.387h5.376a5.381 5.381 0 0 0 5.376-5.387m-14.336 0V5.52A5.381 5.381 0 0 0 34.048.133a5.381 5.381 0 0 0-5.376 5.387v14.364a5.381 5.381 0 0 0 5.376 5.387 5.381 5.381 0 0 0 5.376-5.387" />
+                <path fill="#ECB22E"
+                    d="M34.048 54a5.381 5.381 0 0 0 5.376-5.387 5.381 5.381 0 0 0-5.376-5.386h-5.376v5.386A5.381 5.381 0 0 0 34.048 54m0-14.365h14.336a5.381 5.381 0 0 0 5.376-5.386 5.381 5.381 0 0 0-5.376-5.387H34.048a5.381 5.381 0 0 0-5.376 5.387 5.381 5.381 0 0 0 5.376 5.386" />
+                <path fill="#E01E5A"
+                    d="M0 34.249a5.381 5.381 0 0 0 5.376 5.386 5.381 5.381 0 0 0 5.376-5.386v-5.387H5.376A5.381 5.381 0 0 0 0 34.25m14.336-.001v14.364A5.381 5.381 0 0 0 19.712 54a5.381 5.381 0 0 0 5.376-5.387V34.25a5.381 5.381 0 0 0-5.376-5.387 5.381 5.381 0 0 0-5.376 5.387" />
+            </g>
+        </svg>
+    </div>
+    Fake slack
+</h1>
+<form id="message_form" class="submit_message" onsubmit="false;">
+    <label>
+        Выбор канала:
+        <select id="slack_channel" name="channel">
+            {{#each slackChannels}}
+            <option value="{{key}}">{{value}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <input type="text" id="send_message" name="message" placeholder="Поле для составления сообщения боту"></textarea>
+    <div class="buttons"> 
+        <button type="submit">Отправить</button>
+    </div>
+</form>
+<div id="messages"></div>
+<script>
+    const USER_ID = 'U1234123';
+    const socket = new WebSocket(`ws://${location.hostname}:${location.port}/slack`);
+    const form = window.message_form;
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        const channel = data.get('channel');
+        const text = data.get('message');
+        const message = {
+            type: 'message',
+            user: {
+                user_id: USER_ID
+            },
+            channel,
+            text
+        }
+        socket.emitJson(message);
+        window.send_message.value = '';
+    });
+    
+    socket.emit = function (type, data) {
+        socket.send(JSON.stringify({ type, data }))
+    };
+
+    socket.emitJson = function (data) {
+        socket.send(JSON.stringify(data));
+    };
+
+    socket.addEventListener('open', function (event) {
+        console.warn();
+    });
+
+    function createTextarea(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = JSON.stringify(event.data);
+        return textArea;
+    }
+
+    function textAreaAdjust(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    }
+
+    socket.addEventListener('message', function (event) {
+        console.log('Message from server ', event.data);
+        const el = createTextarea();
+        globalThis.messages.appendChild(el);
+        textAreaAdjust(el);
+    });
+</script>

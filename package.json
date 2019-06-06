@@ -1,0 +1,31 @@
+{
+  "name": "mad-fake-slack",
+  "version": "1.0.0",
+  "description": "Fake Slack implementation on node.js + express.js + express-ws",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "example:rtmbot": "node examples/rtmbot/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maddevsio/mad-fake-slack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maddevsio/mad-fake-slack/issues"
+  },
+  "homepage": "https://github.com/maddevsio/mad-fake-slack#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "express-ws": "^4.0.0"
+  },
+  "devDependencies": {
+    "@slack/rtm-api": "^5.0.1",
+    "@slack/web-api": "^5.0.1"
+  }
+}

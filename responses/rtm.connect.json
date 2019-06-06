@@ -1,0 +1,13 @@
+{
+    "ok": true,
+    "self": {
+        "id": "U4X318ZMZ",
+        "name": "robotoverlord"
+    },
+    "team": {
+        "domain": "slackdemo",
+        "id": "T2U81E2FP",
+        "name": "SlackDemo"
+    },
+    "url": "ws://localhost:9001/ws"
+}

@@ -1,0 +1,11 @@
+{
+    "ok": true,
+    "channel": "C1H9RESGL",
+    "ts": "1503435956.000247",
+    "message": {
+        "type": "message",
+        "subtype": "bot_message",
+        "bot_id": "B19LU7CSY",
+        "ts": "1503435956.000247"
+    }
+}

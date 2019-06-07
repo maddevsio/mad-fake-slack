@@ -111,7 +111,7 @@ async function requestTime (req, res, next) {
 app.use(requestTime);
 
 app.get("/", (req, res) => {
-  res.render("slack", { slackChannels });
+  res.render("slackv2", { slackChannels });
 });
 
 app.post("/api/auth.test", (req, res) => console.warn("auth.test") || res.json(responses["auth.test"]));

@@ -1,0 +1,904 @@
+<style>
+* {
+    -ms-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+body {
+    font-family: "Helvetica Neue",Helvetica,"Segoe UI",Tahoma,Arial,sans-serif;
+    font-variant-ligatures: common-ligatures;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+    min-width: 768px;
+    line-height: 1rem;
+    font-size: 16px;
+    background: #fff;
+    color: #1d1c1d;
+    padding: 0;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin: 0;
+    line-height: 24px;
+    background-color: #fff;
+    font-family: NotoSansJP,Slack-Lato,appleLogo,sans-serif;
+}
+
+#client-ui {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.container-fluid {
+    padding-right: 0;
+    padding-left: 0;
+    zoom: 1;
+}
+
+.client_container {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.client_channels_list_container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 220px;
+    flex-shrink: 0;
+    min-width: 1px;
+    max-width: 260px;
+    background: #3f0e40;
+    z-index: 201;
+    box-sizing: content-box;
+    visibility: visible;
+}
+
+#team_menu {
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 0 1rem;
+    color: #fff;
+    border-bottom: 1px solid #3f0e40;
+    position: relative;
+    z-index: 50;
+    flex-basis: 61px;
+    flex-shrink: 0;
+}
+
+#team_menu:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 61px;
+    background-image: url(/images/loading_channel_pane@2x.png);
+    background-position: 16px 16px;
+    background-size: 178px 230px;
+    background-repeat: no-repeat;
+    opacity: 0;
+    -webkit-transition: opacity .2s ease 0s;
+    -moz-transition: opacity .2s ease 0s;
+    transition: opacity .2s ease 0s;
+}
+
+#team_menu .team_name_container {
+    margin-bottom: -2px;
+    margin-top: .5625rem!important;
+    line-height: 1.075rem;
+    display: flex;
+}
+
+#team_menu>* {
+    opacity: 1;
+    -webkit-transition: opacity .2s ease 0s;
+    -moz-transition: opacity .2s ease 0s;
+    transition: opacity .2s ease 0s;
+}
+
+#team_menu .team_name_caret {
+    margin-top: 3px;
+    outline: 0;
+    color: #a09a9f;
+    order: 1;
+}
+
+.btn_unstyle {
+    background: 0 0;
+    border: none;
+    padding: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    outline: 0;
+}
+
+button, input, label, textarea {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+button, input[type=button], input[type=reset], input[type=submit], input[type=radio], input[type=checkbox], label {
+    cursor: pointer;
+}
+
+button, html input[type=button], input[type=reset], input[type=submit] {
+    -webkit-appearance: button;
+    cursor: pointer;
+}
+
+button, input {
+    *overflow: visible;
+}
+
+button, input, textarea {
+    margin: 0;
+    font-size: 100%;
+    vertical-align: middle;
+}
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+button {
+    border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+    border-style: solid;
+    border-width: 1px;
+    padding: 1px 7px 2px;
+    text-rendering: auto;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    margin: 0em;
+    font: 400 11px system-ui;
+    -webkit-writing-mode: horizontal-tb !important;
+    -webkit-appearance: button;
+}
+
+#team_menu .team_name_container {
+    margin-bottom: -2px;
+    margin-top: .5625rem!important;
+    line-height: 1.075rem;
+    display: flex;
+}
+body:not(.loading) #team_menu:not(.placeholder) {
+    cursor: pointer;
+}
+
+#team_menu {
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 0 1rem;
+    color: #fff;
+    border-bottom: 1px solid #3f0e40;
+    position: relative;
+    z-index: 50;
+    flex-basis: 61px;
+    flex-shrink: 0;
+}
+
+#team_menu #team_name {
+    font-size: 1.125rem;
+    line-height: 1.375;
+    max-width: 9.12rem;
+}
+
+.overflow_ellipsis {
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#team_menu .notifications_menu_btn .im {
+    font-size: 18px;
+}
+
+#team_menu .notifications_menu_btn {
+    position: absolute;
+    top: 11px;
+    right: 16px;
+    z-index: 101;
+}
+
+.c-button-unstyled {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    margin: 0;
+    line-height: inherit;
+    overflow: initial;
+    padding: 0;
+    text-align: initial;
+    vertical-align: initial;
+    cursor: pointer;
+}
+
+.p-dnd_button {
+    opacity: .6;
+}
+
+#presence_container {
+    float: left;
+    margin-left: -5px;
+    margin-right: 1px;
+    width: 20px;
+    height: 1.3125rem;
+    text-align: center;
+}
+
+#presence {
+    display: inline-block;
+    position: relative;
+    width: 9px;
+    height: 9px;
+    font-size: 9px;
+}
+
+.active {
+    color: green;
+}
+
+#team_menu_user_details {
+    display: flex;
+}
+
+#team_menu_user_details #team_menu_user_name {
+    flex: 0 1 auto;
+}
+
+#team_menu_user {
+    position: relative;
+    margin-top: 2px;
+    color: #ab9ba9;
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    z-index: 1;
+}
+
+.team_name_caret .im-care-down {
+    font-size: 9px;
+    margin: 0 5px;
+}
+
+#col_channels {
+    width: 220px;
+    float: left;
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#col_channels:before {
+    width: 260px;
+}
+#col_channels:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 170px;
+    display: block;
+    background-image: url(/images/loading_channel_pane@2x.png);
+    background-position: 16px -67px;
+    background-size: 178px 230px;
+    background-repeat: no-repeat;
+    opacity: 0;
+    -ms-pointer-events: none;
+    -webkit-pointer-events: none;
+    pointer-events: none;
+    -webkit-transition: opacity .2s ease 0s;
+    -moz-transition: opacity .2s ease 0s;
+    transition: opacity .2s ease 0s;
+}
+
+.flex_one {
+    flex: 1;
+}
+.flex_direction_column {
+    flex-direction: column;
+}
+
+.display_flex {
+    display: flex;
+}
+
+.p-channel_sidebar {
+    background: #3F0E40;
+    color: rgb(197,183,198);
+}
+.p-channel_sidebar {
+    width: 220px;
+    flex: 1;
+    height: 100%;
+    position: relative;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background: #3F0E40;
+    color: rgb(197,183,198);
+}
+
+.p-channel_sidebar__list {
+    flex: 1;
+}
+
+.p-channel_sidebar__channel, .p-channel_sidebar__link {
+    display: flex;
+    align-items: center;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 12px 0 15px;
+    width: 100%;
+    border-radius: 0;
+    color: rgb(197,183,198);
+}
+
+.p-channel_sidebar__name {
+    margin-right: auto;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.p-channel_sidebar:not(.p-channel_sidebar--global_nav):not(.p-channel_sidebar--classic_nav) {
+    font-size: 16px;
+}
+
+.p-channel_sidebar__link--all-threads .im-data-validate {
+    font-size: 12px;
+    margin: 0 5px 0 0;
+}
+
+.p-channel_sidebar__folder_heading, .p-channel_sidebar__section_heading {
+    padding: 0 12px 0 15px;
+    margin: 0;
+    width: 100%;
+    height: 26px;
+    display: flex;
+    align-items: center;
+}
+
+.p-channel_sidebar__folder_heading_label, .p-channel_sidebar__section_heading_label {
+    line-height: 1;
+    display: block;
+    opacity: 1;
+    text-align: left;
+    width: 100%;
+    transition: color .1s ease-out;
+    white-space: nowrap;
+}
+
+.p-channel_sidebar__folder_heading .p-channel_sidebar__folder_heading_plus, .p-channel_sidebar__section_heading_plus {
+    margin-left: 8px;
+    line-height: 1;
+}
+
+.p-channel_sidebar__section_heading_plus .im-plus-circle {
+    font-size: 16px;
+}
+
+.p-channel_sidebar__channel:before, .p-channel_sidebar__link:before {
+    margin: 0 1px 0 -4px;
+}
+
+a {
+    color: #08c;
+    text-decoration: none;
+}
+
+a .im-hashtag {
+    font-size: 12px;
+    margin: 0 5px 0 10px;
+}
+
+.p-channel_sidebar__link--add-channel .im-plus {
+    font-size: 9px;
+    padding: 0 5px;
+}
+
+.p-channel_sidebar__close_container {
+    position: relative;
+}
+
+.p-channel_sidebar__channel--im .im {
+    font-size: 12px;
+    padding: 0 5px;
+}
+
+.client_main_container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 1px;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
+    display: block;
+}
+
+#client_header {
+    background: 0 0;
+    flex-basis: 53px;
+    z-index: 202;
+}
+
+#client_header::after {
+     content: "";
+    display: block;
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+    right: 0;
+    height: 1px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 0 rgba(0,0,0,.1);
+    z-index: 200;
+}
+
+.channel_header {
+    display: flex;
+    background: #fff;
+    padding: .7rem 0 0;
+    height: 100%;
+    box-shadow: inset 1px 0 0 0 #ddd;
+}
+
+.messages_header {
+    display: flex;
+    flex: 1;
+    min-width: 1px;
+    color: #616061;
+}
+
+.channel_title {
+    min-width: 1px;
+    margin-top: -2px;
+}
+
+.channel_header_drag_region {
+    flex: 1;
+}
+
+.channel_title_info .im {
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    display: inline-block;
+    color: #eee;
+}
+
+@media screen and (max-width: 1279px)
+.flex_header {
+    width: 300px;
+}
+@media screen and (max-width: 1366px)
+.flex_header {
+    width: 315px;
+}
+@media screen and (max-width: 1440px)
+.flex_header {
+    width: 365px;
+}
+.flex_header {
+    display: flex;
+    align-items: center;
+    height: 34px;
+    margin: 2px 0 0;
+    padding: 0 10px 0 0;
+    width: 415px;
+    -webkit-transition: width .15s ease-out 0s;
+    -moz-transition: width .15s ease-out 0s;
+    transition: width .15s ease-out 0s;
+}
+
+#client_body {
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+}
+
+.channel_title .channel_name {
+    line-height: 1.3;
+    font-size: 18px;
+}
+
+.channel_title .channel_name {
+    display: flex;
+    min-width: 1px;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    margin: 0 0 -2px;
+    font-weight: 900;
+    padding: 0 .1rem 0 1.3rem;
+    color: #1d1c1d;
+    cursor: pointer;
+    align-items: baseline;
+}
+
+#channel_title, #im_title, .dm_title {
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+}
+.channel_title .channel_name button {
+    color: inherit;
+}
+
+.channel_header_info_item {
+    display: flex;
+    white-space: nowrap;
+    margin-right: .4rem;
+}
+
+.channel_header_info {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    padding-left: 1.3rem;
+    font-size: .8125rem;
+    font-weight: 400;
+    line-height: 1.16;
+}
+
+.channel_header_info .im {
+    font-size: 14px;
+}
+
+.channel_header_info_item {
+    display: flex;
+    white-space: nowrap;
+    margin-right: .4rem;
+}
+
+.channel_header_info button {
+    color: #616061;
+}
+
+#channel_members_toggle_count .im {
+    font-size: 12px;
+}
+
+.channel_header_info_item:not(:empty)~.channel_header_info_item:not(:first-child):before {
+    padding-right: .4rem;
+    color: rgba(97,96,97,.5);
+    content: '|';
+    align-self: center;
+}
+
+.channel_header_info_item.pin {
+    white-space: nowrap;
+}
+
+.channel_topic_container {
+    cursor: default;
+    flex: 1;
+    min-width: 1px;
+}
+
+#edit_topic_inner {
+    display: block;
+}
+
+#channel_topic_text, #channel_topic_text code {
+    white-space: nowrap;
+}
+
+#channel_topic_text {
+    display: block;
+    line-height: 1.4;
+    min-width: min-content;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+}
+
+.channel_header_drag_region {
+    flex: 1;
+}
+
+.channel_title_info {
+    display: flex;
+    color: #616061;
+    margin: 3px 8px 0 0;
+}
+
+.messages_header {
+    display: flex;
+    flex: 1;
+    min-width: 1px;
+    color: #616061;
+}
+
+#search_container {
+    flex: 1;
+    position: relative;
+    z-index: 0;
+    margin: 0 7px 0 0;
+    min-width: 0;
+}
+
+#search_container {
+    flex: 1;
+    position: relative;
+    z-index: 0;
+    margin: 0 7px 0 0;
+    min-width: 0;
+}
+
+.channel_header__buttons {
+    display: inline-block;
+    position: relative;
+}
+
+.channel_header_icon .im {
+    color: #616061;
+    margin: 0 5px;
+}
+
+.channel_header__buttons .im {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    display: inline-block;
+}
+
+#recent_mentions_toggle {
+    flex: none;
+    width: 34px;
+    z-index: 2;
+}
+
+#stars_toggle {
+    flex: none;
+    width: 34px;
+}
+
+#flex_menu_toggle {
+    flex: none;
+    width: 22px;
+}
+
+</style>
+<div id="client-ui">
+    <div class="client_container">
+        <div class="client_channels_list_container">
+            <div id="team_menu">
+                <div class="team_name_container top_margin">
+                    <button class="team_name_caret btn_unstyle">
+                        <i class="im im-care-down"></i>
+                    </button>
+                    <span id="team_name" class="overflow_ellipsis">BotFactory</span>
+                </div>
+                <span class="notifications_menu_btn" data-reactroot="">
+                    <button class="c-button-unstyled p-dnd_button" type="button">
+                        <i class="im im-bell"></i>
+                    </button>
+                </span>
+                <div id="team_menu_user">
+                    <div id="presence_container" class="no_wrap ts_tip ts_tip_bottom ts_tip_left">
+                        <i id="presence" class="im im-radio-button-circle active"></i>
+                    </div>
+                    <span id="team_menu_user_details"><span id="team_menu_user_name" class="overflow_ellipsis current_user_name">Valera Petrov</span>
+                        <span class="current_status hidden current_status_with_expiration current_user_current_status ts_tip_float">            
+                            <span class="ts_tip_tip ts_tip_inner_current_status">
+                                <span class="ts_tip_multiline_inner">
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div id="col_channels" class="channels_list_holder no_unread_msgs_badges default_sort">
+                <div id="col_channels_react_root" class="display_flex flex_direction_column flex_one">
+                    <nav class="p-channel_sidebar" style="width: 220px; height: 100vh;">
+                        <div class="p-channel_sidebar__list" style="position: relative;">
+                            <div role="presentation" style="height: 12px;"></div>
+                            <div role="listitem" style="height: 52px;">
+                                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--all-threads" type="button">
+                                    <i class="im im-data-validate"></i>
+                                    <span class="p-channel_sidebar__name">Threads</span>
+                                </button>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__section_heading">
+                                    <button
+                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                                        type="button" delay="300"> Channels</button>
+                                    <div class="p-channel_sidebar__section_heading_right">
+                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                                            <i class="im im-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
+                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                        <i class="im im-hashtag"></i>bots</span></a>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
+                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                        <i class="im im-hashtag"></i>general</span></a>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
+                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                        <i class="im im-hashtag"></i>random</span></a>
+                            </div>
+                            <div role="presentation" style="height: 18px;"></div>
+                            <div role="listitem" style="height: 26px;">
+                                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim" type="button">
+                                    <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Add a channel</span>
+                                </button>
+                            </div>
+                            <div role="presentation" style="height: 18px;"></div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__section_heading">
+                                    <button
+                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                                        type="button"> Direct Messages</button>
+                                    <div class="p-channel_sidebar__section_heading_right">
+                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                                            <i class="im im-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__close_container">
+                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
+                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                            <i class="im im-heart active"></i>SlackBot</span></a>
+                                </div>
+                            </div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__close_container">
+                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
+                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                        <i class="im im-radio-button-circle active"></i>Valera Petrov</span>
+                                    </a>
+                                </div> 
+                            </div>
+                            <div role="presentation" style="height: 18px;"></div>
+                            <div role="listitem" style="height: 26px;">
+                                <button
+                                    class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim"
+                                    type="button">
+                                    <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Invite people</span>
+                                </button>
+                            </div>
+                            <div role="presentation" style="height: 18px;"></div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__section_heading">
+                                    <button
+                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                                        type="button">Apps</button>
+                                    <div class="p-channel_sidebar__section_heading_right">
+                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                                            <i class="im im-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="presentation" style="height: 18px;"></div>
+                            <div role="listitem" style="height: 26px;">
+                                <div class="p-channel_sidebar__close_container">
+                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
+                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
+                                            <i class="im im-radio-button-circle active"></i>Valera</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="client_main_container">
+            <header id="client_header">
+                <div class="channel_header">
+                    <div class="messages_header">
+                        <div class="channel_title">
+                            <div id="channel_name_container" class="channel_name_container">
+                                <span id="channel_name" class="channel_name" data-qa="channel_name">
+                                    <button type="button" id="channel_title" class="btn_unstyle">#general</button>
+                                </span>
+                                <div class="channel_actions_container">
+                                    <div id="mute_container"></div>
+                                </div>
+                            </div>
+                            <div id="channel_header_info" class="channel_header_info">
+                                <div id="star_container" class="channel_header_info_item">
+                                    <button type="button" class="btn_unstyle">
+                                        <i class="im im-star-o"></i>
+                                    </button>
+                                </div>
+                                <div class="channel_header_info_item">
+                                    <button type="button" id="channel_members_toggle_count"
+                                        class="btn_unstyle blue_on_hover">
+                                        <i class="im im-user-male"></i>
+                                        <span id="channel_members_toggle_count_count">1</span>
+                                    </button>
+                                </div>
+                                <div class="channel_header_info_item pin">
+                                    <button type="button" id="channel_members_toggle_count" class="btn_unstyle blue_on_hover">
+                                        <i class="im im-pin"></i>
+                                        <span id="channel_members_toggle_count_count">0</span>
+                                    </button>
+                                </div>
+                                <div class="channel_header_info_item channel_topic_container">
+                                    <span id="edit_topic_container" class="channel_topic" tabindex="0" role="button">
+                                        <span id="edit_topic_inner">
+                                            <span id="channel_topic_text" class="no_jumbomoji">
+                                                Company-wide announcements and work-based matters
+                                            </span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="channel_header_drag_region">
+                        </div>
+                        <div class="channel_title_info">
+                        </div>
+                    </div>
+                    <div class="flex_header">
+                        <div id="search_container">
+                        </div>
+                        <div class="channel_header__buttons">
+                            <button type="button" id="recent_mentions_toggle"
+                                class="channel_header_icon btn_unstyle">
+                                <i class="im im-link"></i>
+                            </button>
+                            <button type="button" id="stars_toggle"
+                                class="channel_header_icon btn_unstyle">
+                                <i class="im im-star-o"></i>
+                            </button>
+                            <button type="button" id="flex_menu_toggle"
+                                class="channel_header_icon btn_unstyle">
+                                <i class="im im-menu-dot-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>   
+            </header>
+            <div id="client_body"></div>
+        </div>
+    </div>
+</div>

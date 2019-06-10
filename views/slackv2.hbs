@@ -1140,6 +1140,8 @@ button.btn, input[type=submit].btn {
     flex: 1;
     display: flex;
     outline: 0;
+    margin-top: 18px;
+    flex-direction: column;
 }
 
 #message_edit_form .ql-editor, #message_edit_form .ql-placeholder, #msg_form .ql-editor, #msg_form .ql-placeholder {
@@ -1248,6 +1250,148 @@ code, pre {
     width: calc(100% - 78px);
     border: none;
     padding: 0 15px;
+}
+
+.c-message {
+    font-size: 15px;
+}
+.c-message--light {
+    padding: 6px 0;
+}
+.c-message {
+    padding-right: 26px;
+    min-width: 1px;
+    position: relative;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+.c-message--light .c-message__gutter, .c-message--light .c-message__label__gutter {
+    width: 70px;
+    padding-right: 8px;
+}
+
+.c-message__gutter, .c-message__label__gutter {
+    float: left;
+    text-align: right;
+}
+
+.c-message__avatar {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.c-avatar--interactive {
+    cursor: pointer;
+}
+.c-avatar {
+    position: relative;
+    display: inline-block;
+    cursor: default;
+}
+
+.c-avatar__emoji, .c-avatar__image {
+    border-radius: 3px;
+    display: block;
+    height: 100%!important;
+    width: 100%!important;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+    border: 0;
+    -ms-interpolation-mode: bicubic;
+}
+
+.c-message--light .c-message__content {
+    margin-top: -9px;
+    margin-left: 70px;
+}
+.c-message__content {
+    margin-right: 20px;
+    min-width: 1px;
+}
+
+.c-message--light .c-message__content:before {
+    content: "";
+    display: block;
+    padding-top: 1px;
+}
+
+.c-message--light .c-message__content_header {
+    margin: 9px 0 -5px;
+}
+.c-message--light .c-message__content_header {
+    line-height: 1;
+}
+
+.c-message__sender {
+    color: #1d1c1d;
+    font-weight: 900;
+    word-break: break-word;
+}
+
+.c-message--light .c-message__sender .c-message__sender_link {
+    color: #1d1c1d;
+}
+
+.c-timestamp--static, .c-timestamp--static:hover, .c-timestamp--static:link {
+    text-decoration: none;
+    cursor: default;
+}
+.c-timestamp, .c-timestamp:hover, .c-timestamp:link {
+    color: #616061;
+}
+
+.c-timestamp {
+    font-size: 12px;
+}
+
+.c-message__body {
+    line-height: 1.46668;
+    margin: 8px 0 -4px;
+    text-align: left;
+    display: inline-block;
+    width: 100%;
+    color: #1d1c1d;
+    word-wrap: break-word;
+}
+
+.c-message {
+    font-size: 15px;
+    padding-right: 26px;
+    min-width: 1px;
+    position: relative;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+.list__item {
+    width: 100%;
+}
+
+.margin_left_25 {
+    margin-left: 4px;
+}
+
+.c-app_badge, .c-app_label {
+    border-radius: 2px;
+    font-size: 10px;
+    padding: 1px 3px;
+    color: rgba(29,28,29,.7);
+    background-color: rgba(29,28,29,.13);
+    display: inline-block;
+    height: 14px;
+    line-height: 1.25;
+    font-weight: 700;
+    vertical-align: .125rem;
 }
 
 </style>
@@ -1457,7 +1601,137 @@ code, pre {
             </header>
             <div id="client_body">
                 <div id="col_messages">
-                    <div id="messages_container"></div>
+                    <div id="messages_container">
+                        <div class="list__item">
+                            <div class="c-message c-message--light">
+                                <div class="c-message__gutter">
+                                    <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+                                        class="c-link c-message__avatar c-avatar c-avatar--interactive" 
+                                        href="/team/U12345678"
+                                        style="height: 36px; line-height: 36px; width: 36px;">
+                                        <img class="c-avatar__image"
+                                            src="/images/slack_user.png" alt="">
+                                    </a>
+                                </div>
+                                <div class="c-message__content">
+                                    <div class="c-message__content_header">
+                                        <span class="c-message__sender">
+                                            <a target="_blank" 
+                                                rel="noopener noreferrer" 
+                                                class="c-link c-message__sender_link" 
+                                                href="/team/U12345678">
+                                                Valera Petrov
+                                            </a>
+                                            <span class="margin_left_25">
+                                                <span class="c-app_badge">
+                                                    APP
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <a class="c-link c-timestamp c-timestamp--static" href="#">
+                                            <span class="c-timestamp__label">2:00 PM</span>
+                                        </a>
+                                    </div>
+                                    <span class="c-message__body" dir="auto">Lorem ipsum dolor sit amet, at vivendo lobortis nec. His in sale menandri petentium, mea tollit mentitum eu, autem
+                                    ignota pro no. Eu mea prima ceteros, diceret facilis pericula ne eam. At has lorem mentitum. Ne ullum aeterno vel. Te
+                                    commodo laoreet nominati sit.
+                                    
+                                    Eius iriure ad cum. Mea ad quis delectus officiis, his sint laboramus ne. An doming docendi omittantur has. Congue
+                                    deseruisse at vix. Id commune consulatu molestiae vis, vix tollit commune ad.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list__item">
+                            <div class="c-message c-message--light">
+                                <div class="c-message__gutter">
+                                    <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+                                        class="c-link c-message__avatar c-avatar c-avatar--interactive" href="/team/U12345678"
+                                        style="height: 36px; line-height: 36px; width: 36px;">
+                                        <img class="c-avatar__image" src="/images/slack_user.png" alt="">
+                                    </a>
+                                </div>
+                                <div class="c-message__content">
+                                    <div class="c-message__content_header">
+                                        <span class="c-message__sender">
+                                            <a target="_blank" rel="noopener noreferrer" class="c-link c-message__sender_link"
+                                                href="/team/U12345678">
+                                                Valera Petrov
+                                            </a>
+                                            <span class="margin_left_25">
+                                                <span class="c-app_badge">
+                                                    APP
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <a class="c-link c-timestamp c-timestamp--static" href="#">
+                                            <span class="c-timestamp__label">2:00 PM</span>
+                                        </a>
+                                    </div>
+                                    <span class="c-message__body" dir="auto">A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list__item">
+                            <div class="c-message c-message--light">
+                                <div class="c-message__gutter">
+                                    <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+                                        class="c-link c-message__avatar c-avatar c-avatar--interactive" href="/team/U12345678"
+                                        style="height: 36px; line-height: 36px; width: 36px;">
+                                        <img class="c-avatar__image" src="/images/slack_user.png" alt="">
+                                    </a>
+                                </div>
+                                <div class="c-message__content">
+                                    <div class="c-message__content_header">
+                                        <span class="c-message__sender">
+                                            <a target="_blank" rel="noopener noreferrer" class="c-link c-message__sender_link"
+                                                href="/team/U12345678">
+                                                Valera Petrov
+                                            </a>
+                                            <span class="margin_left_25">
+                                                <span class="c-app_badge">
+                                                    APP
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <a class="c-link c-timestamp c-timestamp--static" href="#">
+                                            <span class="c-timestamp__label">2:00 PM</span>
+                                        </a>
+                                    </div>
+                                    <span class="c-message__body" dir="auto">A robot must obey the orders given it by human beings except where such orders would conflict with the First Law</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list__item">
+                            <div class="c-message c-message--light">
+                                <div class="c-message__gutter">
+                                    <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+                                        class="c-link c-message__avatar c-avatar c-avatar--interactive" href="/team/U12345678"
+                                        style="height: 36px; line-height: 36px; width: 36px;">
+                                        <img class="c-avatar__image" src="/images/slack_user.png" alt="">
+                                    </a>
+                                </div>
+                                <div class="c-message__content">
+                                    <div class="c-message__content_header">
+                                        <span class="c-message__sender">
+                                            <a target="_blank" rel="noopener noreferrer" class="c-link c-message__sender_link"
+                                                href="/team/U12345678">
+                                                Valera Petrov
+                                            </a>
+                                            <span class="margin_left_25">
+                                                <span class="c-app_badge">
+                                                    APP
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <a class="c-link c-timestamp c-timestamp--static" href="#">
+                                            <span class="c-timestamp__label">2:00 PM</span>
+                                        </a>
+                                    </div>
+                                    <span class="c-message__body" dir="auto">A robot may not injure a human being or, through inaction, allow a human being to come to harm.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div id="footer">
                         <div id="footer_msgs">
                             <form id="msg_form" class="offline" onsubmit="return false;">

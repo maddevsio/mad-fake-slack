@@ -1,0 +1,64 @@
+[
+    {
+        "id": "C12345678",
+        "name": "random",
+        "is_channel": true,
+        "created": 1449709280,
+        "creator": "W12345678",
+        "is_archived": false,
+        "is_general": false,
+        "name_normalized": "random",
+        "is_shared": false,
+        "is_org_shared": false,
+        "is_member": true,
+        "is_private": false,
+        "is_mpim": false,
+        "members": [
+            "W12345678",
+            "W12345679"
+        ],
+        "topic": {
+            "value": "Other stuff",
+            "creator": "W12345678",
+            "last_set": 1449709352
+        },
+        "purpose": {
+            "value": "A place for non-work-related flimflam, faffing, hodge-podge or jibber-jabber you'd prefer to keep out of more focused work-related channels.",
+            "creator": "",
+            "last_set": 0
+        },
+        "previous_names": [],
+        "num_members": 2
+    },
+    {
+        "id": "C12345679",
+        "name": "general",
+        "is_channel": true,
+        "created": 1449709280,
+        "creator": "W12345678",
+        "is_archived": false,
+        "is_general": true,
+        "name_normalized": "general",
+        "is_shared": false,
+        "is_org_shared": false,
+        "is_member": true,
+        "is_private": false,
+        "is_mpim": false,
+        "members":[
+            "W12345678",
+            "W12345679"
+        ],
+        "topic": {
+            "value": "Talk about anything!",
+            "creator": "W12345678",
+            "last_set": 1449709364
+        },
+        "purpose": {
+            "value": "To talk about anything!",
+            "creator": "W12345678",
+            "last_set": 1449709334
+        },
+        "previous_names": [],
+        "num_members": 2
+    }
+]

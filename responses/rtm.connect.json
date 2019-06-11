@@ -1,13 +1,13 @@
 {
     "ok": true,
     "self": {
-        "id": "U4X318ZMZ",
-        "name": "robotoverlord"
+        "id": "W12345678",
+        "name": "valera.petrov"
     },
     "team": {
-        "domain": "slackdemo",
-        "id": "T2U81E2FP",
-        "name": "SlackDemo"
+        "domain": "botfactory",
+        "id": "T12345678",
+        "name": "BotFactory"
     },
     "url": "ws://localhost:9001/ws"
 }

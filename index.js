@@ -1,5 +1,7 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
+const db = require("./db");
+
 const app = express();
 require("express-ws")(app);
 
@@ -7,16 +9,21 @@ const responses = require("./responses");
 const port = 9001;
 const OPEN = 1;
 
-const slackChannels = require("./responses/channels.list.json")
-  .channels.map(ch => ({ key: ch.id, value: ch.name }));
+const slackChannels = db.channels;
+const slackTeam = db.teams[0];
+const slackUsers = db.users;
+const slackUser = db.users[0];
 
 function copyObject (obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
 app.use(express.static("public"));
+app.use("/assets", express.static("node_modules"));
+
 app.engine(".hbs", exphbs({
-  extname: ".hbs"
+  extname: ".hbs",
+  helpers: require("./helpers.js")
 }));
 app.set("view engine", ".hbs");
 
@@ -111,7 +118,13 @@ async function requestTime (req, res, next) {
 app.use(requestTime);
 
 app.get("/", (req, res) => {
-  res.render("slackv2", { slackChannels });
+  res.render("slackv2", {
+    channels: slackChannels,
+    users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
+    bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
+    team: slackTeam,
+    me: slackUser
+  });
 });
 
 app.post("/api/auth.test", (req, res) => console.warn("auth.test") || res.json(responses["auth.test"]));

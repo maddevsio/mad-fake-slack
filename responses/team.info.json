@@ -1,0 +1,20 @@
+{
+    "ok": true,
+    "team": {
+        "id": "T12345678",
+        "name": "BotFactory",
+        "domain": "example",
+        "email_domain": "example.com",
+        "icon": {
+            "image_34": "/images/slack_user.png",
+            "image_44": "/images/slack_user.png",
+            "image_68": "/images/slack_user.png",
+            "image_88": "/images/slack_user.png",
+            "image_102": "/images/slack_user.png",
+            "image_132": "/images/slack_user.png",
+            "image_default": true
+        },
+        "enterprise_id": "E123456789",
+        "enterprise_name": "Umbrella Corporation"
+    }
+}

@@ -1,8 +1,8 @@
 {
     "ok": true,
     "url": "http://localhost:9001/",
-    "team": "Test workspace Workspace",
-    "user": "valera",
+    "team": "BotFactory",
+    "user": "valera.petrov",
     "team_id": "T12345678",
     "user_id": "W12345678"
 }

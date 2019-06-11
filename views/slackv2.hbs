@@ -1403,7 +1403,7 @@ img {
                     <button class="team_name_caret btn_unstyle">
                         <i class="im im-care-down"></i>
                     </button>
-                    <span id="team_name" class="overflow_ellipsis">BotFactory</span>
+                    <span id="team_name" class="overflow_ellipsis">{{team.name}}</span>
                 </div>
                 <span class="notifications_menu_btn" data-reactroot="">
                     <button class="c-button-unstyled p-dnd_button" type="button">
@@ -1414,14 +1414,7 @@ img {
                     <div id="presence_container" class="no_wrap ts_tip ts_tip_bottom ts_tip_left">
                         <i id="presence" class="im im-radio-button-circle active"></i>
                     </div>
-                    <span id="team_menu_user_details"><span id="team_menu_user_name" class="overflow_ellipsis current_user_name">Valera Petrov</span>
-                        <span class="current_status hidden current_status_with_expiration current_user_current_status ts_tip_float">            
-                            <span class="ts_tip_tip ts_tip_inner_current_status">
-                                <span class="ts_tip_multiline_inner">
-                                </span>
-                            </span>
-                        </span>
-                    </span>
+                    {{> mehref me=me}}
                 </div>
             </div>
             <div id="col_channels" class="channels_list_holder no_unread_msgs_badges default_sort">
@@ -1447,21 +1440,9 @@ img {
                                     </div>
                                 </div>
                             </div>
-                            <div role="listitem" style="height: 26px;">
-                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
-                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                        <i class="im im-hashtag"></i>bots</span></a>
-                            </div>
-                            <div role="listitem" style="height: 26px;">
-                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
-                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                        <i class="im im-hashtag"></i>general</span></a>
-                            </div>
-                            <div role="listitem" style="height: 26px;">
-                                <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--selected"
-                                    href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                        <i class="im im-hashtag"></i>random</span></a>
-                            </div>
+                            {{#each channels as |channel|}}
+                                {{> channel href=channel.id name=channel.name}}
+                            {{/each}}
                             <div role="presentation" style="height: 18px;"></div>
                             <div role="listitem" style="height: 26px;">
                                 <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim" type="button">
@@ -1481,21 +1462,9 @@ img {
                                     </div>
                                 </div>
                             </div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__close_container">
-                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
-                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                            <i class="im im-heart active"></i>SlackBot</span></a>
-                                </div>
-                            </div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__close_container">
-                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
-                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                        <i class="im im-radio-button-circle active"></i>Valera Petrov</span>
-                                    </a>
-                                </div> 
-                            </div>
+                            {{#each users as |user|}}
+                                {{> directuser user=user}}
+                            {{/each}}   
                             <div role="presentation" style="height: 18px;"></div>
                             <div role="listitem" style="height: 26px;">
                                 <button
@@ -1518,14 +1487,9 @@ img {
                                 </div>
                             </div>
                             <div role="presentation" style="height: 18px;"></div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__close_container">
-                                    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
-                                        href="https://localhost:9001/messages/C12345678"><span class="p-channel_sidebar__name">
-                                            <i class="im im-radio-button-circle active"></i>Valera</span>
-                                    </a>
-                                </div>
-                            </div>
+                            {{#each bots as |bot|}}
+                                {{> appitem bot=bot}}
+                            {{/each}}
                         </div>
                     </nav>
                 </div>
@@ -1790,3 +1754,15 @@ img {
         </div>
     </div>
 </div>
+<script src="/assets/handlebars/dist/handlebars.min.js"></script>
+<script>
+    const channels = {{{json channels}}};
+    {{!-- const slackTeam = {{{slackTeam}}}
+    function setTeamInfo(team) {
+        globalThis.team_name.textContent = team.name;
+    }
+    function createChannel(name) {
+        const html = `{{> channel href="http://localhost:9001" name="lalalalal"}}`;
+    }
+    setTeamInfo(slackTeam); --}}
+</script>

@@ -516,9 +516,6 @@ article, aside, details, figcaption, figure, footer, header, hgroup, nav, sectio
 .channel_title .channel_name {
     line-height: 1.3;
     font-size: 18px;
-}
-
-.channel_title .channel_name {
     display: flex;
     min-width: 1px;
     -webkit-user-select: text;
@@ -1414,6 +1411,44 @@ img {
     color: white;
 }
 
+.channel_header .channel_header__tabs {
+    display: flex;
+    align-items: flex-end;
+    margin: 0 0 0 1.3rem;
+    position: absolute;
+    top: 24px;
+}
+
+.channel_header .channel_header__tabs .channel_header__tab.--active {
+    color: #1d1c1d;
+    position: relative;
+}
+.channel_header .channel_header__tabs .channel_header__tab {
+    color: #616061;
+    font-size: 14px;
+    height: 36px;
+    margin-right: 1rem;
+}
+
+.channel_header .channel_header__tabs .channel_header__tab.--active::after {
+    border-bottom: 1px solid #616061;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.star_app .im {
+    font-size: 16px;
+}
+
+.channel_header_info.stripped {
+    margin-top: 0;
+    padding-left: 0;
+}
+
 </style>
 <div id="client-ui">
     <div class="client_container">
@@ -1507,8 +1542,8 @@ img {
                                 </div>
                             </div>
                             <div role="presentation" style="height: 18px;"></div>
-                            {{#each bots as |bot|}}
-                                {{> appitem bot=bot}}
+                            {{#each bots as |app|}}
+                                {{> appitem app=app selectedApp=@root.selectedApp}}
                             {{/each}}
                         </div>
                     </nav>
@@ -1524,6 +1559,9 @@ img {
                         {{/if}}
                         {{#if selectedUser}}
                             {{> userchannelheader user=selectedUser me=me}}
+                        {{/if}}
+                        {{#if selectedApp}}
+                            {{> appitemheader app=selectedApp}}
                         {{/if}}
                         <div class="channel_header_drag_region">
                         </div>

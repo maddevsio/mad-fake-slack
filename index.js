@@ -117,8 +117,24 @@ async function requestTime (req, res, next) {
 
 app.use(requestTime);
 
+const MAIN_PAGE = "slackv2";
+
 app.get("/", (req, res) => {
-  res.render("slackv2", {
+  const selectedChannel = db.channels.filter(ch => ch.name === "general")[0];
+  res.render(MAIN_PAGE, {
+    selectedChannel,
+    channels: slackChannels,
+    users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
+    bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
+    team: slackTeam,
+    me: slackUser
+  });
+});
+
+app.get("/messages/:channel", (req, res) => {
+  const selectedChannel = db.channels.filter(ch => ch.id === req.params.channel)[0];
+  res.render(MAIN_PAGE, {
+    selectedChannel,
     channels: slackChannels,
     users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
     bots: slackUsers.filter(su => su.is_bot || su.is_app_user),

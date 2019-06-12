@@ -1,13 +1,13 @@
 <div role="listitem" style="height: 26px;">
     <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im"
-            href="http://localhost:9001/messages/{{bot.id}}">
+        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#ifeq app.id selectedApp.id}}p-channel_sidebar__channel--selected{{/ifeq}}"
+            href="http://localhost:9001/messages/{{app.id}}">
             <span class="p-channel_sidebar__name">
                 <i class="im im-radio-button-circle active"></i>
-                {{#ifeq bot.is_app_user true}}
-                    {{bot.real_name}}
+                {{#ifeq app.is_app_user true}}
+                    {{app.real_name}}
                 {{else}}
-                    {{bot.name}}
+                    {{app.name}}
                 {{/ifeq}}
             </span>
         </a>

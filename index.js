@@ -123,6 +123,7 @@ app.get("/", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.name === "general")[0];
   res.render(MAIN_PAGE, {
     selectedChannel,
+    selectedUser: null,
     channels: slackChannels,
     users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
     bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
@@ -131,10 +132,12 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/messages/:channel", (req, res) => {
-  const selectedChannel = db.channels.filter(ch => ch.id === req.params.channel)[0];
+app.get("/messages/:id", (req, res) => {
+  const selectedChannel = db.channels.filter(ch => ch.id === req.params.id);
+  const selectedUser = db.users.filter(ch => ch.id === req.params.id);
   res.render(MAIN_PAGE, {
-    selectedChannel,
+    selectedChannel: selectedChannel.length && selectedChannel[0],
+    selectedUser: selectedUser.length && selectedUser[0],
     channels: slackChannels,
     users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
     bots: slackUsers.filter(su => su.is_bot || su.is_app_user),

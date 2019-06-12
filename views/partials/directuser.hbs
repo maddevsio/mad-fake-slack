@@ -1,7 +1,7 @@
 {{#ifeq user.id "USLACKBOT"}}
 <div role="listitem" style="height: 26px;">
     <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
+        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im"
             href="https://localhost:9001/messages/{{user.id}}">
             <span class="p-channel_sidebar__name">
                 <i class="im im-heart active"></i>
@@ -13,7 +13,7 @@
 {{else}}
 <div role="listitem" style="height: 26px;">
     <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im p-channel_sidebar__channel--selected"
+        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im"
             href="https://localhost:9001/messages/{{user.id}}">
             <span class="p-channel_sidebar__name">
                 <i class="im im-radio-button-circle active"></i>

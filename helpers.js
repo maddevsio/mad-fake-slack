@@ -15,5 +15,8 @@ module.exports = {
     } else {
       return options.inverse(this);
     }
+  },
+  "concat": function (...args) {
+    return args.slice(0, -1).join("");
   }
 };

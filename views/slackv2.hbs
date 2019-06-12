@@ -1398,6 +1398,22 @@ img {
     background: #1164A3;
 }
 
+.channel_header_member_status .im {
+    font-size: 9px;
+    margin-right: 3px;
+}
+
+.normal {
+    font-weight: 400;
+}
+.subtle_silver {
+    color: #616061!important;
+}
+
+.p-channel_sidebar__channel--selected, .p-channel_sidebar__channel--selected .im {
+    color: white;
+}
+
 </style>
 <div id="client-ui">
     <div class="client_container">
@@ -1467,7 +1483,7 @@ img {
                                 </div>
                             </div>
                             {{#each users as |user|}}
-                                {{> directuser user=user}}
+                                {{> directuser user=user selectedUser=@root.selectedUser}}
                             {{/each}}   
                             <div role="presentation" style="height: 18px;"></div>
                             <div role="listitem" style="height: 26px;">
@@ -1503,7 +1519,12 @@ img {
             <header id="client_header">
                 <div class="channel_header">
                     <div class="messages_header">
-                        {{> channelheader channel=selectedChannel}}
+                        {{#if selectedChannel}}
+                            {{> channelheader channel=selectedChannel}}
+                        {{/if}}
+                        {{#if selectedUser}}
+                            {{> userchannelheader user=selectedUser me=me}}
+                        {{/if}}
                         <div class="channel_header_drag_region">
                         </div>
                         <div class="channel_title_info">

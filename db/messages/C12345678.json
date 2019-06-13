@@ -1,0 +1,29 @@
+{
+    "meta": {
+        "last_id": 4
+    },
+    "1560402102.000001": {
+        "type": "message",
+        "user_id": "W12345678",
+        "text": "Lorem ipsum dolor sit amet, at vivendo lobortis nec. His in sale menandri petentium, mea tollit mentitum eu, autem ignota pro no. Eu mea prima ceteros, diceret facilis pericula ne eam. At has lorem mentitum. Ne ullum aeterno vel. Te commodo laoreet nominati sit. Eius iriure ad cum. Mea ad quis delectus officiis, his sint laboramus ne. An doming docendi omittantur has. Congue deseruisse at vix. Id commune consulatu molestiae vis, vix tollit commune ad",
+        "ts": "1560402102.000001"
+    },
+    "1560402103.000002": {
+        "type": "message",
+        "user_id": "W12345679",
+        "text": "A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws.",
+        "ts": "1560402103.000002"
+    },
+    "1560402106.000003": {
+        "type": "message",
+        "user_id": "W12345679",
+        "text": "A robot must obey the orders given it by human beings except where such orders would conflict with the First Law",
+        "ts": "1560402106.000003"
+    },
+    "1560402110.000004": {
+        "type": "message",
+        "user_id": "W12345679",
+        "text": "A robot may not injure a human being or, through inaction, allow a human being to come to harm.",
+        "ts": "1560402110.000004"
+    }
+}

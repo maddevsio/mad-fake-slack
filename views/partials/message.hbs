@@ -1,0 +1,34 @@
+<div class="list__item">
+    <div class="c-message c-message--light">
+        <div class="c-message__gutter">
+            <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+                class="c-link c-message__avatar c-avatar c-avatar--interactive" href="/team/{{message.team.id}}"
+                style="height: 36px; line-height: 36px; width: 36px;">
+                <img class="c-avatar__image" src="{{message.user.profile.image_original}}" alt="">
+            </a>
+        </div>
+        <div class="c-message__content">
+            <div class="c-message__content_header">
+                <span class="c-message__sender">
+                    <a target="_blank" rel="noopener noreferrer" class="c-link c-message__sender_link"
+                        href="/team/{{message.team.id}}">
+                        {{message.user.real_name}}
+                    </a>
+                    {{#if (or (eq message.user.is_bot true) (eq message.user.is_app_user true))}}
+                    <span class="margin_left_25">
+                        <span class="c-app_badge">
+                            APP
+                        </span>
+                    </span>
+                    {{/if}}
+                </span>
+                <a class="c-link c-timestamp c-timestamp--static" href="#">
+                    <span class="c-timestamp__label">{{toHumanTime message.ts}}</span>
+                </a>
+            </div>
+            <span class="c-message__body" dir="auto">
+                {{message.text}}
+            </span>
+        </div>
+    </div>
+</div>

@@ -16,7 +16,7 @@ modules["manager"] = {
       messages (total) {
         return Object
           .values(modules.messages[channelId])
-          .slice(1, Number.isInteger(total) ? total + 1 : total).map(m => {
+          .slice(1).slice(Number.isInteger(total) ? -total : total).map(m => {
             const user = modules.users.filter(u => u.id === m.user_id)[0];
             const team = modules.teams.filter(t => t.id === user.team_id)[0];
             return {

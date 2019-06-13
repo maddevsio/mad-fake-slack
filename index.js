@@ -121,6 +121,7 @@ const MAIN_PAGE = "slackv2";
 
 app.get("/", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.name === "general")[0];
+  const messages = db.manager.channel(selectedChannel.id).messages(10);
   res.render(MAIN_PAGE, {
     selectedChannel,
     selectedUser: null,
@@ -129,7 +130,8 @@ app.get("/", (req, res) => {
     users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
     bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
     team: slackTeam,
-    me: slackUser
+    me: slackUser,
+    messages
   });
 });
 
@@ -137,6 +139,7 @@ app.get("/messages/:id", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.id === req.params.id);
   const selectedUser = db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
   const selectedApp = db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
+  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(10)) || [];
   res.render(MAIN_PAGE, {
     selectedChannel: selectedChannel.length && selectedChannel[0],
     selectedUser: selectedUser.length && selectedUser[0],
@@ -145,7 +148,8 @@ app.get("/messages/:id", (req, res) => {
     users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
     bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
     team: slackTeam,
-    me: slackUser
+    me: slackUser,
+    messages
   });
 });
 

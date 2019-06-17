@@ -8,11 +8,26 @@ require("fs").readdirSync(__dirname).forEach(function (file) {
   }
 });
 
+function createTs (id) {
+  return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, "0")}`;
+}
+
 const messages = require("./messages");
 modules["messages"] = messages;
 modules["manager"] = {
   channel (channelId) {
     return {
+      createMessage (userId, message) {
+        const messages = modules.messages[channelId];
+        messages.meta.last_id += 1;
+        const id = createTs(messages.meta.last_id);
+        messages[id] = {
+          type: "message",
+          user_id: userId,
+          text: message.text,
+          ts: id
+        };
+      },
       messages (total) {
         return Object
           .values(modules.messages[channelId])

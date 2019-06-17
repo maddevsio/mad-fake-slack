@@ -14,10 +14,22 @@ function createTs (id) {
 
 const messages = require("./messages");
 modules["messages"] = messages;
+
+function initMessages (channelId) {
+  if (!modules.messages[channelId]) {
+    modules.messages[channelId] = {
+      meta: {
+        last_id: 0
+      }
+    };
+  }
+}
+
 modules["manager"] = {
   channel (channelId) {
     return {
       createMessage (userId, message) {
+        initMessages(channelId);
         const messages = modules.messages[channelId];
         messages.meta.last_id += 1;
         const id = createTs(messages.meta.last_id);
@@ -30,6 +42,7 @@ modules["manager"] = {
         return messages[id];
       },
       messages (total) {
+        initMessages(channelId);
         return Object
           .values(modules.messages[channelId])
           .slice(1).slice(Number.isInteger(total) ? -total : total).map(m => {

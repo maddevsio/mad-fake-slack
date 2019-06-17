@@ -1,5 +1,26 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "/tmp/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now()}`);
+  }
+});
+
+function isUrlEncodedForm (req) {
+  return req.headers["content-type"] === ("application/x-www-form-urlencoded");
+}
+
+function isMultipartForm (req) {
+  return req.headers["content-type"].startsWith("multipart/form-data");
+}
+
+const upload = multer({ storage });
+
 const db = require("./db");
 
 const app = express();
@@ -27,7 +48,15 @@ app.engine(".hbs", exphbs({
 }));
 app.set("view engine", ".hbs");
 
-app.use("/api/*", express.json());
+app.use("/api/*", (req, res, next) => {
+  if (isUrlEncodedForm(req)) {
+    express.urlencoded(req, res, next);
+  } else if (isMultipartForm(req)) {
+    upload.none()(req, res, next);
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 const slackWss = new Set();
 const slackBots = new Set();
@@ -118,10 +147,11 @@ async function requestTime (req, res, next) {
 app.use(requestTime);
 
 const MAIN_PAGE = "slackv2";
+const MESSAGES_MAX_COUNT = 100;
 
 app.get("/", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.name === "general")[0];
-  const messages = db.manager.channel(selectedChannel.id).messages(10);
+  const messages = db.manager.channel(selectedChannel.id).messages(MESSAGES_MAX_COUNT);
   res.render(MAIN_PAGE, {
     selectedChannel,
     selectedUser: null,
@@ -139,7 +169,7 @@ app.get("/messages/:id", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.id === req.params.id);
   const selectedUser = db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
   const selectedApp = db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
-  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(10)) || [];
+  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT)) || [];
   res.render(MAIN_PAGE, {
     selectedChannel: selectedChannel.length && selectedChannel[0],
     selectedUser: selectedUser.length && selectedUser[0],
@@ -156,13 +186,19 @@ app.get("/messages/:id", (req, res) => {
 app.post("/api/auth.test", (req, res) => console.warn("auth.test") || res.json(responses["auth.test"]));
 
 app.post("/api/chat.postMessage", async (req, res) => {
-  const response = copyObject(responses["chat.postMessage"]);
-  response.message = {
-    ...response.message,
-    ...req.body
-  };
-  broadcast(JSON.stringify(req.body));
-  res.json(response);
+  if (isUrlEncodedForm(req) || isMultipartForm(req)) {
+    db.manager.channel(req.body.channel).createMessage(slackUser.id, req.body);
+    const channelId = /^[CWD][A-Z0-9]{8}$/.exec(req.body.channel);
+    res.redirect(`/messages/${channelId}`);
+  } else {
+    const response = copyObject(responses["chat.postMessage"]);
+    response.message = {
+      ...response.message,
+      ...req.body
+    };
+    broadcast(JSON.stringify(req.body));
+    res.json(response);
+  }
 });
 
 app.post("/api/channels.list", (req, res) => res.json(responses["channels.list"]));

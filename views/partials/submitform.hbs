@@ -45,3 +45,12 @@
         Send
     </button>
 </form>
+<script>
+    const msgForm = window.msg_form;
+    msgForm.addEventListener('submit', (e) => {
+        const data = new FormData(e.target);
+        if (!data.get('text').trim()) {
+            e.preventDefault();
+        }
+    });
+</script>

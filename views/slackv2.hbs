@@ -145,55 +145,7 @@
                     </div>
                     <div id="footer">
                         <div id="footer_msgs">
-                            <form id="msg_form" class="offline" onsubmit="return false;">
-                                <div class="msg_input_wrapper">
-                                    <div id="msg_input" class="texty_legacy ql-container focus">
-                                        <div class="ql-editor ql-blank" dir="auto" spellcheck="true" autocorrect="off" autocomplete="off">
-                                            <p><input type="input" class="ql-input-msg" value="" placeholder="Type text here" /></p>
-                                        </div>
-                                        <div class="ql-clipboard" contenteditable="true" tabindex="-1" aria-hidden="true" role="presentation"
-                                            spellcheck="true" autocorrect="off" autocomplete="off">
-                                        </div>
-                                    </div>
-                                    <button type="button" id="primary_file_button" tabindex="2">
-                                        <i class="im im-plus"></i>
-                                    </button>
-                                    <input type="file" id="file_upload" class="offscreen" multiple="" tabindex="-1">
-                                        <button type="button" id="main_emo_menu" class="btn_unstyle emo_menu" tabindex="4">
-                                            <i class="im im-smiley-o ts-icon ts_icon_mentions"></i>
-                                        </button>
-                                        <button type="button" class="btn_unstyle msg_mentions_button" tabindex="3">
-                                            <i class="im im-link ts-icon ts_icon_mentions"></i>
-                                        </button>
-                                    <div id="msg_input_message">
-                                    </div>
-                                    <div>
-                                        <div id="notification_bar">
-                                            <div class="p-notification_bar p-notification_bar--legacy">
-                                                <div class="p-notification_bar__section p-notification_bar__section--left"></div>
-                                                <div class="p-notification_bar__section p-notification_bar__section--right">
-                                                    <span class="p-notification_bar__formatting" aria-hidden="true">
-                                                        <b>*bold*</b>
-                                                        <i>_italics_</i>
-                                                        ~strike~ 
-                                                        <code>`code`</code> 
-                                                        <code>```preformatted```</code>
-                                                        <span>&gt;quote</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button 
-                                    id="msg_input_send" 
-                                    type="button" 
-                                    class="btn msg_input_btn hidden" 
-                                    tabindex="1"
-                                    onclick="return false;" disabled="">
-                                    Send
-                                </button>
-                            </form>
+                            {{> submitform channel=selectedChannel}}
                         </div>
                     </div>
                 </div>
@@ -210,4 +162,10 @@
     const bots = {{{ json bots }}};
     const team = {{{ json team }}};
     const me = {{{ json me }}};
+
+    
+    const lastMessage = document.querySelector('.list__item:last-child');
+    if (lastMessage) {
+        lastMessage.scrollIntoView()
+    }
 </script>

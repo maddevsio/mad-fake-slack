@@ -1,4 +1,5 @@
 const moment = require("moment");
+let id = 0;
 
 module.exports = {
   "json": function (context) {
@@ -30,6 +31,10 @@ module.exports = {
   },
   or: function () {
     return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
+  },
+  makeTs: function () {
+    id += 1;
+    return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, "0")}`;
   },
   toHumanTime: function (timestamp, options) {
     const unixts = +timestamp.split(".")[0];

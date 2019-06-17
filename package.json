@@ -23,7 +23,9 @@
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
     "express-ws": "^4.0.0",
-    "handlebars": "^4.1.2"
+    "handlebars": "^4.1.2",
+    "moment": "^2.24.0",
+    "multer": "^1.4.1"
   },
   "devDependencies": {
     "@slack/rtm-api": "^5.0.1",

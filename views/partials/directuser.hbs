@@ -1,7 +1,7 @@
-{{#ifeq user.id "USLACKBOT"}}
+{{#if (eq user.id "USLACKBOT") }}
 <div role="listitem" style="height: 26px;">
     <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#ifeq user.id selectedUser.id}}p-channel_sidebar__channel--selected{{/ifeq}}"
+        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#if (eq user.id selectedUser.id) }}p-channel_sidebar__channel--selected{{/if}}"
             href="http://localhost:9001/messages/{{user.id}}">
             <span class="p-channel_sidebar__name">
                 <i class="im im-heart active"></i>
@@ -13,7 +13,7 @@
 {{else}}
 <div role="listitem" style="height: 26px;">
     <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#ifeq user.id selectedUser.id}}p-channel_sidebar__channel--selected{{/ifeq}}"
+        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#if (eq user.id selectedUser.id) }}p-channel_sidebar__channel--selected{{/if}}"
             href="http://localhost:9001/messages/{{user.id}}">
             <span class="p-channel_sidebar__name">
                 <i class="im im-radio-button-circle active"></i>
@@ -22,4 +22,4 @@
         </a>
     </div>
 </div>
-{{/ifeq}}
+{{/if}}

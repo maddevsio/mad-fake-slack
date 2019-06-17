@@ -169,7 +169,10 @@ app.get("/messages/:id", (req, res) => {
   const selectedChannel = db.channels.filter(ch => ch.id === req.params.id);
   const selectedUser = db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
   const selectedApp = db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
-  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT)) || [];
+  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT)) ||
+      (selectedUser.length && db.manager.channel(selectedUser[0].id).messages(MESSAGES_MAX_COUNT)) ||
+      (selectedApp.length && db.manager.channel(selectedApp[0].id).messages(MESSAGES_MAX_COUNT)) ||
+      [];
   res.render(MAIN_PAGE, {
     selectedChannel: selectedChannel.length && selectedChannel[0],
     selectedUser: selectedUser.length && selectedUser[0],
@@ -188,7 +191,7 @@ app.post("/api/auth.test", (req, res) => console.warn("auth.test") || res.json(r
 app.post("/api/chat.postMessage", async (req, res) => {
   if (isUrlEncodedForm(req) || isMultipartForm(req)) {
     db.manager.channel(req.body.channel).createMessage(slackUser.id, req.body);
-    const channelId = /^[CWD][A-Z0-9]{8}$/.exec(req.body.channel);
+    const channelId = /^[CWDU][A-Z0-9]{8}$/.exec(req.body.channel);
     res.redirect(`/messages/${channelId}`);
   } else {
     const response = copyObject(responses["chat.postMessage"]);

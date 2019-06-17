@@ -27,6 +27,7 @@ modules["manager"] = {
           text: message.text,
           ts: id
         };
+        return messages[id];
       },
       messages (total) {
         return Object

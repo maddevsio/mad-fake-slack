@@ -145,7 +145,16 @@
                     </div>
                     <div id="footer">
                         <div id="footer_msgs">
-                            {{> submitform channel=selectedChannel}}
+                            {{#if selectedChannel}}
+                                {{> submitform channel=selectedChannel}}
+                            {{else}}
+                                {{#if selectedUser}}
+                                    {{> submitform channel=selectedUser}}
+                                {{/if}}
+                                {{#if selectedApp}}
+                                    {{> submitform channel=selectedApp}}
+                                {{/if}}
+                            {{/if}}    
                         </div>
                     </div>
                 </div>

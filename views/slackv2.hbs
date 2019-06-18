@@ -162,6 +162,33 @@
         </div>
     </div>
 </div>
+<script name="appitem" type="text/x-handlebars-template">
+    {{{include "partials" "appitem"}}}
+</script>
+<script name="appitemheader" type="text/x-handlebars-template">
+    {{{include "partials" "appitemheader"}}}
+</script>
+<script name="channel" type="text/x-handlebars-template">
+    {{{include "partials" "channel"}}}
+</script>
+<script name="channelheader" type="text/x-handlebars-template">
+    {{{include "partials" "channelheader"}}}
+</script>
+<script name="directuser" type="text/x-handlebars-template">
+    {{{include "partials" "directuser"}}}
+</script>
+<script name="mehref" type="text/x-handlebars-template">
+    {{{include "partials" "mehref"}}}
+</script>
+<script name="message" type="text/x-handlebars-template">
+    {{{include "partials" "message"}}}
+</script>
+<script name="submitform" type="text/x-handlebars-template">
+    {{{include "partials" "submitform"}}}
+</script>
+<script name="userchannelheader" type="text/x-handlebars-template">
+    {{{include "partials" "userchannelheader"}}}
+</script>
 <script>
     const selectedChannel = {{{ json selectedChannel }}};
     const selectedUser = {{{ json selectedUser }}};
@@ -172,9 +199,22 @@
     const team = {{{ json team }}};
     const me = {{{ json me }}};
 
-    
-    const lastMessage = document.querySelector('.list__item:last-child');
-    if (lastMessage) {
-        lastMessage.scrollIntoView()
+    window.slack = {
+        scrollToLastMessage() {
+            const lastMessage = document.querySelector('.list__item:last-child');
+            if (lastMessage) {
+                lastMessage.scrollIntoView()
+            }
+        },
+        templates: {}
     }
+
+    const templates = Array.from(document.querySelectorAll('[type="text/x-handlebars-template"]'));
+    templates.forEach((el) => {
+        const templateSrc = el.innerHTML;
+        const templateName = el.getAttribute("name");
+        window.slack.templates[templateName] = Handlebars.compile(templateSrc);
+    });
+
+    window.slack.scrollToLastMessage();
 </script>

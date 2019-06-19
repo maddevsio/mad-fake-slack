@@ -190,31 +190,61 @@
     {{{include "partials" "userchannelheader"}}}
 </script>
 <script>
-    const selectedChannel = {{{ json selectedChannel }}};
-    const selectedUser = {{{ json selectedUser }}};
-    const selectedApp = {{{ json selectedApp }}};
-    const channels = {{{ json channels }}};
-    const users = {{{ json users }}};
-    const bots = {{{ json bots }}};
-    const team = {{{ json team }}};
-    const me = {{{ json me }}};
+    Handlebars.context = {
+        selectedChannel: {{{ json selectedChannel }}},
+        selectedUser: {{{ json selectedUser }}},
+        selectedApp: {{{ json selectedApp }}},
+        channels: {{{ json channels }}},
+        users: {{{ json users }}},
+        bots: {{{ json bots }}},
+        team: {{{ json team }}},
+        me: {{{ json me }}}
+    };
 
-    window.slack = {
+    Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
+        const html = Handlebars.templates[templateName](context)
+        containerEl.insertAdjacentHTML(options.position, html);
+    }
+
+    Handlebars.userUtils = {
         scrollToLastMessage() {
             const lastMessage = document.querySelector('.list__item:last-child');
             if (lastMessage) {
                 lastMessage.scrollIntoView()
             }
         },
-        templates: {}
-    }
+        cleanEventListeners(el) {
+            for (let eventType in getEventListeners(el)) {
+                getEventListeners(el)[eventType].forEach(
+                    function (o) { el.removeEventListener(eventType, o.listener) }
+                )
+            }
+        },
+        clone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        },
+        async postJson(url, data) {
+            const rawResponse = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const content = await rawResponse.json();
+            return content;
+        }
+    };
 
     const templates = Array.from(document.querySelectorAll('[type="text/x-handlebars-template"]'));
+    Handlebars.templates = Handlebars.templates || {};
     templates.forEach((el) => {
         const templateSrc = el.innerHTML;
         const templateName = el.getAttribute("name");
-        window.slack.templates[templateName] = Handlebars.compile(templateSrc);
+        Handlebars.registerPartial(templateName, templateSrc);
+        Handlebars.templates[templateName] = Handlebars.compile(templateSrc);
     });
 
-    window.slack.scrollToLastMessage();
+    Handlebars.userUtils.scrollToLastMessage();
 </script>

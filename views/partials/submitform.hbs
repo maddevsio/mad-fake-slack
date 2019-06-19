@@ -4,8 +4,21 @@
         <input type="hidden" name="type" value="message">
         <input type="hidden" name="ts" value="{{makeTs}}">
         <div id="msg_input" class="texty_legacy ql-container focus">
-            <div class="ql-editor ql-blank" dir="auto" spellcheck="true" autocorrect="off" autocomplete="off">
-                <p><input autofocus="true" name="text" type="input" class="ql-input-msg" value="" placeholder="Type text here" /></p>
+            <div class="ql-editor ql-blank" dir="auto">
+                <p>
+                    <input 
+                        id="msg_input_text" 
+                        autofocus="true" 
+                        name="text" 
+                        type="input" 
+                        class="ql-input-msg" 
+                        value="" 
+                        placeholder="Type text here" 
+                        spellcheck="true" 
+                        autocorrect="off" 
+                        autocomplete="off"
+                    />
+                </p>
             </div>
             <div class="ql-clipboard" contenteditable="true" tabindex="-1" aria-hidden="true" role="presentation"
                 spellcheck="true" autocorrect="off" autocomplete="off">
@@ -47,10 +60,30 @@
 </form>
 <script>
     const msgForm = window.msg_form;
-    msgForm.addEventListener('submit', (e) => {
+    const msgInputText = window.msg_input_text;
+    const msgContainer = window.messages_container;
+    msgForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const data = new FormData(e.target);
-        if (!data.get('text').trim()) {
-            e.preventDefault();
+        if (data.get('text').trim()) {
+            const context = {
+                message: {
+                    team: { id: Handlebars.context.me.team_id },
+                    user: Handlebars.createFrame(Handlebars.context.me),
+                    ts: Handlebars.helpers.makeTs(),
+                    text: data.get('text')
+                }
+            };
+            Handlebars.render(msgContainer, "message", context);
+            Handlebars.userUtils.scrollToLastMessage();
+            msgInputText.value = "";
+            const result = await Handlebars.userUtils.postJson(msgForm.action, { 
+                ...Array.from(data.entries()).reduce((o, [k, v]) => {
+                    o[k] = v;
+                    return o;
+                }, {}), 
+                ts: Handlebars.helpers.makeTs() 
+            });
         }
     });
 </script>

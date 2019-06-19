@@ -189,8 +189,8 @@ app.get("/messages/:id", (req, res) => {
 app.post("/api/auth.test", (req, res) => console.warn("auth.test") || res.json(responses["auth.test"]));
 
 app.post("/api/chat.postMessage", async (req, res) => {
+  db.manager.channel(req.body.channel).createMessage(slackUser.id, req.body);
   if (isUrlEncodedForm(req) || isMultipartForm(req)) {
-    db.manager.channel(req.body.channel).createMessage(slackUser.id, req.body);
     const channelId = /^[CWDU][A-Z0-9]{8}$/.exec(req.body.channel);
     res.redirect(`/messages/${channelId}`);
   } else {

@@ -190,6 +190,11 @@
     {{{include "partials" "userchannelheader"}}}
 </script>
 <script>
+    function textAreaAdjust(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    }
+
     Handlebars.context = {
         selectedChannel: {{{ json selectedChannel }}},
         selectedUser: {{{ json selectedUser }}},
@@ -234,6 +239,35 @@
             });
             const content = await rawResponse.json();
             return content;
+        },
+        renderMessageFromOthers(message) {
+            const msgContainer = window.messages_container;
+            const context = {
+                message: {
+                    team: message.team,
+                    user: message.user,
+                    ts: message.ts,
+                    text: message.text
+                }
+            };
+            Handlebars.render(msgContainer, "message", context);
+            Handlebars.userUtils.scrollToLastMessage();
+        },
+        isActiveChannel(channelId) {
+            const selectedChannel = Handlebars.context.selectedChannel;
+            const selectedUser = Handlebars.context.selectedUser;
+            const selectedApp = Handlebars.context.selectedApp;
+
+            if (selectedChannel && selectedChannel.id === channelId) {
+                return true;
+            }
+            if (selectedUser && selectedUser.id === channelId) {
+                return true;
+            }
+            if (selectedApp && selectedApp.id === channelId) {
+                return true;
+            }
+            return false;
         }
     };
 
@@ -247,4 +281,31 @@
     });
 
     Handlebars.userUtils.scrollToLastMessage();
+
+    const socket = new WebSocket(`ws://${location.hostname}:${location.port}/slack`);
+    socket.emit = function (type, data) {
+        socket.send(JSON.stringify({ type, data }))
+    };
+    socket.emitJson = function (data) {
+        socket.send(JSON.stringify(data));
+    };
+    socket.addEventListener('open', function (event) {
+        console.warn('[i] Ws connected successfuly');
+    });
+    socket.addEventListener('close', function (event) {
+        console.warn('[i] Ws connection closed');
+    });
+    socket.addEventListener('error', function (event) {
+        console.warn('[i] Error', event);
+    });
+    socket.addEventListener('message', function (event) {
+        const { data } = event;
+        const message = JSON.parse(data);
+        console.log('Message from server ', message);
+        if (message.type === "message" && Handlebars.userUtils.isActiveChannel(message.channel)) {
+            Handlebars.userUtils.renderMessageFromOthers(message);
+        }
+    });
+
+    Handlebars.ws = socket;
 </script>

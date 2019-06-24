@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "description": "Fake Slack implementation on node.js + express.js + express-ws",
   "main": "index.js",
+  "jest": {
+    "preset": "jest-puppeteer",
+    "verbose": true
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js",
-    "example:rtmbot": "node examples/rtmbot/index.js"
+    "example:rtmbot": "node examples/rtmbot/index.js",
+    "example:rtmbot:integration": "SLACK_API=http://0.0.0.0:9001/api/ npm test --maxWorkers=1 -- examples/rtmbot/integration/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +35,11 @@
   },
   "devDependencies": {
     "@slack/rtm-api": "^5.0.1",
-    "@slack/web-api": "^5.0.1"
+    "@slack/web-api": "^5.0.1",
+    "bluebird": "^3.5.5",
+    "jest": "^24.8.0",
+    "jest-puppeteer": "^4.2.0",
+    "node-fetch": "^2.6.0",
+    "puppeteer": "^1.18.0"
   }
 }

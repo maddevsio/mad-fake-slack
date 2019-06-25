@@ -1,14 +1,12 @@
-const { startBot, waitMs } = require("./utils");
+const { startBot, waitMs, resetDb } = require("./utils");
 
 describe("Bot's greeting", () => {
   let bot = null;
-  beforeAll(async () => {
-    await page.goto("http://0.0.0.0:9001");
-  });
 
   beforeEach(async () => {
-    bot = startBot();
-    await waitMs(2000); // Wait for bot starts
+    await resetDb();
+    await page.goto("http://0.0.0.0:9001");
+    bot = await startBot();
   });
 
   describe("when starts", () => {
@@ -23,6 +21,7 @@ describe("Bot's greeting", () => {
     if (bot) {
       await bot.destroy();
       await waitMs(1000);
+      await resetDb();
     };
   });
 });

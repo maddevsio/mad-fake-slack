@@ -8,7 +8,9 @@ module.exports = {
     executablePath: "google-chrome-stable"
   },
   server: {
-    command: "npm start"
+    command: "npm start",
+    port: 9001,
+    usedPortAction: "error"
   },
   browserContext: "incognito"
 };

@@ -29,6 +29,18 @@ RUN npm install -g eslint eslint-config-standard eslint-plugin-import \
     eslint-plugin-node eslint-plugin-promise \
     eslint-plugin-standard eslint-plugin-html
 
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Uncomment to skip the chromium download when installing puppeteer. If you do,
+# you'll need to launch puppeteer with:
+#     browser.launch({executablePath: 'google-chrome-stable'})
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 # Clean up
 RUN apt-get autoremove -y \
     && apt-get clean -y \

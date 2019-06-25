@@ -2,7 +2,8 @@ module.exports = {
     "env": {
         "browser": true,
         "es6": true,
-        "node": true
+        "node": true,
+        "jest": true
     },
     "extends": "standard",
     "plugins": [
@@ -13,7 +14,11 @@ module.exports = {
     },
     "globals": {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
+        "page": true,
+        "browser": true,
+        "context": true,
+        "jestPuppeteer": true,
     },
     "parserOptions": {
         "ecmaVersion": 2018

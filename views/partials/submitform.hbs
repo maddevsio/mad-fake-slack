@@ -64,6 +64,7 @@
     const msgContainer = window.messages_container;
     msgForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (e.target.id !== "msg_form") return;
         const data = new FormData(e.target);
         if (data.get('text').trim()) {
             const context = {

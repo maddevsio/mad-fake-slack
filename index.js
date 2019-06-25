@@ -33,14 +33,18 @@ function isOpenChannel (channel) {
   return channel && channel.startsWith("C");
 }
 
-function isBot (channel) {
-  const users = db.users.filter(u => u.id === channel && (u.is_app_user || u.is_bot));
+function isBot (channel, db) {
+  const users = dbManager.db.users.filter(u => u.id === channel && (u.is_app_user || u.is_bot));
   return users.length;
 }
 
 const upload = multer({ storage });
 
-const db = require("./db");
+const {
+  createDbManager
+} = require("./db");
+
+const dbManager = createDbManager();
 
 const app = express();
 require("express-ws")(app);
@@ -48,11 +52,6 @@ require("express-ws")(app);
 const responses = require("./responses");
 const port = 9001;
 const OPEN = 1;
-
-const slackChannels = db.channels;
-const slackTeam = db.teams[0];
-const slackUsers = db.users;
-const slackUser = db.users[0];
 
 app.use(express.static("public"));
 app.use("/assets", express.static("node_modules"));
@@ -100,7 +99,7 @@ const handlers = {
       response["reply_to"] = msg.id;
     }
 
-    const message = db.manager.channel(msg.channel).createMessage(ws.user.id, msg);
+    const message = dbManager.channel(msg.channel).createMessage(ws.user.id, msg);
     message.user = ws.user;
     message.team = ws.team;
     message.channel = msg.channel;
@@ -117,8 +116,8 @@ const handlers = {
 app.ws("/ws", function (ws, req, next) {
   ws.clientType = "bot";
   const uid = req.query && req.query.uid;
-  ws.user = db.users.filter(u => u.id === db.sessions[uid])[0];
-  ws.team = db.teams.filter(tm => tm.id === ws.user.team_id)[0];
+  ws.user = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid])[0];
+  ws.team = dbManager.db.teams.filter(tm => tm.id === ws.user.team_id)[0];
   slackBots.add(ws);
 
   sendJson(ws, {
@@ -140,8 +139,8 @@ app.ws("/ws", function (ws, req, next) {
 
 app.ws("/slack", function (ws, req, next) {
   ws.clientType = "ui";
-  ws.user = slackUser;
-  ws.team = slackTeam;
+  ws.user = dbManager.slackUser();
+  ws.team = dbManager.slackTeam();
 
   slackWss.add(ws);
   console.warn("new ui client connection");
@@ -192,6 +191,8 @@ function broadcastToBot (msg, botId) {
 }
 
 async function requestTime (req, res, next) {
+  const token = (req.body && req.body.token) || req.headers["Authorization"];
+  req.token = token;
   console.warn("[i] request: ", req.url, req.method, req.query, req.body);
   req.requestTime = Date.now();
   next();
@@ -203,38 +204,38 @@ const MAIN_PAGE = "slackv2";
 const MESSAGES_MAX_COUNT = 100;
 
 app.get("/", (req, res) => {
-  const selectedChannel = db.channels.filter(ch => ch.name === "general")[0];
-  const messages = db.manager.channel(selectedChannel.id).messages(MESSAGES_MAX_COUNT);
+  const selectedChannel = dbManager.db.channels.filter(ch => ch.name === "general")[0];
+  const messages = dbManager.channel(selectedChannel.id).messages(MESSAGES_MAX_COUNT);
   res.render(MAIN_PAGE, {
     selectedChannel,
     selectedUser: null,
     selectedApp: null,
-    channels: slackChannels,
-    users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
-    bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
-    team: slackTeam,
-    me: slackUser,
+    channels: dbManager.db.channels,
+    users: dbManager.db.users.filter(su => !su.is_bot && !su.is_app_user),
+    bots: dbManager.db.users.filter(su => su.is_bot || su.is_app_user),
+    team: dbManager.slackTeam(),
+    me: dbManager.slackUser(),
     messages
   });
 });
 
 app.get("/messages/:id", (req, res) => {
-  const selectedChannel = db.channels.filter(ch => ch.id === req.params.id);
-  const selectedUser = db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
-  const selectedApp = db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
-  const messages = (selectedChannel.length && db.manager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT)) ||
-      (selectedUser.length && db.manager.channel(selectedUser[0].id).messages(MESSAGES_MAX_COUNT)) ||
-      (selectedApp.length && db.manager.channel(selectedApp[0].id).messages(MESSAGES_MAX_COUNT)) ||
+  const selectedChannel = dbManager.db.channels.filter(ch => ch.id === req.params.id);
+  const selectedUser = dbManager.db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
+  const selectedApp = dbManager.db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
+  const messages = (selectedChannel.length && dbManager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT)) ||
+      (selectedUser.length && dbManager.channel(selectedUser[0].id).messages(MESSAGES_MAX_COUNT)) ||
+      (selectedApp.length && dbManager.channel(selectedApp[0].id).messages(MESSAGES_MAX_COUNT)) ||
       [];
   res.render(MAIN_PAGE, {
     selectedChannel: selectedChannel.length && selectedChannel[0],
     selectedUser: selectedUser.length && selectedUser[0],
     selectedApp: selectedApp.length && selectedApp[0],
-    channels: slackChannels,
-    users: slackUsers.filter(su => !su.is_bot && !su.is_app_user),
-    bots: slackUsers.filter(su => su.is_bot || su.is_app_user),
-    team: slackTeam,
-    me: slackUser,
+    channels: dbManager.db.channels,
+    users: dbManager.db.users.filter(su => !su.is_bot && !su.is_app_user),
+    bots: dbManager.db.users.filter(su => su.is_bot || su.is_app_user),
+    team: dbManager.slackTeam(),
+    me: dbManager.slackUser(),
     messages
   });
 });
@@ -243,8 +244,8 @@ app.post("/api/auth.test", (req, res) => {
   console.warn("auth.test");
   const token = (req.body && req.body.token) || req.headers["Authorization"];
   const uid = crypto.createHash("md5").update(token).digest("hex");
-  const user = db.users.filter(u => u.id === db.sessions[uid])[0];
-  const team = db.teams.filter(tm => tm.id === user.team_id)[0];
+  const user = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid])[0];
+  const team = dbManager.db.teams.filter(tm => tm.id === user.team_id)[0];
   const exampleResponse = responses["auth.test"];
   exampleResponse.team_id = team.id;
   exampleResponse.user_id = user.id;
@@ -252,7 +253,7 @@ app.post("/api/auth.test", (req, res) => {
 });
 
 app.post("/api/chat.postMessage", async (req, res) => {
-  db.manager.channel(req.body.channel).createMessage(slackUser.id, req.body);
+  dbManager.channel(req.body.channel).createMessage(dbManager.slackUser().id, req.body);
   if (isUrlEncodedForm(req) || isMultipartForm(req)) {
     const channelId = getChannelId(req.body.channel);
     res.redirect(`/messages/${channelId && channelId[0]}`);
@@ -263,12 +264,13 @@ app.post("/api/chat.postMessage", async (req, res) => {
       ...req.body
     };
     const toChannelId = getChannelId(req.body.channel);
+    const currentUserId = dbManager.slackUser().id;
 
-    broadcast(JSON.stringify(response.message), slackUser.id);
+    broadcast(JSON.stringify(response.message), currentUserId);
     if (isOpenChannel(toChannelId)) {
-      broadcastToBots(JSON.stringify(response.message), slackUser.id);
+      broadcastToBots(JSON.stringify(response.message), currentUserId);
     }
-    if (isBot(toChannelId)) {
+    if (isBot(toChannelId, dbManager.db)) {
       broadcastToBot(JSON.stringify(response.message), toChannelId);
     }
     res.json(response);
@@ -283,12 +285,14 @@ function rtmConnectHandler (req, res) {
   const response = {
     ...successResponse
   };
-  response.self.id = slackUser.id;
-  response.self.name = slackUser.name;
+  const { id: userId, name: userName } = dbManager.slackUser();
+  response.self.id = userId;
+  response.self.name = userName;
 
-  response.team.id = slackTeam.id;
-  response.team.domain = slackTeam.domain;
-  response.team.name = slackTeam.name;
+  const { id: teamId, domain, name: teamName } = dbManager.slackTeam();
+  response.team.id = teamId;
+  response.team.domain = domain;
+  response.team.name = teamName;
   response.url = `${response.url}?uid=${tokenHash}`;
   res.json(response);
 }
@@ -298,12 +302,15 @@ app.post("/api/channels.list", (req, res) => {
     ...responses["channels.list"]
   };
 
-  successResponse.channels = db.channels;
+  successResponse.channels = dbManager.db.channels;
   res.json(successResponse);
 });
 app.get("/api/rtm.connect", rtmConnectHandler);
 app.post("/api/rtm.connect", rtmConnectHandler);
 app.get("/api/rtm.start", rtmConnectHandler);
 app.post("/api/rtm.start", rtmConnectHandler);
-
+app.get("/test/api/db/reset", (req, res) => {
+  dbManager.reset();
+  res.json({ ok: true });
+});
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

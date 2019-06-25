@@ -5,13 +5,17 @@
   "main": "index.js",
   "jest": {
     "preset": "jest-puppeteer",
-    "verbose": true
+    "verbose": true,
+    "testMatch": [
+      "**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)",
+      "**/?(*.)+(spec|test).[jt]s?(x)"
+    ]
   },
   "scripts": {
     "test": "jest",
     "start": "node index.js",
     "example:rtmbot": "node examples/rtmbot/index.js",
-    "example:rtmbot:integration": "SLACK_API=http://0.0.0.0:9001/api/ npm test --maxWorkers=1 -- examples/rtmbot/integration/*.test.js"
+    "example:rtmbot:integration": "SLACK_API=http://0.0.0.0:9001/api/ npm test -- --runInBand examples/rtmbot/"
   },
   "repository": {
     "type": "git",

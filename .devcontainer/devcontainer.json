@@ -15,6 +15,7 @@
 	"extensions": [
 		"dbaeumer.vscode-eslint",
 		"editorconfig.editorconfig",
-		"ms-vscode.atom-keybindings"
+		"ms-vscode.atom-keybindings",
+		"alexkrechik.cucumberautocomplete"
 	]
 }

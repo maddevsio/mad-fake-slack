@@ -50,7 +50,9 @@ const app = express();
 require("express-ws")(app);
 
 const responses = require("./responses");
-const port = 9001;
+const port = process.env.PORT || 9001;
+const host = process.env.HOST || "0.0.0.0";
+
 const OPEN = 1;
 
 app.use(express.static("public"));
@@ -313,4 +315,25 @@ app.get("/test/api/db/reset", (req, res) => {
   dbManager.reset();
   res.json({ ok: true });
 });
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+function createUIServer ({ port, host }) {
+  const server = require("http").createServer(app);
+  return {
+    start () {
+      return new Promise((resolve) => {
+        server.listen(port, host, () => {
+          resolve(server);
+        });
+      });
+    },
+    close () {
+      server.close();
+    }
+  };
+}
+
+if (require.main === module) {
+  app.listen(port, host, () => console.log(`Example app listening on port ${port}!`));
+} else {
+  module.exports = createUIServer;
+}

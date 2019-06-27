@@ -13,6 +13,8 @@
   },
   "scripts": {
     "test": "jest",
+    "test:integration": "npx cucumber-js --fail-fast",
+    "test:integration:only": "npx cucumber-js --fail-fast --tags=@only",
     "start": "node index.js",
     "example:rtmbot": "node examples/rtmbot/index.js",
     "example:rtmbot:integration": "SLACK_API=http://0.0.0.0:9001/api/ npm test -- --runInBand examples/rtmbot/"
@@ -41,6 +43,7 @@
     "@slack/rtm-api": "^5.0.1",
     "@slack/web-api": "^5.0.1",
     "bluebird": "^3.5.5",
+    "cucumber": "^5.1.0",
     "jest": "^24.8.0",
     "jest-puppeteer": "^4.2.0",
     "node-fetch": "^2.6.0",

@@ -128,51 +128,69 @@ function loadPageSelectors (currentPageName) {
   scope.context.currentSelectors = selectors[currentPageName];
 }
 
-async function clickOnText (text) {
-  const element = await scope.context.currentPage.$x(`//*[contains(text(),'${text}')]`);
-  expect(element).toHaveLength(1);
-  await element[0].click();
-}
-
 function interceptRequest (url, response) {
   scope.interceptRequests[url] = response;
 }
 
-async function hasText (text) {
+async function getText (selectorName) {
   await initBrowser();
-  const element = await scope.context.currentPage.$x(`//*[contains(text(),'${text}')]`);
-  expect(element).toHaveLength(1);
+  const selector = scope.context.currentSelectors[selectorName];
+  return scope.context.currentPage.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(" "));
 }
 
-async function hasTextIn (text, selectorName) {
-  const selectorExpression = scope.context.currentSelectors[selectorName];
+async function hasElement (containerSelectorName, elementSelectorName) {
   await initBrowser();
-  const element = await scope.context
-    .currentPage.$x(`//*[contains(text(),'${text}') ${selectorExpression}]`);
-  expect(element).toHaveLength(1);
+  const containerSelector = scope.context.currentSelectors[containerSelectorName];
+  const elementSelector = scope.context.currentSelectors[elementSelectorName];
+  return !!scope.context.currentPage.$(`${containerSelector} > ${elementSelector}`);
 }
 
-async function hasChannels (names) {
-  const selector = scope.context.currentSelectors["channelSections"](names);
-  const elements = await scope.context.currentPage.$x(selector);
-  expect(elements).toHaveLength(names.length);
+async function countOfElements (containerSelectorName, elementSelectorName) {
+  await initBrowser();
+  const containerSelector = scope.context.currentSelectors[containerSelectorName];
+  const elementSelector = scope.context.currentSelectors[elementSelectorName];
+  return scope.context.currentPage.$$eval(`${containerSelector} > ${elementSelector}`, elements => elements.length);
+}
+
+async function getTextsBetween (itemsSelector, afterText, beforeText) {
+  await initBrowser();
+  return scope.context.currentPage.$$eval(itemsSelector, (elements, afterText, beforeText) => {
+    const texts = [];
+    let beginTextFound = false;
+    for (let element of elements) {
+      const elementTextContent = element.textContent.trim();
+
+      if (elementTextContent === beforeText) {
+        break;
+      }
+
+      if (beginTextFound) {
+        texts.push(elementTextContent);
+      }
+
+      if (elementTextContent === afterText) {
+        beginTextFound = true;
+      }
+    }
+    return texts;
+  }, afterText, beforeText);
 }
 
 module.exports = {
   wait,
   goToUrl,
-  hasText,
-  hasTextIn,
+  getText,
   visitPage,
   reloadPage,
+  hasElement,
   waitForUrl,
-  hasChannels,
   waitForText,
-  clickOnText,
   setTimezone,
   setLanguages,
+  countOfElements,
   interceptRequest,
   loadPageSelectors,
   waitForNavigation,
-  waitForElementHides
+  waitForElementHides,
+  getTextsBetween
 };

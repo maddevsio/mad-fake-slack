@@ -1,5 +1,7 @@
 # mad-fake-slack
 
+[![CircleCI](https://circleci.com/gh/maddevsio/mad-fake-slack.svg?style=svg)](https://circleci.com/gh/maddevsio/mad-fake-slack)
+
 ### Demo of interaction with bot from examples folder (Демо взаимодействия с ботом, через UI `mad-fake-slack`)
 <img src="docs/images/demo.gif" width="500px"/>
 

@@ -1,7 +1,10 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const exphbs = require("express-handlebars");
 const multer = require("multer");
 const crypto = require("crypto");
+const morgan = require("morgan");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -50,7 +53,9 @@ const app = express();
 require("express-ws")(app);
 
 const responses = require("./responses");
-const port = 9001;
+const port = process.env.PORT || 9001;
+const host = process.env.HOST || "0.0.0.0";
+
 const OPEN = 1;
 
 app.use(express.static("public"));
@@ -71,6 +76,30 @@ app.use("/api/*", (req, res, next) => {
     express.json()(req, res, next);
   }
 });
+
+morgan.token("type", function (req, res) { return req.headers["content-type"]; });
+
+/* eslint-disable-next-line */
+const format = ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :type :status :res[content-length] ":referrer" ":user-agent"';
+morgan.format("full", format);
+
+app.use(morgan("dev", {
+  skip: function (req, res) { return res.statusCode < 400 || res.statusCode === 404; }
+}));
+
+// log all requests to access.log
+app.use(morgan("full", {
+  stream: fs.createWriteStream(path.join("/tmp", "access.log"), { flags: "a" })
+}));
+
+function requestTime (req, res, next) {
+  const token = (req.body && req.body.token) || req.headers["Authorization"];
+  req.token = token;
+  req.requestTime = Date.now();
+  next();
+};
+
+app.use(requestTime);
 
 const slackWss = new Set();
 const slackBots = new Set();
@@ -125,7 +154,6 @@ app.ws("/ws", function (ws, req, next) {
   });
 
   ws.on("message", function (msg) {
-    console.log("ws msg:", msg);
     const jsonMsg = JSON.parse(msg);
     if (handlers[jsonMsg.type]) {
       handlers[jsonMsg.type](ws, jsonMsg);
@@ -141,12 +169,8 @@ app.ws("/slack", function (ws, req, next) {
   ws.clientType = "ui";
   ws.user = dbManager.slackUser();
   ws.team = dbManager.slackTeam();
-
   slackWss.add(ws);
-  console.warn("new ui client connection");
-
   ws.on("message", function (msg) {
-    console.log("web msg:", msg);
     const jsonMsg = JSON.parse(msg);
     if (handlers[jsonMsg.type]) {
       handlers[jsonMsg.type](ws, jsonMsg);
@@ -189,16 +213,6 @@ function broadcastToBot (msg, botId) {
     }
   });
 }
-
-async function requestTime (req, res, next) {
-  const token = (req.body && req.body.token) || req.headers["Authorization"];
-  req.token = token;
-  console.warn("[i] request: ", req.url, req.method, req.query, req.body);
-  req.requestTime = Date.now();
-  next();
-};
-
-app.use(requestTime);
 
 const MAIN_PAGE = "slackv2";
 const MESSAGES_MAX_COUNT = 100;
@@ -313,4 +327,25 @@ app.get("/test/api/db/reset", (req, res) => {
   dbManager.reset();
   res.json({ ok: true });
 });
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+function createUIServer ({ port, host }) {
+  const server = require("http").createServer(app);
+  return {
+    start () {
+      return new Promise((resolve) => {
+        server.listen(port, host, () => {
+          resolve(server);
+        });
+      });
+    },
+    close () {
+      server.close();
+    }
+  };
+}
+
+if (require.main === module) {
+  app.listen(port, host, () => console.log(`Example app listening on port ${port}!`));
+} else {
+  module.exports = createUIServer;
+}

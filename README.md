@@ -1,6 +1,7 @@
 # mad-fake-slack
 
 [![CircleCI](https://circleci.com/gh/maddevsio/mad-fake-slack.svg?style=svg)](https://circleci.com/gh/maddevsio/mad-fake-slack)
+[![Build Status](https://travis-ci.org/maddevsio/mad-fake-slack.svg?branch=master)](https://travis-ci.org/maddevsio/mad-fake-slack)
 [![dependencies Status](https://david-dm.org/maddevsio/mad-fake-slack.svg)](https://david-dm.org/maddevsio/mad-fake-slack)
 [![devDependencies Status](https://david-dm.org/maddevsio/mad-fake-slack/dev-status.svg)](https://david-dm.org/maddevsio/mad-fake-slack?type=dev)
 [![Known Vulnerabilities](https://snyk.io/test/github/maddevsio/mad-fake-slack/badge.svg)](https://snyk.io/test/github/maddevsio/mad-fake-slack)

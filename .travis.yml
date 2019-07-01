@@ -13,6 +13,8 @@ cache:
 sudo: required
 node_js:
   - "10.15.3"
+env:
+  - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 install:
   - npm i
 script:

@@ -13,7 +13,6 @@ node_js:
 env:
   global:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-    - USE_REMOTE_DUBUG=false
 # allow headful tests
 before_install:
   # Enable user namespace cloning

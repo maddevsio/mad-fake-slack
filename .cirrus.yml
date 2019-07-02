@@ -1,0 +1,13 @@
+env:
+  DISPLAY: :99.0
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+  USE_SANDBOX: true
+  
+task:
+  matrix:
+    - name: Chromium (node10 + linux)
+      container:
+        dockerfile: .ci/node10/Dockerfile.linux
+      xvfb_start_background_script: Xvfb :99 -ac -screen 0 1920x1080x24
+  install_script: npm install --unsafe-perm
+  test_script: npm run test:integration

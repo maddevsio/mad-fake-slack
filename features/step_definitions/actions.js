@@ -7,13 +7,32 @@ const VIEWPORT = [1920, 1080];
 
 async function initBrowser () {
   if (!scope.browser) {
+    const useSandbox = process.env.USE_SANDBOX;
+    const headless = (process.env.HEADLESS === undefined ? "true" : process.env.HEADLESS).trim().toLowerCase() === "true";
+    const slowMo = parseInt((process.env.SLOW_MO || "0").trim(), 10);
+    const dumpio = !!process.env.DUMPIO;
+    const executablePath = process.env.EXECUTABLE_BROWSER_PATH || "google-chrome-stable";
+    const useRemoteDebug = (process.env.USE_REMOTE_DUBUG === undefined ? "true" : process.env.USE_REMOTE_DUBUG).trim().toLowerCase() === "true";
+
+    const args = [
+      `--window-size=${VIEWPORT}`
+    ];
+    if (useRemoteDebug) {
+      args.push(
+        "--remote-debugging-address=0.0.0.0",
+        "--remote-debugging-port=9222"
+      );
+    }
+    if (!useSandbox) {
+      args.push("--no-sandbox", "--disable-setuid-sandbox");
+    }
     scope.browser = await scope.driver.launch({
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        `--window-size=${VIEWPORT}`
-      ],
-      executablePath: "google-chrome-stable"
+      args,
+      handleSIGINT: true,
+      executablePath,
+      headless,
+      slowMo,
+      dumpio
     });
   }
   return scope.browser;

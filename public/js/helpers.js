@@ -9,6 +9,17 @@ if (isServer) {
   moment = window.moment;
 }
 
+function isEmpty(value) {
+  if (!value && value !== 0) {
+    return true;
+  }
+
+  if (Array.isArray(value) && value.length === 0) {
+    return true;
+  }
+  return false;
+}
+
 const helpers = {
   json(context) {
     return JSON.stringify(context);
@@ -47,6 +58,16 @@ const helpers = {
   toHumanTime(timestamp) {
     const unixts = +timestamp.split('.')[0];
     return moment.unix(unixts).format('h:mm A');
+  },
+  inlineIf(conditional, trueOption, elseOption) {
+    let ifCondition = conditional;
+    if (typeof ifCondition === 'function') {
+      ifCondition = ifCondition.call(this);
+    }
+    if (!conditional || isEmpty(conditional)) {
+      return elseOption;
+    }
+    return trueOption;
   }
 };
 

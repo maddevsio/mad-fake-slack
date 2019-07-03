@@ -1,5 +1,5 @@
 const pages = {
-  "fake slack ui": "/"
+  'fake slack ui': '/'
 };
 
 module.exports = pages;

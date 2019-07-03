@@ -1,10 +1,10 @@
-const createUIServer = require("../../../index");
+const createUIServer = require('../../../index');
 
 module.exports = {
   ui: {
     server: createUIServer({
-      port: 9001,
-      host: "localhost"
+      httpPort: 9001,
+      httpHost: 'localhost'
     })
   }
 };

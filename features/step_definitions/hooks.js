@@ -5,10 +5,10 @@ const {
   Before,
   BeforeAll,
   setDefaultTimeout
-} = require("cucumber");
+} = require('cucumber');
 
-const scope = require("./support/scope");
-const services = require("./support/services");
+const scope = require('./support/scope');
+const services = require('./support/services');
 setDefaultTimeout(2 * 60 * 1000);
 
 BeforeAll(async () => {
@@ -56,10 +56,10 @@ AfterAll(async () => {
   if (services.ui.server) await services.ui.server.close();
 });
 
-async function clearResources () {
+async function clearResources() {
   if (services.ui.server) await services.ui.server.close();
 }
 
-process.on("exit", clearResources);
-process.on("SIGINT", clearResources);
-process.on("SIGTERM", clearResources);
+process.on('exit', clearResources);
+process.on('SIGINT', clearResources);
+process.on('SIGTERM', clearResources);

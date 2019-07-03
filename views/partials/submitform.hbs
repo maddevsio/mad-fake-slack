@@ -1,90 +1,90 @@
 <form id="msg_form" class="offline" method="POST" action="/api/chat.postMessage" enctype="multipart/form-data">
-    <div class="msg_input_wrapper">
-        <input type="hidden" name="channel" value="{{channel.id}}">
-        <input type="hidden" name="type" value="message">
-        <input type="hidden" name="ts" value="{{makeTs}}">
-        <div id="msg_input" class="texty_legacy ql-container focus">
-            <div class="ql-editor ql-blank" dir="auto">
-                <p>
-                    <input 
-                        id="msg_input_text" 
-                        autofocus="true" 
-                        name="text" 
-                        type="input" 
-                        class="ql-input-msg" 
-                        value="" 
-                        placeholder="Type text here" 
-                        spellcheck="true" 
-                        autocorrect="off" 
-                        autocomplete="off"
-                    />
-                </p>
-            </div>
-            <div class="ql-clipboard" contenteditable="true" tabindex="-1" aria-hidden="true" role="presentation"
-                spellcheck="true" autocorrect="off" autocomplete="off">
-            </div>
-        </div>
-        <button type="button" id="primary_file_button" tabindex="2">
-            <i class="im im-plus"></i>
-        </button>
-        <input type="file" id="file_upload" class="offscreen" multiple="" tabindex="-1">
-        <button type="button" id="main_emo_menu" class="btn_unstyle emo_menu" tabindex="4">
-            <i class="im im-smiley-o ts-icon ts_icon_mentions"></i>
-        </button>
-        <button type="button" class="btn_unstyle msg_mentions_button" tabindex="3">
-            <i class="im im-link ts-icon ts_icon_mentions"></i>
-        </button>
-        <div id="msg_input_message">
-        </div>
-        <div>
-            <div id="notification_bar">
-                <div class="p-notification_bar p-notification_bar--legacy">
-                    <div class="p-notification_bar__section p-notification_bar__section--left"></div>
-                    <div class="p-notification_bar__section p-notification_bar__section--right">
-                        <span class="p-notification_bar__formatting" aria-hidden="true">
-                            <b>*bold*</b>
-                            <i>_italics_</i>
-                            ~strike~
-                            <code>`code`</code>
-                            <code>```preformatted```</code>
-                            <span>&gt;quote</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="msg_input_wrapper">
+    <input type="hidden" name="channel" value={{channel.id}}>
+    <input type="hidden" name="type" value="message">
+    <input type="hidden" name="ts" value={{makeTs}}>
+    <div id="msg_input" class="texty_legacy ql-container focus">
+      <div class="ql-editor ql-blank" dir="auto">
+        <p>
+          <input
+              id="msg_input_text"
+              autofocus="true"
+              name="text"
+              type="input"
+              class="ql-input-msg"
+              value=""
+              placeholder="Type text here"
+              spellcheck="true"
+              autocorrect="off"
+              autocomplete="off"
+          >
+        </p>
+      </div>
+      <div class="ql-clipboard" contenteditable="true" tabindex="-1" aria-hidden="true" role="presentation"
+        spellcheck="true" autocorrect="off" autocomplete="off">
+      </div>
     </div>
-    <button id="msg_input_send" type="button" class="btn msg_input_btn hidden" tabindex="1">
-        Send
+    <button type="button" id="primary_file_button" tabindex="2">
+      <i class="im im-plus"></i>
     </button>
+    <input type="file" id="file_upload" class="offscreen" multiple="" tabindex="-1">
+    <button type="button" id="main_emo_menu" class="btn_unstyle emo_menu" tabindex="4">
+      <i class="im im-smiley-o ts-icon ts_icon_mentions"></i>
+    </button>
+    <button type="button" class="btn_unstyle msg_mentions_button" tabindex="3">
+      <i class="im im-link ts-icon ts_icon_mentions"></i>
+    </button>
+    <div id="msg_input_message">
+    </div>
+    <div>
+      <div id="notification_bar">
+        <div class="p-notification_bar p-notification_bar--legacy">
+          <div class="p-notification_bar__section p-notification_bar__section--left"></div>
+          <div class="p-notification_bar__section p-notification_bar__section--right">
+            <span class="p-notification_bar__formatting" aria-hidden="true">
+              <b>*bold*</b>
+              <i>_italics_</i>
+              ~strike~
+              <code>`code`</code>
+              <code>```preformatted```</code>
+              <span>&gt;quote</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button id="msg_input_send" type="button" class="btn msg_input_btn hidden" tabindex="1">
+    Send
+  </button>
 </form>
 <script>
-    const msgForm = window.msg_form;
-    const msgInputText = window.msg_input_text;
-    const msgContainer = window.messages_container;
-    msgForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (e.target.id !== "msg_form") return;
-        const data = new FormData(e.target);
-        if (data.get('text').trim()) {
-            const context = {
-                message: {
-                    team: { id: Handlebars.context.me.team_id },
-                    user: Handlebars.createFrame(Handlebars.context.me),
-                    ts: Handlebars.helpers.makeTs(),
-                    text: data.get('text')
-                }
-            };
-            Handlebars.render(msgContainer, "message", context);
-            Handlebars.userUtils.scrollToLastMessage();
-            msgInputText.value = "";
-            const result = await Handlebars.userUtils.postJson(msgForm.action, { 
-                ...Array.from(data.entries()).reduce((o, [k, v]) => {
-                    o[k] = v;
-                    return o;
-                }, {}), 
-                ts: Handlebars.helpers.makeTs() 
-            });
+  const msgForm = window.msg_form;
+  const msgInputText = window.msg_input_text;
+  const msgContainer = window.messages_container;
+  msgForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (e.target.id !== "msg_form") return;
+    const data = new FormData(e.target);
+    if (data.get('text').trim()) {
+      const context = {
+        message: {
+            team: { id: Handlebars.context.me.team_id },
+            user: Handlebars.createFrame(Handlebars.context.me),
+            ts: Handlebars.helpers.makeTs(),
+            text: data.get('text')
         }
-    });
+      };
+      Handlebars.render(msgContainer, "message", context);
+      Handlebars.userUtils.scrollToLastMessage();
+      msgInputText.value = "";
+      const result = await Handlebars.userUtils.postJson(msgForm.action, {
+        ...Array.from(data.entries()).reduce((o, [k, v]) => {
+            o[k] = v;
+            return o;
+        }, {}),
+        ts: Handlebars.helpers.makeTs()
+      });
+    }
+  });
 </script>

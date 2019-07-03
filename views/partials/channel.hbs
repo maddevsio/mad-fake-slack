@@ -1,8 +1,9 @@
+{{! template-lint-disable no-inline-styles }}
 <div role="listitem" style="height: 26px;">
-    <a class="c-link p-channel_sidebar__channel {{#if (eq channel.id selectedChannel.id) }}p-channel_sidebar__channel--selected{{/if}}"
-        href="{{href}}">
-        <span class="p-channel_sidebar__name">
-            <i class="im im-hashtag"></i>{{channel.name}}
-        </span>
-    </a>
+  <a href={{href}} class="c-link p-channel_sidebar__channel {{inlineIf (eq channel.id selectedChannel.id) "p-channel_sidebar__channel--selected" }}">
+    <span class="p-channel_sidebar__name">
+      <i class="im im-hashtag"></i>
+      {{channel.name}}
+    </span>
+  </a>
 </div>

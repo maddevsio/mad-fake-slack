@@ -1,42 +1,43 @@
 <div class="channel_title">
-    <div id="channel_name_container" class="channel_name_container">
-        <span id="channel_name" class="channel_name" data-qa="channel_name">
-            <button type="button" id="channel_title" class="btn_unstyle">{{user.real_name}}
-                {{#if (eq user.id me.id) }}
-                <span class="normal subtle_silver"> (you)</span>
-                {{/if}}
-            </button>
-        </span>
-        <div class="channel_actions_container">
-            <div id="mute_container"></div>
-        </div>
-    </div>
-    <div id="channel_header_info" class="channel_header_info">
-        <div id="star_container" class="channel_header_info_item">
-            <button type="button" class="btn_unstyle">
-                <i class="im im-star-o"></i>
-            </button>
-        </div>
-        <div class="channel_header_info_item channel_header_member_status member_presence_USLACKBOT member_USLACKBOT">
-            <span data-member-presence="USLACKBOT" class="presence active member_presence_USLACKBOT">
-                {{#if (eq user.id "USLACKBOT") }}
-                <i class="im im-heart active"></i>
-                {{else}}
-                <i class="im im-radio-button-circle active"></i>
-                {{/if}}
-            </span>
-            <span id="header_status_message">active</span>
-        </div>
-        {{#if (eq user.id "USLACKBOT") }}
-        <div class="channel_header_info_item channel_topic_container">
-            <span id="edit_topic_container" class="channel_topic" tabindex="0" role="button">
-                <span id="edit_topic_inner">
-                    <span id="channel_topic_text" class="no_jumbomoji">
-                        {{user.real_name}}
-                    </span>
-                </span>
-            </span>
-        </div>
+  <div id="channel_name_container" class="channel_name_container">
+    <span id="channel_name" class="channel_name" data-qa="channel_name">
+      <button type="button" id="channel_title" class="btn_unstyle">
+        {{user.real_name}}
+        {{#if (eq user.id me.id) }}
+          <span class="normal subtle_silver"> (you)</span>
         {{/if}}
+      </button>
+    </span>
+    <div class="channel_actions_container">
+      <div id="mute_container"></div>
     </div>
+  </div>
+  <div id="channel_header_info" class="channel_header_info">
+    <div id="star_container" class="channel_header_info_item">
+      <button type="button" class="btn_unstyle">
+        <i class="im im-star-o"></i>
+      </button>
+    </div>
+    <div class="channel_header_info_item channel_header_member_status member_presence_USLACKBOT member_USLACKBOT">
+      <span data-member-presence="USLACKBOT" class="presence active member_presence_USLACKBOT">
+        {{#if (eq user.id "USLACKBOT") }}
+          <i class="im im-heart active"></i>
+        {{else}}
+          <i class="im im-radio-button-circle active"></i>
+        {{/if}}
+      </span>
+      <span id="header_status_message">active</span>
+    </div>
+    {{#if (eq user.id "USLACKBOT") }}
+      <div class="channel_header_info_item channel_topic_container">
+        <span id="edit_topic_container" class="channel_topic" tabindex="0" role="button">
+          <span id="edit_topic_inner">
+            <span id="channel_topic_text" class="no_jumbomoji">
+              {{user.real_name}}
+            </span>
+          </span>
+        </span>
+      </div>
+    {{/if}}
+  </div>
 </div>

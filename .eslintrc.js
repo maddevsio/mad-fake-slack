@@ -6,10 +6,7 @@ module.exports = {
     "node": true,
     "jest": true
   },
-  "plugins": ["jest", "html" ],
-  "settings": {
-    "html/html-extensions": [".hbs"],
-  },
+  "plugins": ["jest"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",

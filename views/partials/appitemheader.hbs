@@ -1,24 +1,23 @@
 <div class="channel_title">
-    <div id="channel_name_container" class="channel_name_container">
-        <h2 class="channel_name cursor_default">
-            <div id="star_container" class="channel_header_info_item">
-                <button type="button" class="star star_app btn_unstyle">
-                    <i class="im im-star-o"></i>
-                </button>
-            </div>
-            <span>{{app.real_name}}</span>
-        </h2>
+  <div id="channel_name_container" class="channel_name_container">
+    <h2 class="channel_name cursor_default">
+      <div id="star_container" class="channel_header_info_item">
+        <button type="button" class="star star_app btn_unstyle">
+          <i class="im im-star-o"></i>
+        </button>
+      </div>
+      <span>{{app.real_name}}</span>
+    </h2>
+  </div>
+  <div id="channel_header_info" class="channel_header_info stripped">
+    <div class="channel_header__tabs" data-js="channel_header_tabs">
+      <button type="button"
+          class="btn_unstyle channel_header__tab --active">
+        Messages
+      </button>
+      <button type="button" class="btn_unstyle channel_header__tab">
+        About
+      </button>
     </div>
-    <div id="channel_header_info" class="channel_header_info stripped">
-        <div class="channel_header__tabs" data-js="channel_header_tabs">
-            <button type="button" class="btn_unstyle channel_header__tab --active"
-                data-target="messages" data-qa="messages">
-                Messages
-            </button>
-            <button type="button" class="btn_unstyle channel_header__tab"
-                data-qa="about">
-                About
-            </button>
-        </div>
-    </div>
+  </div>
 </div>

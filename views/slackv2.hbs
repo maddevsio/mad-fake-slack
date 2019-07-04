@@ -1,311 +1,311 @@
 <div id="client-ui">
-    <div class="client_container">
-        <div class="client_channels_list_container">
-            <div id="team_menu">
-                <div class="team_name_container top_margin">
-                    <button class="team_name_caret btn_unstyle">
-                        <i class="im im-care-down"></i>
-                    </button>
-                    <span id="team_name" class="overflow_ellipsis">{{team.name}}</span>
-                </div>
-                <span class="notifications_menu_btn" data-reactroot="">
-                    <button class="c-button-unstyled p-dnd_button" type="button">
-                        <i class="im im-bell"></i>
-                    </button>
-                </span>
-                <div id="team_menu_user">
-                    <div id="presence_container" class="no_wrap ts_tip ts_tip_bottom ts_tip_left">
-                        <i id="presence" class="im im-radio-button-circle active"></i>
-                    </div>
-                    {{> mehref me=me}}
-                </div>
-            </div>
-            <div id="col_channels" class="channels_list_holder no_unread_msgs_badges default_sort">
-                <div id="col_channels_react_root" class="display_flex flex_direction_column flex_one">
-                    <nav class="p-channel_sidebar" style="width: 220px;">
-                        <div class="p-channel_sidebar__list" style="position: relative;">
-                            <div role="presentation" style="height: 12px;"></div>
-                            <div role="listitem" style="height: 52px;">
-                                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--all-threads" type="button">
-                                    <i class="im im-data-validate"></i>
-                                    <span class="p-channel_sidebar__name">Threads</span>
-                                </button>
-                            </div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__section_heading">
-                                    <button
-                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
-                                        type="button" delay="300"> Channels</button>
-                                    <div class="p-channel_sidebar__section_heading_right">
-                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
-                                            <i class="im im-plus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            {{#each channels as |channel|}}
-                                {{> channel channel=channel selectedChannel=@root.selectedChannel href=(concat "/messages/" channel.id)}}
-                            {{/each}}
-                            <div role="presentation" style="height: 18px;"></div>
-                            <div role="listitem" style="height: 26px;">
-                                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim" type="button">
-                                    <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Add a channel</span>
-                                </button>
-                            </div>
-                            <div role="presentation" style="height: 18px;"></div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__section_heading">
-                                    <button
-                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
-                                        type="button"> Direct Messages</button>
-                                    <div class="p-channel_sidebar__section_heading_right">
-                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
-                                            <i class="im im-plus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            {{#each users as |user|}}
-                                {{> directuser user=user selectedUser=@root.selectedUser}}
-                            {{/each}}   
-                            <div role="presentation" style="height: 18px;"></div>
-                            <div role="listitem" style="height: 26px;">
-                                <button
-                                    class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim"
-                                    type="button">
-                                    <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Invite people</span>
-                                </button>
-                            </div>
-                            <div role="presentation" style="height: 18px;"></div>
-                            <div role="listitem" style="height: 26px;">
-                                <div class="p-channel_sidebar__section_heading">
-                                    <button
-                                        class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
-                                        type="button">Apps</button>
-                                    <div class="p-channel_sidebar__section_heading_right">
-                                        <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
-                                            <i class="im im-plus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div role="presentation" style="height: 18px;"></div>
-                            {{#each bots as |app|}}
-                                {{> appitem app=app selectedApp=@root.selectedApp}}
-                            {{/each}}
-                        </div>
-                    </nav>
-                </div>
-            </div>
+  <div class="client_container">
+    <div class="client_channels_list_container">
+      <div id="team_menu">
+        <div class="team_name_container top_margin">
+          <button class="team_name_caret btn_unstyle">
+              <i class="im im-care-down"></i>
+          </button>
+          <span id="team_name" class="overflow_ellipsis">{{team.name}}</span>
         </div>
-        <div class="client_main_container">
-            <header id="client_header">
-                <div class="channel_header">
-                    <div class="messages_header">
-                        {{#if selectedChannel}}
-                            {{> channelheader channel=selectedChannel}}
-                        {{/if}}
-                        {{#if selectedUser}}
-                            {{> userchannelheader user=selectedUser me=me}}
-                        {{/if}}
-                        {{#if selectedApp}}
-                            {{> appitemheader app=selectedApp}}
-                        {{/if}}
-                        <div class="channel_header_drag_region">
-                        </div>
-                        <div class="channel_title_info">
-                        </div>
-                    </div>
-                    <div class="flex_header">
-                        <div id="search_container">
-                        </div>
-                        <div class="channel_header__buttons">
-                            <button type="button" id="recent_mentions_toggle"
-                                class="channel_header_icon btn_unstyle">
-                                <i class="im im-link"></i>
-                            </button>
-                            <button type="button" id="stars_toggle"
-                                class="channel_header_icon btn_unstyle">
-                                <i class="im im-star-o"></i>
-                            </button>
-                            <button type="button" id="flex_menu_toggle"
-                                class="channel_header_icon btn_unstyle">
-                                <i class="im im-menu-dot-v"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>   
-            </header>
-            <div id="client_body">
-                <div id="col_messages">
-                    <div id="messages_container">
-                        {{#each messages as |message|}}
-                            {{> message message=message}}
-                        {{/each}}
-                    </div>
-                    <div id="footer">
-                        <div id="footer_msgs">
-                            {{#if selectedChannel}}
-                                {{> submitform channel=selectedChannel}}
-                            {{else}}
-                                {{#if selectedUser}}
-                                    {{> submitform channel=selectedUser}}
-                                {{/if}}
-                                {{#if selectedApp}}
-                                    {{> submitform channel=selectedApp}}
-                                {{/if}}
-                            {{/if}}    
-                        </div>
-                    </div>
+        <span class="notifications_menu_btn" data-reactroot="">
+          <button class="c-button-unstyled p-dnd_button" type="button">
+            <i class="im im-bell"></i>
+          </button>
+        </span>
+        <div id="team_menu_user">
+          <div id="presence_container" class="no_wrap ts_tip ts_tip_bottom ts_tip_left">
+              <i id="presence" class="im im-radio-button-circle active"></i>
+          </div>
+          {{> mehref me=me}}
+        </div>
+      </div>
+      <div id="col_channels" class="channels_list_holder no_unread_msgs_badges default_sort">
+        <div id="col_channels_react_root" class="display_flex flex_direction_column flex_one">
+          <nav class="p-channel_sidebar" style="width: 220px;">
+            <div class="p-channel_sidebar__list" style="position: relative;">
+              <div role="presentation" style="height: 12px;"></div>
+              <div role="listitem" style="height: 52px;">
+                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--all-threads" type="button">
+                  <i class="im im-data-validate"></i>
+                  <span class="p-channel_sidebar__name">Threads</span>
+                </button>
+              </div>
+              <div role="listitem" style="height: 26px;">
+                <div class="p-channel_sidebar__section_heading">
+                  <button
+                      class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                      type="button" delay="300"> Channels</button>
+                  <div class="p-channel_sidebar__section_heading_right">
+                    <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                      <i class="im im-plus-circle"></i>
+                    </button>
+                  </div>
                 </div>
+              </div>
+              {{#each channels as |channel|}}
+                {{> channel channel=channel selectedChannel=@root.selectedChannel href=(concat "/messages/" channel.id)}}
+              {{/each}}
+              <div role="presentation" style="height: 18px;"></div>
+              <div role="listitem" style="height: 26px;">
+                <button class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim" type="button">
+                  <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Add a channel</span>
+                </button>
+              </div>
+              <div role="presentation" style="height: 18px;"></div>
+              <div role="listitem" style="height: 26px;">
+                <div class="p-channel_sidebar__section_heading">
+                  <button
+                      class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                      type="button"> Direct Messages</button>
+                  <div class="p-channel_sidebar__section_heading_right">
+                    <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                      <i class="im im-plus-circle"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {{#each users as |user|}}
+                {{> directuser user=user selectedUser=@root.selectedUser}}
+              {{/each}}
+              <div role="presentation" style="height: 18px;"></div>
+              <div role="listitem" style="height: 26px;">
+                <button
+                    class="c-button-unstyled p-channel_sidebar__link p-channel_sidebar__link--add-channel p-channel_sidebar__link--dim"
+                    type="button">
+                  <span class="p-channel_sidebar__name"><i class="im im-plus"></i>Invite people</span>
+                </button>
+              </div>
+              <div role="presentation" style="height: 18px;"></div>
+              <div role="listitem" style="height: 26px;">
+                <div class="p-channel_sidebar__section_heading">
+                  <button
+                      class="c-button-unstyled p-channel_sidebar__section_heading_label p-channel_sidebar__section_heading_label--clickable"
+                      type="button">Apps</button>
+                  <div class="p-channel_sidebar__section_heading_right">
+                    <button class="c-button-unstyled p-channel_sidebar__section_heading_plus" type="button">
+                      <i class="im im-plus-circle"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div role="presentation" style="height: 18px;"></div>
+              {{#each bots as |app|}}
+                {{> appitem app=app selectedApp=@root.selectedApp}}
+              {{/each}}
             </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <div class="client_main_container">
+      <header id="client_header">
+        <div class="channel_header">
+          <div class="messages_header">
+            {{#if selectedChannel}}
+                {{> channelheader channel=selectedChannel}}
+            {{/if}}
+            {{#if selectedUser}}
+                {{> userchannelheader user=selectedUser me=me}}
+            {{/if}}
+            {{#if selectedApp}}
+                {{> appitemheader app=selectedApp}}
+            {{/if}}
+            <div class="channel_header_drag_region">
+            </div>
+            <div class="channel_title_info">
+            </div>
+          </div>
+          <div class="flex_header">
+            <div id="search_container">
+            </div>
+            <div class="channel_header__buttons">
+              <button type="button" id="recent_mentions_toggle"
+                  class="channel_header_icon btn_unstyle">
+                <i class="im im-link"></i>
+              </button>
+              <button type="button" id="stars_toggle"
+                  class="channel_header_icon btn_unstyle">
+                <i class="im im-star-o"></i>
+              </button>
+              <button type="button" id="flex_menu_toggle"
+                  class="channel_header_icon btn_unstyle">
+                <i class="im im-menu-dot-v"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+        <div id="client_body">
+          <div id="col_messages">
+            <div id="messages_container">
+                {{#each messages as |message|}}
+                  {{> message message=message}}
+                {{/each}}
+            </div>
+            <div id="footer">
+              <div id="footer_msgs">
+                {{#if selectedChannel}}
+                  {{> submitform channel=selectedChannel}}
+                {{else}}
+                  {{#if selectedUser}}
+                    {{> submitform channel=selectedUser}}
+                  {{/if}}
+                  {{#if selectedApp}}
+                    {{> submitform channel=selectedApp}}
+                  {{/if}}
+                {{/if}}
+              </div>
+            </div>
+          </div>
         </div>
     </div>
+  </div>
 </div>
 <script name="appitem" type="text/x-handlebars-template">
-    {{{include "partials" "appitem"}}}
+  {{{include "partials" "appitem"}}}
 </script>
 <script name="appitemheader" type="text/x-handlebars-template">
-    {{{include "partials" "appitemheader"}}}
+  {{{include "partials" "appitemheader"}}}
 </script>
 <script name="channel" type="text/x-handlebars-template">
-    {{{include "partials" "channel"}}}
+  {{{include "partials" "channel"}}}
 </script>
 <script name="channelheader" type="text/x-handlebars-template">
-    {{{include "partials" "channelheader"}}}
+  {{{include "partials" "channelheader"}}}
 </script>
 <script name="directuser" type="text/x-handlebars-template">
-    {{{include "partials" "directuser"}}}
+  {{{include "partials" "directuser"}}}
 </script>
 <script name="mehref" type="text/x-handlebars-template">
-    {{{include "partials" "mehref"}}}
+  {{{include "partials" "mehref"}}}
 </script>
 <script name="message" type="text/x-handlebars-template">
-    {{{include "partials" "message"}}}
+  {{{include "partials" "message"}}}
 </script>
 <script name="submitform" type="text/x-handlebars-template">
-    {{{include "partials" "submitform"}}}
+  {{{include "partials" "submitform"}}}
 </script>
 <script name="userchannelheader" type="text/x-handlebars-template">
-    {{{include "partials" "userchannelheader"}}}
+  {{{include "partials" "userchannelheader"}}}
 </script>
 <script>
-    function textAreaAdjust(el) {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    }
+  function textAreaAdjust(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
 
-    Handlebars.context = {
-        selectedChannel: {{{ json selectedChannel }}},
-        selectedUser: {{{ json selectedUser }}},
-        selectedApp: {{{ json selectedApp }}},
-        channels: {{{ json channels }}},
-        users: {{{ json users }}},
-        bots: {{{ json bots }}},
-        team: {{{ json team }}},
-        me: {{{ json me }}}
-    };
+  Handlebars.context = {
+    selectedChannel: {{{ json selectedChannel }}},
+    selectedUser: {{{ json selectedUser }}},
+    selectedApp: {{{ json selectedApp }}},
+    channels: {{{ json channels }}},
+    users: {{{ json users }}},
+    bots: {{{ json bots }}},
+    team: {{{ json team }}},
+    me: {{{ json me }}}
+  };
 
-    Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
-        const html = Handlebars.templates[templateName](context)
-        containerEl.insertAdjacentHTML(options.position, html);
-    }
+  Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
+    const html = Handlebars.templates[templateName](context)
+    containerEl.insertAdjacentHTML(options.position, html);
+  }
 
-    Handlebars.userUtils = {
-        scrollToLastMessage() {
-            const lastMessage = document.querySelector('.list__item:last-child');
-            if (lastMessage) {
-                lastMessage.scrollIntoView()
-            }
+  Handlebars.userUtils = {
+    scrollToLastMessage() {
+      const lastMessage = document.querySelector('.list__item:last-child');
+      if (lastMessage) {
+          lastMessage.scrollIntoView()
+      }
+    },
+    cleanEventListeners(el) {
+      for (let eventType in getEventListeners(el)) {
+        getEventListeners(el)[eventType].forEach(
+            function (o) { el.removeEventListener(eventType, o.listener) }
+        )
+      }
+    },
+    clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    },
+    async postJson(url, data) {
+      const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         },
-        cleanEventListeners(el) {
-            for (let eventType in getEventListeners(el)) {
-                getEventListeners(el)[eventType].forEach(
-                    function (o) { el.removeEventListener(eventType, o.listener) }
-                )
-            }
-        },
-        clone(obj) {
-            return JSON.parse(JSON.stringify(obj));
-        },
-        async postJson(url, data) {
-            const rawResponse = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            const content = await rawResponse.json();
-            return content;
-        },
-        renderMessageFromOthers(message) {
-            const msgContainer = window.messages_container;
-            const context = {
-                message: {
-                    team: message.team,
-                    user: message.user,
-                    ts: message.ts,
-                    text: message.text
-                }
-            };
-            Handlebars.render(msgContainer, "message", context);
-            Handlebars.userUtils.scrollToLastMessage();
-        },
-        isActiveChannel(channelId) {
-            const selectedChannel = Handlebars.context.selectedChannel;
-            const selectedUser = Handlebars.context.selectedUser;
-            const selectedApp = Handlebars.context.selectedApp;
-
-            if (selectedChannel && selectedChannel.id === channelId) {
-                return true;
-            }
-            if (selectedUser && selectedUser.id === channelId) {
-                return true;
-            }
-            if (selectedApp && selectedApp.id === channelId) {
-                return true;
-            }
-            return false;
+        body: JSON.stringify(data)
+      });
+      const content = await rawResponse.json();
+      return content;
+    },
+    renderMessageFromOthers(message) {
+      const msgContainer = window.messages_container;
+      const context = {
+        message: {
+          team: message.team,
+          user: message.user,
+          ts: message.ts,
+          text: message.text
         }
-    };
+      };
+      Handlebars.render(msgContainer, "message", context);
+      Handlebars.userUtils.scrollToLastMessage();
+    },
+    isActiveChannel(channelId) {
+      const selectedChannel = Handlebars.context.selectedChannel;
+      const selectedUser = Handlebars.context.selectedUser;
+      const selectedApp = Handlebars.context.selectedApp;
 
-    const templates = Array.from(document.querySelectorAll('[type="text/x-handlebars-template"]'));
-    Handlebars.templates = Handlebars.templates || {};
-    templates.forEach((el) => {
-        const templateSrc = el.innerHTML;
-        const templateName = el.getAttribute("name");
-        Handlebars.registerPartial(templateName, templateSrc);
-        Handlebars.templates[templateName] = Handlebars.compile(templateSrc);
-    });
+      if (selectedChannel && selectedChannel.id === channelId) {
+        return true;
+      }
+      if (selectedUser && selectedUser.id === channelId) {
+        return true;
+      }
+      if (selectedApp && selectedApp.id === channelId) {
+        return true;
+      }
+      return false;
+    }
+  };
 
-    Handlebars.userUtils.scrollToLastMessage();
+  const templates = Array.from(document.querySelectorAll('[type="text/x-handlebars-template"]'));
+  Handlebars.templates = Handlebars.templates || {};
+  templates.forEach((el) => {
+    const templateSrc = el.innerHTML;
+    const templateName = el.getAttribute("name");
+    Handlebars.registerPartial(templateName, templateSrc);
+    Handlebars.templates[templateName] = Handlebars.compile(templateSrc);
+  });
 
-    const socket = new WebSocket(`ws://${location.hostname}:${location.port}/slack`);
-    socket.emit = function (type, data) {
-        socket.send(JSON.stringify({ type, data }))
-    };
-    socket.emitJson = function (data) {
-        socket.send(JSON.stringify(data));
-    };
-    socket.addEventListener('open', function (event) {
-        console.warn('[i] Ws connected successfuly');
-    });
-    socket.addEventListener('close', function (event) {
-        console.warn('[i] Ws connection closed');
-    });
-    socket.addEventListener('error', function (event) {
-        console.warn('[i] Error', event);
-    });
-    socket.addEventListener('message', function (event) {
-        const { data } = event;
-        const message = JSON.parse(data);
-        console.log('Message from server ', message);
-        if (message.type === "message" && Handlebars.userUtils.isActiveChannel(message.channel)) {
-            Handlebars.userUtils.renderMessageFromOthers(message);
-        }
-    });
+  Handlebars.userUtils.scrollToLastMessage();
 
-    Handlebars.ws = socket;
+  const socket = new WebSocket(`ws://${location.hostname}:${location.port}/slack`);
+  socket.emit = function (type, data) {
+    socket.send(JSON.stringify({ type, data }))
+  };
+  socket.emitJson = function (data) {
+    socket.send(JSON.stringify(data));
+  };
+  socket.addEventListener('open', function (event) {
+    console.warn('[i] Ws connected successfuly');
+  });
+  socket.addEventListener('close', function (event) {
+    console.warn('[i] Ws connection closed');
+  });
+  socket.addEventListener('error', function (event) {
+    console.warn('[i] Error', event);
+  });
+  socket.addEventListener('message', function (event) {
+    const { data } = event;
+    const message = JSON.parse(data);
+    console.log('Message from server ', message);
+    if (message.type === "message" && Handlebars.userUtils.isActiveChannel(message.channel)) {
+        Handlebars.userUtils.renderMessageFromOthers(message);
+    }
+  });
+
+  Handlebars.ws = socket;
 </script>

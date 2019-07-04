@@ -1,25 +1,19 @@
-{{#if (eq user.id "USLACKBOT") }}
+{{! template-lint-disable no-bare-strings no-inline-styles }}
 <div role="listitem" style="height: 26px;">
-    <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#if (eq user.id selectedUser.id) }}p-channel_sidebar__channel--selected{{/if}}"
-            href="http://localhost:9001/messages/{{user.id}}">
-            <span class="p-channel_sidebar__name">
-                <i class="im im-heart active"></i>
-                {{user.real_name}}
-            </span>
-        </a>
-    </div>
+  <div class="p-channel_sidebar__close_container">
+    <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{inlineIf (eq user.id selectedUser.id) "p-channel_sidebar__channel--selected"}}"
+      href="http://localhost:9001/messages/{{user.id}}">
+      {{#if (eq user.id "USLACKBOT") }}
+        <span class="p-channel_sidebar__name">
+          <i class="im im-heart active"></i>
+          {{user.real_name}}
+        </span>
+      {{else}}
+        <span class="p-channel_sidebar__name">
+          <i class="im im-radio-button-circle active"></i>
+          {{user.real_name}}
+        </span>
+      {{/if}}
+    </a>
+  </div>
 </div>
-{{else}}
-<div role="listitem" style="height: 26px;">
-    <div class="p-channel_sidebar__close_container">
-        <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{#if (eq user.id selectedUser.id) }}p-channel_sidebar__channel--selected{{/if}}"
-            href="http://localhost:9001/messages/{{user.id}}">
-            <span class="p-channel_sidebar__name">
-                <i class="im im-radio-button-circle active"></i>
-                {{user.real_name}}
-            </span>
-        </a>
-    </div>
-</div>
-{{/if}}

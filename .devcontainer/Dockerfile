@@ -25,9 +25,7 @@ RUN rm -rf /opt/yarn-* \
     && apt-get -y install --no-install-recommends yarn
     
 # Install eslint
-RUN npm install -g eslint eslint-config-standard eslint-plugin-import \
-    eslint-plugin-node eslint-plugin-promise \
-    eslint-plugin-standard eslint-plugin-html
+RUN npm install -g eslint
 
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \

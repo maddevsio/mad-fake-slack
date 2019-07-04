@@ -1,30 +1,30 @@
-const expect = require("expect");
-const scope = require("./support/scope");
-const selectors = require("./selectors");
-const pages = require("./pages");
+const expect = require('expect');
+const scope = require('./support/scope');
+const selectors = require('./selectors');
+const pages = require('./pages');
 
 const VIEWPORT = [1920, 1080];
 
-async function initBrowser () {
+async function initBrowser() {
   if (!scope.browser) {
     const useSandbox = process.env.USE_SANDBOX;
-    const headless = (process.env.HEADLESS === undefined ? "true" : process.env.HEADLESS).trim().toLowerCase() === "true";
-    const slowMo = parseInt((process.env.SLOW_MO || "0").trim(), 10);
+    const headless = (process.env.HEADLESS === undefined ? 'true' : process.env.HEADLESS).trim().toLowerCase() === 'true';
+    const slowMo = parseInt((process.env.SLOW_MO || '0').trim(), 10);
     const dumpio = !!process.env.DUMPIO;
-    const executablePath = process.env.EXECUTABLE_BROWSER_PATH || "google-chrome-stable";
-    const useRemoteDebug = (process.env.USE_REMOTE_DUBUG === undefined ? "true" : process.env.USE_REMOTE_DUBUG).trim().toLowerCase() === "true";
+    const executablePath = process.env.EXECUTABLE_BROWSER_PATH || 'google-chrome-stable';
+    const useRemoteDebug = (process.env.USE_REMOTE_DUBUG === undefined ? 'true' : process.env.USE_REMOTE_DUBUG).trim().toLowerCase() === 'true';
 
     const args = [
       `--window-size=${VIEWPORT}`
     ];
     if (useRemoteDebug) {
       args.push(
-        "--remote-debugging-address=0.0.0.0",
-        "--remote-debugging-port=9222"
+        '--remote-debugging-address=0.0.0.0',
+        '--remote-debugging-port=9222'
       );
     }
     if (!useSandbox) {
-      args.push("--no-sandbox", "--disable-setuid-sandbox");
+      args.push('--no-sandbox', '--disable-setuid-sandbox');
     }
     scope.browser = await scope.driver.launch({
       args,
@@ -35,27 +35,28 @@ async function initBrowser () {
       dumpio
     });
   }
+
   return scope.browser;
 }
 
-async function visitPage (currentPageName) {
+async function visitPage(currentPageName) {
   await initBrowser();
   scope.context.currentSelectors = selectors[currentPageName];
   scope.context.currentPage = await scope.browser.newPage();
   await scope.context.currentPage.setRequestInterception(true);
   await scope.context.currentPage.setExtraHTTPHeaders({
-    "Accept-Language": scope.locale.language[0]
+    'Accept-Language': scope.locale.language[0]
   });
 
   await scope.context.currentPage.evaluateOnNewDocument((locale) => {
-    Object.defineProperty(navigator, "language", {
-      get: function () {
+    Object.defineProperty(navigator, 'language', {
+      get() {
         return locale.language;
       }
     });
 
-    Object.defineProperty(navigator, "languages", {
-      get: function () {
+    Object.defineProperty(navigator, 'languages', {
+      get() {
         return locale.languages;
       }
     });
@@ -63,18 +64,18 @@ async function visitPage (currentPageName) {
     const [firstLang] = locale.language;
     Intl.DateTimeFormat = () => ({
       resolvedOptions: () => ({
-        calendar: "gregory",
-        day: "numeric",
+        calendar: 'gregory',
+        day: 'numeric',
         locale: firstLang,
-        month: "numeric",
-        numberingSystem: "latn",
+        month: 'numeric',
+        numberingSystem: 'latn',
         timeZone: locale.timeZone,
-        year: "numeric"
+        year: 'numeric'
       })
     });
   }, scope.locale);
 
-  scope.context.currentPage.on("request", async request => {
+  scope.context.currentPage.on('request', async request => {
     const interceptRequests = scope.interceptRequests;
     const url = request.url();
     if (interceptRequests[url]) {
@@ -92,94 +93,96 @@ async function visitPage (currentPageName) {
   const urlPath = pages[currentPageName];
   const url = `${scope.host}${urlPath}`;
   const visit = await scope.context.currentPage.goto(url, {
-    waitUntil: "networkidle2"
+    waitUntil: 'networkidle2'
   });
   return visit;
-};
+}
 
-function setLanguages (langs = ["en-US", "en"]) {
+function setLanguages(langs = ['en-US', 'en']) {
   const [language] = langs;
   scope.locale.languages = langs;
   scope.locale.language = [language];
 }
 
-function setTimezone (timeZone) {
+function setTimezone(timeZone) {
   scope.locale.timeZone = timeZone;
 }
 
-async function waitForNavigation () {
+async function waitForNavigation() {
   await scope.context.currentPage.waitForNavigation();
 }
 
-async function waitForUrl (pageName) {
+async function waitForUrl(pageName) {
   const expecetedUrl = pages[pageName];
   const url = await scope.context.currentPage.url();
   expect(url).toEqual(`${scope.host}${expecetedUrl}`);
 }
 
-async function waitForText (text) {
+async function waitForText(text) {
   await scope.context.currentPage.waitForXPath(
-    `//*[contains(normalize-space(string(.)), '${text}')]`);
+    `//*[contains(normalize-space(string(.)), '${text}')]`
+  );
 }
 
-async function waitForElementHides (elementType, elementName) {
+async function waitForElementHides(elementType, elementName) {
   const selector = scope.context.currentSelectors[elementType][elementName];
   await scope.context.currentPage.waitForXPath(selector, {
     hidden: true
   });
 }
 
-async function wait (ms) {
+async function wait(ms) {
   await scope.context.currentPage.waitFor(ms);
 }
 
-async function goToUrl (url) {
+async function goToUrl(url) {
   return scope.context.currentPage.goto(url, {
-    waitUntil: "networkidle2"
+    waitUntil: 'networkidle2'
   });
 }
 
-async function reloadPage () {
+async function reloadPage() {
   await scope.context.currentPage.reload();
 }
 
-function loadPageSelectors (currentPageName) {
+function loadPageSelectors(currentPageName) {
   scope.context.currentSelectors = selectors[currentPageName];
 }
 
-function interceptRequest (url, response) {
+function interceptRequest(url, response) {
   scope.interceptRequests[url] = response;
 }
 
-async function getText (selectorName) {
+async function getText(selectorName) {
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
-  return scope.context.currentPage.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(" "));
+  return scope.context.currentPage.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(' '));
 }
 
-async function hasElement (containerSelectorName, elementSelectorName) {
+async function hasElement(containerSelectorName, elementSelectorName) {
   await initBrowser();
   const containerSelector = scope.context.currentSelectors[containerSelectorName];
   const elementSelector = scope.context.currentSelectors[elementSelectorName];
   return !!scope.context.currentPage.$(`${containerSelector} > ${elementSelector}`);
 }
 
-async function countOfElements (containerSelectorName, elementSelectorName) {
+async function countOfElements(containerSelectorName, elementSelectorName) {
   await initBrowser();
   const containerSelector = scope.context.currentSelectors[containerSelectorName];
   const elementSelector = scope.context.currentSelectors[elementSelectorName];
   return scope.context.currentPage.$$eval(`${containerSelector} > ${elementSelector}`, elements => elements.length);
 }
 
-async function getTextsBetween (itemsSelector, afterText, beforeText) {
+async function getTextsBetween(itemsSelector, afterText, beforeText) {
   await initBrowser();
-  return scope.context.currentPage.$$eval(itemsSelector, (elements, afterText, beforeText) => {
+  return scope.context.currentPage.$$eval(itemsSelector, (elements, beginText, endText) => {
     const texts = [];
     let beginTextFound = false;
+    // eslint-disable-next-line no-restricted-syntax
     for (let element of elements) {
       const elementTextContent = element.textContent.trim();
 
-      if (elementTextContent === beforeText) {
+      if (elementTextContent === endText) {
         break;
       }
 
@@ -187,7 +190,7 @@ async function getTextsBetween (itemsSelector, afterText, beforeText) {
         texts.push(elementTextContent);
       }
 
-      if (elementTextContent === afterText) {
+      if (elementTextContent === beginText) {
         beginTextFound = true;
       }
     }

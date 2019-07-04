@@ -13,11 +13,12 @@
   },
   "scripts": {
     "test": "npm run test:integration",
+    "test:jest": "jest",
     "test:integration": "npm run pretest && npx cucumber-js --fail-fast",
     "test:integration:only": "npm run pretest && npx cucumber-js --fail-fast --tags=@only",
     "start": "node index.js",
     "example:rtmbot": "node examples/rtmbot/index.js",
-    "example:rtmbot:integration": "npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm test -- --runInBand examples/rtmbot/",
+    "example:rtmbot:integration": "npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm run test:jest -- --runInBand examples/rtmbot/",
     "pretest": "eslint --ignore-path .gitignore .",
     "lint:hbs": "ember-template-lint views/* views/**/*"
   },

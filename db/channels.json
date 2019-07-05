@@ -3,16 +3,24 @@
         "id": "C12345679",
         "name": "general",
         "is_channel": true,
+        "is_group": false,
+        "is_im": false,
         "created": 1449709280,
         "creator": "W12345678",
         "is_archived": false,
         "is_general": true,
+        "unlinked": 0,
         "name_normalized": "general",
+        "is_read_only": false,
         "is_shared": false,
+        "is_ext_shared": false,
         "is_org_shared": false,
+        "pending_shared": [],
+        "is_pending_ext_shared": false,
         "is_member": true,
         "is_private": false,
         "is_mpim": false,
+        "last_read": "1502126650.228446",
         "members": [
             "W12345678",
             "W12345679"
@@ -28,22 +36,31 @@
             "last_set": 1449709334
         },
         "previous_names": [],
-        "num_members": 2
+        "num_members": 2,
+        "locale": "en-US"
     },
     {
         "id": "C12345678",
         "name": "random",
         "is_channel": true,
+        "is_group": false,
+        "is_im": false,
         "created": 1449709280,
         "creator": "W12345678",
         "is_archived": false,
         "is_general": false,
+        "unlinked": 0,
         "name_normalized": "random",
+        "is_read_only": false,
         "is_shared": false,
+        "is_ext_shared": false,
         "is_org_shared": false,
+        "pending_shared": [],
+        "is_pending_ext_shared": false,
         "is_member": true,
         "is_private": false,
         "is_mpim": false,
+        "last_read": "1502126650.228446",
         "members": [
             "W12345678",
             "W12345679"
@@ -59,6 +76,7 @@
             "last_set": 0
         },
         "previous_names": [],
-        "num_members": 2
+        "num_members": 2,
+        "locale": "en-US"
     }
 ]

@@ -2,6 +2,7 @@ const expect = require('expect');
 const scope = require('./support/scope');
 const selectors = require('./selectors');
 const pages = require('./pages');
+const { user } = require('./support/services');
 
 const VIEWPORT = [1920, 1080];
 
@@ -198,6 +199,42 @@ async function getTextsBetween(itemsSelector, afterText, beforeText) {
   }, afterText, beforeText);
 }
 
+function createFakeUser(name, params) {
+  if (!scope.context.appUsers[name]) {
+    const bot = user.create(params);
+    scope.context.appUsers[name] = bot;
+  } else {
+    throw new Error(`User with name ${name} already exists and can't be created again`);
+  }
+}
+
+async function connectFakeUser(name) {
+  if (scope.context.appUsers[name]) {
+    await scope.context.appUsers[name].start();
+  } else {
+    throw new Error(`No registered users with name ${name} to start`);
+  }
+}
+
+async function typeText(text) {
+  await scope.context.currentPage.keyboard.type(text);
+}
+
+async function pressTheButton(button) {
+  await scope.context.currentPage.keyboard.press(button);
+}
+
+function getLastIncomingMessageTextForUser(name) {
+  if (scope.context.appUsers[name]) {
+    const message = scope.context.appUsers[name].getLastIncomingMessage();
+    if (!message) {
+      throw new Error(`No messages found for user ${name}`);
+    }
+    return message.text;
+  }
+  throw new Error(`No registered users with name ${name} to start`);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -214,5 +251,10 @@ module.exports = {
   loadPageSelectors,
   waitForNavigation,
   waitForElementHides,
-  getTextsBetween
+  getTextsBetween,
+  createFakeUser,
+  connectFakeUser,
+  typeText,
+  pressTheButton,
+  getLastIncomingMessageTextForUser
 };

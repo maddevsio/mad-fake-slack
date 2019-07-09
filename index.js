@@ -55,6 +55,8 @@ app.use('/test', testApiRouter);
 
 function createUIServer({ httpPort, httpHost }) {
   const server = http.createServer(app);
+  // eslint-disable-next-line global-require
+  require('express-ws')(app, server);
   return {
     start() {
       return new Promise(resolve => {

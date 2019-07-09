@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 
 const {
   Given,
-  // When,
+  When,
   Then
 } = require('cucumber');
 
@@ -53,4 +53,23 @@ Then('I should see {string} messages', async (count) => {
   const expectedCount = +count;
   const actualCount = await actions.countOfElements('Messages container', 'Message item');
   expect(actualCount).toStrictEqual(expectedCount);
+});
+
+Given('User {string} connected to fake slack using parameters:', async (name, dataTable) => {
+  const params = dataTable.rowsHash();
+  actions.createFakeUser(name, params);
+  await actions.connectFakeUser(name);
+});
+
+Given('I type {string}', async (text) => {
+  await actions.typeText(text);
+});
+
+When('I press the {string} keyboard button', async (buttonName) => {
+  await actions.pressTheButton(buttonName);
+});
+
+Then('User {string} should receive message {string}', (userName, expectedMessage) => {
+  const message = actions.getLastIncomingMessageTextForUser(userName);
+  expect(message).toStrictEqual(expectedMessage);
 });

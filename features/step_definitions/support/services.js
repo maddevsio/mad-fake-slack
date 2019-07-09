@@ -1,4 +1,5 @@
 const createUIServer = require('../../../index');
+const FakeUser = require('./fakeuser');
 
 module.exports = {
   ui: {
@@ -6,5 +7,10 @@ module.exports = {
       httpPort: 9001,
       httpHost: 'localhost'
     })
+  },
+  user: {
+    create({ token, url }) {
+      return new FakeUser(token, url);
+    }
   }
 };

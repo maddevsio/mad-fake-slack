@@ -17,7 +17,7 @@
     "test:integration": "npm run pretest && npx cucumber-js --fail-fast",
     "test:integration:only": "npm run pretest && npx cucumber-js --fail-fast --tags=@only",
     "start": "node index.js",
-    "example:rtmbot": "node examples/rtmbot/index.js",
+    "example:rtmbot": "SLACK_API=http://localhost:9001/api/ node examples/rtmbot/index.js",
     "example:rtmbot:integration": "npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm run test:jest -- --runInBand examples/rtmbot/",
     "pretest": "eslint --ignore-path .gitignore .",
     "lint:hbs": "ember-template-lint views/* views/**/*"
@@ -49,7 +49,7 @@
     "bluebird": "^3.5.5",
     "cucumber": "^5.1.0",
     "ember-template-lint": "^1.3.0",
-    "eslint": "^5.3.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-jest": "^22.7.1",

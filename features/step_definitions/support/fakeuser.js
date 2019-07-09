@@ -1,6 +1,5 @@
-const { WebClient, LogLevel } = require('@slack/web-api');
+const { WebClient } = require('@slack/web-api');
 const { RTMClient } = require('@slack/rtm-api');
-
 const API_CHANNELS_LIST = 'channels.list';
 
 class FakeUser {
@@ -16,12 +15,15 @@ class FakeUser {
   }
 
   async start() {
-    this.web = new WebClient(this.token, { slackApiUrl: this.slackApiUrl, logLevel: LogLevel.DEBUG });
-    this.rtm = new RTMClient(this.token, { slackApiUrl: this.slackApiUrl, logLevel: LogLevel.DEBUG });
+    this.web = new WebClient(this.token, { slackApiUrl: this.slackApiUrl });
+    this.rtm = new RTMClient(this.token, { slackApiUrl: this.slackApiUrl });
     this.setupEvents();
     const { self, team } = await this.rtm.start();
     this.self = self;
     this.team = team;
+    return new Promise(resolve => {
+      this.resolveStart = resolve;
+    });
   }
 
   getChannelIdByName(channelName) {
@@ -35,6 +37,10 @@ class FakeUser {
       this.apiResponses['auth.test'] = authTestResponse;
       const channelsListResponse = await this.web.channels.list({ exclude_archived: 1 });
       this.apiResponses['channels.list'] = channelsListResponse;
+      if (typeof this.resolveStart === 'function') {
+        this.resolveStart();
+        delete this.resolveStart;
+      }
     });
 
     this.rtm.on('message', async (event) => {
@@ -51,9 +57,16 @@ class FakeUser {
     return this.rtm.sendMessage(message, id);
   }
 
-  async close() {
-    this.rtm.removeAllListeners();
-    return this.rtm.disconnect();
+  getLastIncomingMessage() {
+    return this.rtmIncomingMessages.length && this.rtmIncomingMessages[this.rtmIncomingMessages.length - 1];
+  }
+
+  close() {
+    if (this.rtm) {
+      this.rtm.removeAllListeners();
+      return this.rtm.disconnect();
+    }
+    return true;
   }
 }
 

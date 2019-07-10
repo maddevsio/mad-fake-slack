@@ -12,4 +12,15 @@ Feature: Sending messages
         And I type "my simple text message"
         When I press the "Enter" keyboard button
         Then I should see "my simple text message" in "Message body"
-        And User "Valera" should receive message "my simple text message"
+        And User "Valera" should receive messages:
+            | message                        | channel |
+            | my simple text message         | general |
+
+    Scenario: Sending simple text message to "random" channel
+        And I click on "channel item" with text "random"
+        And I type "text message to random channel"
+        When I press the "Enter" keyboard button
+        Then I should see "text message to random channel" in "Message body" on the "last" position
+        And User "Valera" should receive messages:
+            | message                        | channel |
+            | text message to random channel | random  |

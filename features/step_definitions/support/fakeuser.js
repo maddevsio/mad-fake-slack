@@ -61,6 +61,16 @@ class FakeUser {
     return this.rtmIncomingMessages.length && this.rtmIncomingMessages[this.rtmIncomingMessages.length - 1];
   }
 
+  getLastIncomingMessageByChannelId(channelId) {
+    const filteredMessages = this.rtmIncomingMessages.filter(msg => msg.channel === channelId);
+    return filteredMessages[filteredMessages.length - 1];
+  }
+
+  getLastIncomingMessagesByChannelId(channelId, limit = 10) {
+    const filteredMessages = this.rtmIncomingMessages.filter(msg => msg.channel === channelId);
+    return filteredMessages.slice(-1 * limit);
+  }
+
   close() {
     if (this.rtm) {
       this.rtm.removeAllListeners();

@@ -18,6 +18,11 @@ Then('I should see {string} in {string}', async (expectedText, selectorName) => 
   expect(actualText).toStrictEqual(expectedText);
 });
 
+Then('I should see {string} in {string} on the {string} position', async (expectedText, selectorName, position) => {
+  const actualText = await actions.getTextByPosition(selectorName, position || 'last');
+  expect(actualText).toStrictEqual(expectedText);
+});
+
 Given('My timezone is {string}', (timezoneName) => {
   actions.setTimezone(timezoneName);
 });
@@ -72,4 +77,14 @@ When('I press the {string} keyboard button', async (buttonName) => {
 Then('User {string} should receive message {string}', (userName, expectedMessage) => {
   const message = actions.getLastIncomingMessageTextForUser(userName);
   expect(message).toStrictEqual(expectedMessage);
+});
+
+Given('I click on {string} with text {string}', async (selectorName, text) => {
+  await actions.clickOn(selectorName, { text });
+});
+
+Then('User {string} should receive messages:', (userName, dataTable) => {
+  const rows = dataTable.rows();
+  const expected = rows.map(row => [...row, true]);
+  expect(actions.checkIsMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });

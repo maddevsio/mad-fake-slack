@@ -1,6 +1,7 @@
 # mad-fake-slack
 
 [![Developed by Mad Devs](https://mdbadge.glitch.me/badge.svg?theme=red-white)](https://maddevs.io)
+[![Dependabot](https://badgen.net/badge/Dependabot/enabled/blue?icon=dependabot)](https://dependabot.com/)
 [![Build Status](https://api.cirrus-ci.com/github/maddevsio/mad-fake-slack.svg)](https://cirrus-ci.com/github/maddevsio/mad-fake-slack)
 [![CircleCI](https://circleci.com/gh/maddevsio/mad-fake-slack.svg?style=svg)](https://circleci.com/gh/maddevsio/mad-fake-slack)
 [![Build Status](https://travis-ci.org/maddevsio/mad-fake-slack.svg?branch=master)](https://travis-ci.org/maddevsio/mad-fake-slack)

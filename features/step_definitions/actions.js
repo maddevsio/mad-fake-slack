@@ -377,6 +377,30 @@ function resetDb() {
   dbManager.reset();
 }
 
+async function waitForAnswer(fn, interval, maxFailCount = 1) {
+  return new Promise((resolve, reject) => {
+    let failCounter = 0;
+    let id;
+    async function check() {
+      try {
+        if (id) {
+          clearTimeout(id);
+        }
+        resolve(await fn());
+      } catch (e) {
+        if (failCounter >= maxFailCount) {
+          if (id) {
+            clearTimeout(id);
+          }
+          reject(e);
+        }
+        failCounter += 1;
+      }
+    }
+    id = setInterval(check, interval);
+  });
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -404,5 +428,6 @@ module.exports = {
   checkIsMessagesReceivedByUserFromChannel,
   validateIncomingMessage,
   getLastIncomingMessageForUser,
-  resetDb
+  resetDb,
+  waitForAnswer
 };

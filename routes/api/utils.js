@@ -24,11 +24,16 @@ function isMultipartForm(req) {
   return req.headers['content-type'] && req.headers['content-type'].startsWith('multipart/form-data');
 }
 
+function createTs(id) {
+  return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, '0')}`;
+}
+
 module.exports = {
   copyObject,
   getChannelId,
   isOpenChannel,
   isBot,
   isUrlEncodedForm,
-  isMultipartForm
+  isMultipartForm,
+  createTs
 };

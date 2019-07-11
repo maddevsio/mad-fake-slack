@@ -53,8 +53,10 @@
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-jest": "^22.7.1",
+    "faker": "^4.1.0",
     "jest": "^24.8.0",
     "jest-puppeteer": "^4.2.0",
+    "jsonschema": "^1.2.4",
     "node-fetch": "^2.6.0",
     "puppeteer": "^1.18.0"
   }

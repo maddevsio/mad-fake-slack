@@ -3,6 +3,7 @@ Feature: Content of fake slack main page
 
     Background:
         Given My timezone is "Asia/Bishkek"
+        And Fake slack db is empty
         And I am on "fake slack ui" page
 
     Scenario: Team name content

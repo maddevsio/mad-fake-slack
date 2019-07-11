@@ -3,8 +3,26 @@ const scope = require('./support/scope');
 const selectors = require('./selectors');
 const pages = require('./pages');
 const { user } = require('./support/services');
+const { dbManager } = require('../../routes/managers');
+const { CustomJSONSchemaValidator } = require('./support/validators');
+const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
+const jsonSchemaValidator = new Validator();
 
 const VIEWPORT = [1920, 1080];
+
+function groupBy(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}
 
 async function initBrowser() {
   if (!scope.browser) {
@@ -217,10 +235,12 @@ async function connectFakeUser(name) {
 }
 
 async function typeText(text) {
+  await initBrowser();
   await scope.context.currentPage.keyboard.type(text);
 }
 
 async function pressTheButton(button) {
+  await initBrowser();
   await scope.context.currentPage.keyboard.press(button);
 }
 
@@ -233,6 +253,152 @@ function getLastIncomingMessageTextForUser(name) {
     return message.text;
   }
   throw new Error(`No registered users with name ${name} to start`);
+}
+
+function getLastIncomingMessageForUser(name) {
+  if (scope.context.appUsers[name]) {
+    const message = scope.context.appUsers[name].getLastIncomingMessage();
+    if (!message) {
+      throw new Error(`No messages found for user ${name}`);
+    }
+    return message;
+  }
+  throw new Error(`No registered users with name ${name} to start`);
+}
+
+async function findElement(options) {
+  const page = scope.context.currentPage;
+  return page.waitForFunction(({ text, selector: elementSelector }) => {
+    if (text) {
+      const elements = Array.from(document.querySelectorAll(elementSelector));
+      const getTextContent = el => el.textContent
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const filterByText = el => getTextContent(el) === text;
+      const filterByTextRegexp = el => getTextContent(el).match(text) !== null;
+
+      let selectedFilter = text instanceof RegExp ? filterByTextRegexp : filterByText;
+      const elementsWithText = elements.filter(selectedFilter);
+
+      if (elementsWithText.length) {
+        return elementsWithText[0];
+      }
+    } else {
+      const htmlElement = document.querySelector(elementSelector);
+      if (htmlElement) {
+        return htmlElement;
+      }
+    }
+    return false;
+  }, {}, options);
+}
+
+async function clickOn(selectorName, options = {}) {
+  await initBrowser();
+  const selector = scope.context.currentSelectors[selectorName];
+  if (!selector) {
+    throw new Error(`[${clickOn.name}] Selector by name ${selectorName} not found!`);
+  }
+  const page = scope.context.currentPage;
+  const element = await findElement({ selector, ...options });
+
+  return Promise.all([
+    page.waitForNavigation(),
+    element.click()
+  ]);
+}
+
+async function getTextByPosition(selectorName, position) {
+  const FIRST_POSITION = 'first';
+  const LAST_POSITION = 'last';
+  const page = scope.context.currentPage;
+  if (![LAST_POSITION, FIRST_POSITION].includes(position)) {
+    throw new Error(`[${getTextByPosition.name}] Invalid value for "position"! Valid values: [${position}]`);
+  }
+  await initBrowser();
+  const selector = scope.context.currentSelectors[selectorName];
+  const textContents = await page.$$eval(selector, elements => elements.map(el => el.textContent.replace(/\s+/g, ' ').trim()));
+  return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
+}
+
+function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
+  const channelNameColumnIndex = 1;
+  const messagesByChannels = groupBy(rows, row => row[channelNameColumnIndex]);
+  const channelNames = Array.from(messagesByChannels.keys());
+
+  const channelIds = channelNames.reduce((all, name) => {
+    const channel = dbManager.db.channels.filter(ch => ch.name === name)[0];
+    // eslint-disable-next-line no-param-reassign
+    all[name] = channel.id;
+    return all;
+  }, {});
+
+  const result = [];
+  Array.from(messagesByChannels.entries()).forEach(([channelName, channelMessages]) => {
+    const messages = scope.context.appUsers[userName].getLastIncomingMessagesByChannelId(channelIds[channelName], channelMessages.length);
+    const texts = messages.map(message => message.text);
+    channelMessages.forEach(
+      ([message, channel]) => result.push(
+        [message, channel, texts.includes(message)]
+      )
+    );
+  });
+  return result;
+}
+
+function validateIncomingMessage(messageObject, schemaRows) {
+  const { properties, required } = schemaRows.reduce((schema, row) => {
+    const propName = row[0];
+    const item = { type: row[1] };
+    if (row[3]) {
+      item.format = row[3];
+    }
+    // eslint-disable-next-line no-param-reassign
+    schema.properties[propName] = item;
+    if (row[2] === 'true') {
+      schema.required.push(propName);
+    }
+    return schema;
+  }, { properties: {}, required: [] });
+
+  const schema = {
+    id: '/IncomingMessage',
+    type: 'object',
+    properties,
+    required
+  };
+
+  const validationResult = jsonSchemaValidator.validate(messageObject, schema);
+  return validationResult.errors;
+}
+
+function resetDb() {
+  dbManager.reset();
+}
+
+async function waitForAnswer(fn, interval, maxFailCount = 1) {
+  return new Promise((resolve, reject) => {
+    let failCounter = 0;
+    let id;
+    async function check() {
+      try {
+        if (id) {
+          clearTimeout(id);
+        }
+        resolve(await fn());
+      } catch (e) {
+        if (failCounter >= maxFailCount) {
+          if (id) {
+            clearTimeout(id);
+          }
+          reject(e);
+        }
+        failCounter += 1;
+      }
+    }
+    id = setInterval(check, interval);
+  });
 }
 
 module.exports = {
@@ -256,5 +422,12 @@ module.exports = {
   connectFakeUser,
   typeText,
   pressTheButton,
-  getLastIncomingMessageTextForUser
+  getLastIncomingMessageTextForUser,
+  clickOn,
+  getTextByPosition,
+  checkIsMessagesReceivedByUserFromChannel,
+  validateIncomingMessage,
+  getLastIncomingMessageForUser,
+  resetDb,
+  waitForAnswer
 };

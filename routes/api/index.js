@@ -6,6 +6,7 @@ const multer = require('multer');
 const { dbManager, wsManager } = require('../managers');
 const responses = require('../responses');
 const utils = require('./utils');
+const factories = require('./factories');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -18,7 +19,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.use('*', (req, res, next) => {
+function beforeAllHandler(req, res, next) {
   if (utils.isUrlEncodedForm(req)) {
     express.urlencoded()(req, res, next);
   } else if (utils.isMultipartForm(req)) {
@@ -26,9 +27,9 @@ router.use('*', (req, res, next) => {
   } else {
     express.json()(req, res, next);
   }
-});
+}
 
-router.post('/auth.test', (req, res) => {
+function authTestHandler(req, res) {
   const token = (req.body && req.body.token) || req.headers.Authorization;
   const uid = crypto
     .createHash('md5')
@@ -40,22 +41,27 @@ router.post('/auth.test', (req, res) => {
   exampleResponse.team_id = team.id;
   exampleResponse.user_id = user.id;
   res.json(exampleResponse);
-});
+}
 
-router.post('/chat.postMessage', async (req, res) => {
-  dbManager.channel(req.body.channel).createMessage(dbManager.slackUser().id, req.body);
+async function postMessageHandler(req, res) {
+  const message = dbManager.channel(req.body.channel).createMessage(dbManager.slackUser().id, req.body);
   if (utils.isUrlEncodedForm(req) || utils.isMultipartForm(req)) {
     const channelId = utils.getChannelId(req.body.channel);
     res.redirect(`/messages/${channelId && channelId[0]}`);
   } else {
-    const response = utils.copyObject(responses['chat.postMessage']);
-    response.message = {
-      ...response.message,
-      ...req.body
-    };
     const toChannelId = utils.getChannelId(req.body.channel);
-    const currentUserId = dbManager.slackUser().id;
-
+    const user = dbManager.slackUser();
+    const team = dbManager.slackTeam();
+    const currentUserId = user.id;
+    const response = factories.createMessageResponse(
+      {
+        type: 'message',
+        ts: message.ts,
+        text: req.body.text,
+        channel: toChannelId
+      },
+      { user, team }
+    );
     wsManager.broadcast(JSON.stringify(response.message), currentUserId);
     if (utils.isOpenChannel(toChannelId)) {
       wsManager.broadcastToBots(JSON.stringify(response.message), currentUserId);
@@ -65,7 +71,7 @@ router.post('/chat.postMessage', async (req, res) => {
     }
     res.json(response);
   }
-});
+}
 
 function rtmConnectHandler(req, res) {
   const token = (req.body && req.body.token) || req.headers.Authorization;
@@ -90,19 +96,16 @@ function rtmConnectHandler(req, res) {
   res.json(response);
 }
 
-router.post('/channels.list', (req, res) => {
+function channelsListHandler(req, res) {
   const successResponse = {
     ...responses['channels.list']
   };
 
   successResponse.channels = dbManager.db.channels;
   res.json(successResponse);
-});
-router.get('/rtm.connect', rtmConnectHandler);
-router.post('/rtm.connect', rtmConnectHandler);
-router.get('/rtm.start', rtmConnectHandler);
-router.post('/rtm.start', rtmConnectHandler);
-router.get('/conversations.list', (req, res) => {
+}
+
+function conversationsListHandler(req, res) {
   let { types } = req.query;
   const channelTypes = new Set();
   if (!types) {
@@ -116,6 +119,16 @@ router.get('/conversations.list', (req, res) => {
   }
 
   res.json({ ok: true });
-});
+}
+
+router.use('*', beforeAllHandler);
+router.post('/auth.test', authTestHandler);
+router.post('/chat.postMessage', postMessageHandler);
+router.post('/channels.list', channelsListHandler);
+router.get('/rtm.connect', rtmConnectHandler);
+router.post('/rtm.connect', rtmConnectHandler);
+router.get('/rtm.start', rtmConnectHandler);
+router.post('/rtm.start', rtmConnectHandler);
+router.get('/conversations.list', conversationsListHandler);
 
 module.exports = router;

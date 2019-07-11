@@ -3,6 +3,7 @@ Feature: Sending messages
 
     Background:
         Given My timezone is "Asia/Bishkek"
+        And Fake slack db is empty
         And I am on "fake slack ui" page
         And User "Valera" connected to fake slack using parameters:
             | token | xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT |

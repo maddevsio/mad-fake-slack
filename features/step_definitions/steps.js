@@ -90,10 +90,10 @@ Then('User {string} should receive messages:', (userName, dataTable) => {
 });
 
 
-Then('User {string} should receive the following {string} payload:', (userName, messageDirection, dataTable) => {
+Then('User {string} should receive the following {string} payload:', async (userName, messageDirection, dataTable) => {
   const payload = dataTable.rows();
   if (messageDirection === 'incoming') {
-    const message = actions.getLastIncomingMessageForUser(userName);
+    const message = await actions.waitForAnswer(() => actions.getLastIncomingMessageForUser(userName), 1000, 3);
     expect(actions.validateIncomingMessage(message, payload)).toStrictEqual([]);
   }
 });

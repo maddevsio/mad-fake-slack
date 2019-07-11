@@ -88,3 +88,16 @@ Then('User {string} should receive messages:', (userName, dataTable) => {
   const expected = rows.map(row => [...row, true]);
   expect(actions.checkIsMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
+
+
+Then('User {string} should receive the following {string} payload:', (userName, messageDirection, dataTable) => {
+  const payload = dataTable.rows();
+  if (messageDirection === 'incoming') {
+    const message = actions.getLastIncomingMessageForUser(userName);
+    expect(actions.validateIncomingMessage(message, payload)).toStrictEqual([]);
+  }
+});
+
+Given('Fake slack db is empty', () => {
+  actions.resetDb();
+});

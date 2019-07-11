@@ -4,6 +4,9 @@ const selectors = require('./selectors');
 const pages = require('./pages');
 const { user } = require('./support/services');
 const { dbManager } = require('../../routes/managers');
+const { CustomJSONSchemaValidator } = require('./support/validators');
+const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
+const jsonSchemaValidator = new Validator();
 
 const VIEWPORT = [1920, 1080];
 
@@ -252,6 +255,17 @@ function getLastIncomingMessageTextForUser(name) {
   throw new Error(`No registered users with name ${name} to start`);
 }
 
+function getLastIncomingMessageForUser(name) {
+  if (scope.context.appUsers[name]) {
+    const message = scope.context.appUsers[name].getLastIncomingMessage();
+    if (!message) {
+      throw new Error(`No messages found for user ${name}`);
+    }
+    return message;
+  }
+  throw new Error(`No registered users with name ${name} to start`);
+}
+
 async function findElement(options) {
   const page = scope.context.currentPage;
   return page.waitForFunction(({ text, selector: elementSelector }) => {
@@ -333,6 +347,36 @@ function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
   return result;
 }
 
+function validateIncomingMessage(messageObject, schemaRows) {
+  const { properties, required } = schemaRows.reduce((schema, row) => {
+    const propName = row[0];
+    const item = { type: row[1] };
+    if (row[3]) {
+      item.format = row[3];
+    }
+    // eslint-disable-next-line no-param-reassign
+    schema.properties[propName] = item;
+    if (row[2] === 'true') {
+      schema.required.push(propName);
+    }
+    return schema;
+  }, { properties: {}, required: [] });
+
+  const schema = {
+    id: '/IncomingMessage',
+    type: 'object',
+    properties,
+    required
+  };
+
+  const validationResult = jsonSchemaValidator.validate(messageObject, schema);
+  return validationResult.errors;
+}
+
+function resetDb() {
+  dbManager.reset();
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -357,5 +401,8 @@ module.exports = {
   getLastIncomingMessageTextForUser,
   clickOn,
   getTextByPosition,
-  checkIsMessagesReceivedByUserFromChannel
+  checkIsMessagesReceivedByUserFromChannel,
+  validateIncomingMessage,
+  getLastIncomingMessageForUser,
+  resetDb
 };

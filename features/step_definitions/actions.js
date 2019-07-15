@@ -359,7 +359,11 @@ function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
 function checkIsStatusMessagesReceivedByUserFromChannel(userName, rows) {
   const result = [];
   iterateLastIncomingMessages(userName, rows, (messages, channelMessages) => {
-    const types = messages.map(message => message.type);
+    const types = Array.from(messages.reduce((set, message) => {
+      set.add(message.type);
+      return set;
+    }, new Set()).values());
+
     channelMessages.forEach(
       ([type, channel]) => result.push(
         [type, channel, types.includes(type)]

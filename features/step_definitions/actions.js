@@ -255,9 +255,9 @@ function getLastIncomingMessageTextForUser(name) {
   throw new Error(`No registered users with name ${name} to start`);
 }
 
-function getLastIncomingMessageForUser(name) {
+function getLastIncomingPayloadForUser(name, payloadType) {
   if (scope.context.appUsers[name]) {
-    const message = scope.context.appUsers[name].getLastIncomingMessage();
+    const message = scope.context.appUsers[name].getLastIncomingPayload(payloadType);
     if (!message) {
       throw new Error(`No messages found for user ${name}`);
     }
@@ -322,7 +322,7 @@ async function getTextByPosition(selectorName, position) {
   return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
 }
 
-function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
+function iterateLastIncomingMessages(userName, rows, cb) {
   const channelNameColumnIndex = 1;
   const messagesByChannels = groupBy(rows, row => row[channelNameColumnIndex]);
   const channelNames = Array.from(messagesByChannels.keys());
@@ -337,10 +337,32 @@ function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
   const result = [];
   Array.from(messagesByChannels.entries()).forEach(([channelName, channelMessages]) => {
     const messages = scope.context.appUsers[userName].getLastIncomingMessagesByChannelId(channelIds[channelName], channelMessages.length);
+    cb(messages, channelMessages);
+  });
+  return result;
+}
+
+
+function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
+  const result = [];
+  iterateLastIncomingMessages(userName, rows, (messages, channelMessages) => {
     const texts = messages.map(message => message.text);
     channelMessages.forEach(
       ([message, channel]) => result.push(
         [message, channel, texts.includes(message)]
+      )
+    );
+  });
+  return result;
+}
+
+function checkIsStatusMessagesReceivedByUserFromChannel(userName, rows) {
+  const result = [];
+  iterateLastIncomingMessages(userName, rows, (messages, channelMessages) => {
+    const types = messages.map(message => message.type);
+    channelMessages.forEach(
+      ([type, channel]) => result.push(
+        [type, channel, types.includes(type)]
       )
     );
   });
@@ -428,7 +450,8 @@ module.exports = {
   getTextByPosition,
   checkIsMessagesReceivedByUserFromChannel,
   validateIncomingMessage,
-  getLastIncomingMessageForUser,
   resetDb,
-  waitForAnswer
+  waitForAnswer,
+  checkIsStatusMessagesReceivedByUserFromChannel,
+  getLastIncomingPayloadForUser
 };

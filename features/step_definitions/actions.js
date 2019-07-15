@@ -234,9 +234,9 @@ async function connectFakeUser(name) {
   }
 }
 
-async function typeText(text) {
+async function typeText(text, options = { delay: 100 }) {
   await initBrowser();
-  await scope.context.currentPage.keyboard.type(text);
+  await scope.context.currentPage.keyboard.type(text, options);
 }
 
 async function pressTheButton(button) {
@@ -381,17 +381,18 @@ async function waitForAnswer(fn, interval, maxFailCount = 1) {
   return new Promise((resolve, reject) => {
     let failCounter = 0;
     let id;
+    function clearResources(timerId) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    }
     async function check() {
       try {
-        if (id) {
-          clearTimeout(id);
-        }
         resolve(await fn());
+        clearResources(id);
       } catch (e) {
         if (failCounter >= maxFailCount) {
-          if (id) {
-            clearTimeout(id);
-          }
+          clearResources(id);
           reject(e);
         }
         failCounter += 1;

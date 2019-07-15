@@ -203,7 +203,10 @@
     users: {{{ json users }}},
     bots: {{{ json bots }}},
     team: {{{ json team }}},
-    me: {{{ json me }}}
+    me: {{{ json me }}},
+    getSelectedChannel() {
+      return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
+    }
   };
 
   Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
@@ -286,7 +289,7 @@
   socket.emit = function (type, data) {
     socket.send(JSON.stringify({ type, data }))
   };
-  socket.emitJson = function (data) {
+  socket.emitJSON = function (data) {
     socket.send(JSON.stringify(data));
   };
   socket.addEventListener('open', function (event) {

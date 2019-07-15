@@ -62,6 +62,34 @@
   const msgForm = window.msg_form;
   const msgInputText = window.msg_input_text;
   const msgContainer = window.messages_container;
+
+  const throttle = (func, limit) => {
+    let lastFunc;
+    let lastRan;
+    return function () {
+      const context = this
+      const args = Array.from(arguments);
+      if (!lastRan) {
+        func.apply(context, args)
+        lastRan = Date.now()
+      } else {
+        clearTimeout(lastFunc)
+        lastFunc = setTimeout(function () {
+          if ((Date.now() - lastRan) >= limit) {
+            func.apply(context, args)
+            lastRan = Date.now()
+          }
+        }, limit - (Date.now() - lastRan))
+      }
+    }
+  }
+
+  msgInputText.addEventListener('input', throttle((e) => {
+    const user = Handlebars.context.me.id;
+    const channel = Handlebars.context.getSelectedChannel().id;
+    Handlebars.ws.emitJSON({ type: "user_typing", channel, user });
+  }, 5000));
+
   msgForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (e.target.id !== "msg_form") return;

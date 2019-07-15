@@ -14,7 +14,7 @@ Feature: Incoming message payload
         And I type "general text message"
         When I press the "Enter" keyboard button
         Then I should see "general text message" in "Message body"
-        And User "Valera" should receive the following "incoming" payload:
+        And User "Valera" should receive "incoming" payload with "message" type:
             | field                 | type    | required | format      |
             | client_msg_id         | string  | true     | uuid        |
             | suppress_notification | boolean | true     |             |
@@ -32,7 +32,8 @@ Feature: Incoming message payload
         And I click on "channel item" with text "random"
         And I type "random text message"
         When I press the "Enter" keyboard button
-        And User "Valera" should receive the following "incoming" payload:
+        Then I should see "random text message" in "Message body" on the "last" position
+        And User "Valera" should receive "incoming" payload with "message" type:
             | field                 | type    | required | format      |
             | client_msg_id         | string  | true     | uuid        |
             | suppress_notification | boolean | true     |             |

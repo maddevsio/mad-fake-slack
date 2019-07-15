@@ -29,9 +29,16 @@ const handlers = {
     response.ts = message.ts;
     response.channel = message.channel;
 
+    const jsonPayload = JSON.stringify(response.message);
+
     wsManager.sendJson(ws, response);
-    wsManager.broadcast(JSON.stringify(response.message), ws.user.id);
-    wsManager.broadcastToBots(JSON.stringify(response.message), ws.user.id);
+    wsManager.broadcast(jsonPayload, ws.user.id);
+    wsManager.broadcastToBots(jsonPayload, ws.user.id);
+  },
+  user_typing: (ws, msg) => {
+    const message = JSON.stringify(msg);
+    wsManager.broadcast(message, ws.user.id);
+    wsManager.broadcastToBots(message, ws.user.id);
   }
 };
 

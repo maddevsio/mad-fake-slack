@@ -234,9 +234,9 @@ async function connectFakeUser(name) {
   }
 }
 
-async function typeText(text) {
+async function typeText(text, options = { delay: 100 }) {
   await initBrowser();
-  await scope.context.currentPage.keyboard.type(text);
+  await scope.context.currentPage.keyboard.type(text, options);
 }
 
 async function pressTheButton(button) {
@@ -255,9 +255,9 @@ function getLastIncomingMessageTextForUser(name) {
   throw new Error(`No registered users with name ${name} to start`);
 }
 
-function getLastIncomingMessageForUser(name) {
+function getLastIncomingPayloadForUser(name, payloadType) {
   if (scope.context.appUsers[name]) {
-    const message = scope.context.appUsers[name].getLastIncomingMessage();
+    const message = scope.context.appUsers[name].getLastIncomingPayload(payloadType);
     if (!message) {
       throw new Error(`No messages found for user ${name}`);
     }
@@ -322,7 +322,7 @@ async function getTextByPosition(selectorName, position) {
   return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
 }
 
-function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
+function iterateLastIncomingMessages(userName, rows, cb) {
   const channelNameColumnIndex = 1;
   const messagesByChannels = groupBy(rows, row => row[channelNameColumnIndex]);
   const channelNames = Array.from(messagesByChannels.keys());
@@ -337,10 +337,36 @@ function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
   const result = [];
   Array.from(messagesByChannels.entries()).forEach(([channelName, channelMessages]) => {
     const messages = scope.context.appUsers[userName].getLastIncomingMessagesByChannelId(channelIds[channelName], channelMessages.length);
+    cb(messages, channelMessages);
+  });
+  return result;
+}
+
+
+function checkIsMessagesReceivedByUserFromChannel(userName, rows) {
+  const result = [];
+  iterateLastIncomingMessages(userName, rows, (messages, channelMessages) => {
     const texts = messages.map(message => message.text);
     channelMessages.forEach(
       ([message, channel]) => result.push(
         [message, channel, texts.includes(message)]
+      )
+    );
+  });
+  return result;
+}
+
+function checkIsStatusMessagesReceivedByUserFromChannel(userName, rows) {
+  const result = [];
+  iterateLastIncomingMessages(userName, rows, (messages, channelMessages) => {
+    const types = Array.from(messages.reduce((set, message) => {
+      set.add(message.type);
+      return set;
+    }, new Set()).values());
+
+    channelMessages.forEach(
+      ([type, channel]) => result.push(
+        [type, channel, types.includes(type)]
       )
     );
   });
@@ -381,17 +407,18 @@ async function waitForAnswer(fn, interval, maxFailCount = 1) {
   return new Promise((resolve, reject) => {
     let failCounter = 0;
     let id;
+    function clearResources(timerId) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    }
     async function check() {
       try {
-        if (id) {
-          clearTimeout(id);
-        }
         resolve(await fn());
+        clearResources(id);
       } catch (e) {
         if (failCounter >= maxFailCount) {
-          if (id) {
-            clearTimeout(id);
-          }
+          clearResources(id);
           reject(e);
         }
         failCounter += 1;
@@ -427,7 +454,8 @@ module.exports = {
   getTextByPosition,
   checkIsMessagesReceivedByUserFromChannel,
   validateIncomingMessage,
-  getLastIncomingMessageForUser,
   resetDb,
-  waitForAnswer
+  waitForAnswer,
+  checkIsStatusMessagesReceivedByUserFromChannel,
+  getLastIncomingPayloadForUser
 };

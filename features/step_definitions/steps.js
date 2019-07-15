@@ -89,11 +89,16 @@ Then('User {string} should receive messages:', (userName, dataTable) => {
   expect(actions.checkIsMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
 
+Then('User {string} should receive status messages:', (userName, dataTable) => {
+  const rows = dataTable.rows();
+  const expected = rows.map(row => [...row, true]);
+  expect(actions.checkIsStatusMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
+});
 
-Then('User {string} should receive the following {string} payload:', async (userName, messageDirection, dataTable) => {
+Then('User {string} should receive {string} payload with {string} type:', async (userName, messageDirection, payloadType, dataTable) => {
   const payload = dataTable.rows();
   if (messageDirection === 'incoming') {
-    const message = await actions.waitForAnswer(() => actions.getLastIncomingMessageForUser(userName), 1000, 3);
+    const message = await actions.waitForAnswer(() => actions.getLastIncomingPayloadForUser(userName, payloadType), 1000, 3);
     expect(actions.validateIncomingMessage(message, payload)).toStrictEqual([]);
   }
 });

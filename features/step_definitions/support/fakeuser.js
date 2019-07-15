@@ -57,12 +57,18 @@ class FakeUser {
     return this.rtm.sendMessage(message, id);
   }
 
+  getLastIncomingPayload(payloadType) {
+    const lastItemIndex = this.rtmIncomingMessages.length - 1;
+    const index = this.rtmIncomingMessages.slice().reverse().findIndex(m => m.type === payloadType);
+    return index >= 0 && this.rtmIncomingMessages[lastItemIndex - index];
+  }
+
   getLastIncomingMessage() {
-    return this.rtmIncomingMessages.length && this.rtmIncomingMessages[this.rtmIncomingMessages.length - 1];
+    return this.getLastIncomingPayload('message');
   }
 
   getLastIncomingMessageByChannelId(channelId) {
-    const filteredMessages = this.rtmIncomingMessages.filter(msg => msg.channel === channelId);
+    const filteredMessages = this.getLastIncomingMessagesByChannelId(channelId, 1);
     return filteredMessages[filteredMessages.length - 1];
   }
 

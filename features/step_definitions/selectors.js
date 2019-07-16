@@ -23,7 +23,9 @@ const mainSelectors = {
   'Left notification section': '.p-notification_bar__section.p-notification_bar__section--left',
   'Right notification section': '.p-notification_bar__section.p-notification_bar__section--right',
   'Message body': '#messages_container .c-message__body',
-  'channel item': 'span.p-channel_sidebar__name'
+  'channel item': 'span.p-channel_sidebar__name',
+  'Notification bar': '.p-notification_bar__section--left',
+  'Notification bar item': '.p-notification_bar__section--left .p-notification_bar__typing'
 };
 
 const selectors = {

@@ -5,7 +5,9 @@
 
 	// Uncomment the next line if you want to publish any ports.
 	"appPort": [9001, 9222],
-
+	"runArgs": [
+		"-v", "/var/run/docker.sock:/var/run/docker.sock", 
+	],
 	// Uncomment the next line if you want to add in default container specific settings.json values
 	// "settings":  { "workbench.colorTheme": "Quiet Light" },
 

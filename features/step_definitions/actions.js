@@ -175,6 +175,7 @@ function interceptRequest(url, response) {
 async function getText(selectorName) {
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
+  await scope.context.currentPage.waitForSelector(selector, { visible: true });
   return scope.context.currentPage.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(' '));
 }
 
@@ -428,6 +429,14 @@ async function waitForAnswer(fn, interval, maxFailCount = 1) {
   });
 }
 
+async function sendMessageFrom(userName, channelName, options) {
+  const { type } = options;
+  if (type === 'user_typing') {
+    return scope.context.appUsers[userName].sendUserTypingToChannel(channelName);
+  }
+  return scope.context.appUsers[userName].sendTextMessageToChannel(channelName, options.text);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -457,5 +466,6 @@ module.exports = {
   resetDb,
   waitForAnswer,
   checkIsStatusMessagesReceivedByUserFromChannel,
-  getLastIncomingPayloadForUser
+  getLastIncomingPayloadForUser,
+  sendMessageFrom
 };

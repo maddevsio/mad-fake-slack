@@ -189,6 +189,9 @@
 <script name="userchannelheader" type="text/x-handlebars-template">
   {{{include "partials" "userchannelheader"}}}
 </script>
+<script name="statustyping" type="text/x-handlebars-template">
+  {{{include "partials" "statustyping"}}}
+</script>
 <script>
   function textAreaAdjust(el) {
     el.style.height = 'auto';
@@ -208,6 +211,8 @@
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
     }
   };
+
+  Handlebars.context.allUsers = Handlebars.context.users.concat(Handlebars.context.bots);
 
   Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
     const html = Handlebars.templates[templateName](context)
@@ -255,6 +260,26 @@
       };
       Handlebars.render(msgContainer, "message", context);
       Handlebars.userUtils.scrollToLastMessage();
+    },
+    renderTypingFromOthers(message) {
+      const container = window.notification_bar.querySelector('.p-notification_bar__section--left');
+      const userIndex = Handlebars.context.allUsers.findIndex(u => u.id === message.user);
+
+      if (userIndex >= 0) {
+        const user = Handlebars.context.allUsers[userIndex];
+        const context = {
+          user
+        };
+        container.innerHTML = '';
+        Handlebars.render(container, "statustyping", context);
+        if (Handlebars.context.prevClearStatusTimerId) {
+          clearTimeout(Handlebars.context.prevClearStatusTimerId);
+          Handlebars.context.prevClearStatusTimerId = null;
+        }
+        Handlebars.context.prevClearStatusTimerId = setTimeout(() => {
+          container.innerHTML = '';
+        }, 5000);
+      }
     },
     isActiveChannel(channelId) {
       const selectedChannel = Handlebars.context.selectedChannel;
@@ -307,6 +332,9 @@
     console.log('Message from server ', message);
     if (message.type === "message" && Handlebars.userUtils.isActiveChannel(message.channel)) {
         Handlebars.userUtils.renderMessageFromOthers(message);
+    }
+    if (['user_typing', 'typing'].includes(message.type) && Handlebars.userUtils.isActiveChannel(message.channel)) {
+      Handlebars.userUtils.renderTypingFromOthers(message);
     }
   });
 

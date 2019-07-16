@@ -43,6 +43,13 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update \
+  && apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
+  && curl -fsSL https://download.docker.com/linux/$(/usr/bin/lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg | apt-key add - 2>&1 >/dev/null \
+  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(/usr/bin/lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" \
+  && apt-get update \
+  && apt-get install -y docker-ce-cli
+
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
 #     browser.launch({executablePath: 'google-chrome-stable'})

@@ -106,3 +106,7 @@ Then('User {string} should receive {string} payload with {string} type:', async 
 Given('Fake slack db is empty', () => {
   actions.resetDb();
 });
+
+When('User {string} send {string} message to {string} channel', async (userName, messageType, channelName) => {
+  await actions.sendMessageFrom(userName, channelName, { type: messageType });
+});

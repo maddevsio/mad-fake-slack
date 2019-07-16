@@ -53,8 +53,13 @@ class FakeUser {
   }
 
   sendTextMessageToChannel(channelName, message) {
-    const id = this.getChannelIdByName(channelName);
-    return this.rtm.sendMessage(message, id);
+    const channel = this.getChannelIdByName(channelName);
+    return this.rtm.sendMessage(message, channel.id);
+  }
+
+  sendUserTypingToChannel(channelName) {
+    const channel = this.getChannelIdByName(channelName);
+    return this.rtm.sendTyping(channel.id);
   }
 
   getLastIncomingPayload(payloadType) {

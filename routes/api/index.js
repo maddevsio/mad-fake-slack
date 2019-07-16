@@ -35,12 +35,18 @@ function authTestHandler(req, res) {
     .createHash('md5')
     .update(token)
     .digest('hex');
-  const user = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid])[0];
-  const team = dbManager.db.teams.filter(tm => tm.id === user.team_id)[0];
-  const exampleResponse = responses['auth.test'];
-  exampleResponse.team_id = team.id;
-  exampleResponse.user_id = user.id;
-  res.json(exampleResponse);
+
+  const users = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid]);
+  if (!users.length) {
+    res.json(responses.invalid_auth);
+  } else {
+    const user = users[0];
+    const team = dbManager.db.teams.filter(tm => tm.id === user.team_id)[0];
+    const exampleResponse = responses['auth.test'];
+    exampleResponse.team_id = team.id;
+    exampleResponse.user_id = user.id;
+    res.json(exampleResponse);
+  }
 }
 
 async function postMessageHandler(req, res) {
@@ -121,6 +127,21 @@ function conversationsListHandler(req, res) {
   res.json({ ok: true });
 }
 
+function userInfoHandler(req, res) {
+  let { user: userId } = req.query;
+  const users = dbManager.db.users.filter(u => u.id === userId);
+  if (!users.length) {
+    res.json(responses.user_not_found);
+  } else {
+    const user = users[0];
+    const response = responses['users.info'];
+    res.json({
+      ...response,
+      user
+    });
+  }
+}
+
 router.use('*', beforeAllHandler);
 router.post('/auth.test', authTestHandler);
 router.post('/chat.postMessage', postMessageHandler);
@@ -129,6 +150,7 @@ router.get('/rtm.connect', rtmConnectHandler);
 router.post('/rtm.connect', rtmConnectHandler);
 router.get('/rtm.start', rtmConnectHandler);
 router.post('/rtm.start', rtmConnectHandler);
+router.get('/users.info', userInfoHandler);
 router.get('/conversations.list', conversationsListHandler);
 
 module.exports = router;

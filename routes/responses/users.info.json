@@ -1,41 +1,4 @@
 {
     "ok": true,
-    "user": {
-        "id": "W12345678",
-        "team_id": "T12345678",
-        "name": "valera",
-        "deleted": false,
-        "color": "9f69e7",
-        "real_name": "Valera Petrov",
-        "tz": "America/Los_Angeles",
-        "tz_label": "Pacific Daylight Time",
-        "tz_offset": -25200,
-        "profile": {
-            "avatar_hash": "ge3b51ca72de",
-            "status_text": "Print is dead",
-            "status_emoji": ":books:",
-            "real_name": "Valera Petrov",
-            "display_name": "valera",
-            "real_name_normalized": "Valera Petrov",
-            "display_name_normalized": "valera.petrov",
-            "email": "petrov@ghostbusters.example.com",
-            "image_original": "/images/slack_user.png",
-            "image_24": "/images/slack_user.png",
-            "image_32": "/images/slack_user.png",
-            "image_48": "/images/slack_user.png",
-            "image_72": "/images/slack_user.png",
-            "image_192": "/images/slack_user.png",
-            "image_512": "/images/slack_user.png",
-            "team": "T12345678"
-        },
-        "is_admin": true,
-        "is_owner": false,
-        "is_primary_owner": false,
-        "is_restricted": false,
-        "is_ultra_restricted": false,
-        "is_bot": false,
-        "updated": 1502138686,
-        "is_app_user": false,
-        "has_2fa": false
-    }
+    "user": {}
 }

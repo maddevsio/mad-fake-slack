@@ -35,8 +35,15 @@ const handlers = {
     wsManager.broadcast(jsonPayload, ws.user.id);
     wsManager.broadcastToBots(jsonPayload, ws.user.id);
   },
+  typing: (ws, msg) => {
+    handlers.user_typing(ws, msg);
+  },
   user_typing: (ws, msg) => {
-    const message = JSON.stringify(msg);
+    const message = JSON.stringify({
+      ...msg,
+      channel: msg.channel.id || msg.channel,
+      user: ws.user.id
+    });
     wsManager.broadcast(message, ws.user.id);
     wsManager.broadcastToBots(message, ws.user.id);
   }

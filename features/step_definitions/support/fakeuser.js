@@ -2,6 +2,22 @@ const { WebClient } = require('@slack/web-api');
 const { RTMClient } = require('@slack/rtm-api');
 const API_CHANNELS_LIST = 'channels.list';
 
+function trackArray(array, check, cb) {
+  const arrayChangeHandler = {
+    set(target, property, value) {
+      // eslint-disable-next-line no-param-reassign
+      target[property] = value;
+      const isCallbacksValid = typeof check === 'function' && typeof cb === 'function';
+      if (isCallbacksValid && check(property, value)) {
+        cb(target);
+      }
+      return true;
+    }
+  };
+
+  return new Proxy(array, arrayChangeHandler);
+}
+
 class FakeUser {
   constructor(token, slackApiUrl) {
     this.token = token;
@@ -11,7 +27,14 @@ class FakeUser {
     this.self = null;
     this.team = null;
     this.apiResponses = {};
-    this.rtmIncomingMessages = [];
+    this.incomingLastUpdate = null;
+    this.rtmIncomingMessages = trackArray(
+      [],
+      property => property === 'length',
+      () => {
+        this.incomingLastUpdate = +new Date();
+      }
+    );
   }
 
   async start() {
@@ -49,6 +72,25 @@ class FakeUser {
 
     this.rtm.on('user_typing', async (event) => {
       this.rtmIncomingMessages.push(event);
+    });
+  }
+
+  waitForIncomingMessages(numOfTries = 10) {
+    return new Promise((resolve, reject) => {
+      let counter = 0;
+      const prevValue = this.incomingLastUpdate;
+      const id = setInterval(() => {
+        if (counter >= numOfTries) {
+          clearInterval(id);
+          reject(new Error(`No changes were found in the message collection after ${numOfTries} tries`));
+        }
+        if (prevValue !== this.incomingLastUpdate) {
+          clearInterval(id);
+          resolve(true);
+        } else {
+          counter += 1;
+        }
+      }, 100);
     });
   }
 

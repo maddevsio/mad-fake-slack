@@ -110,3 +110,18 @@ Given('Fake slack db is empty', () => {
 When('User {string} send {string} message to {string} channel', async (userName, messageType, channelName) => {
   await actions.sendMessageFrom(userName, channelName, { type: messageType });
 });
+
+When('User {string} send message:', async (userName, dataTable) => {
+  const payload = dataTable.rowsHash();
+  const { channel, ...options } = payload;
+  await actions.sendMessageFrom(userName, channel, options);
+});
+
+Then('I should see {string} message with:', async (position, dataTable) => {
+  const options = dataTable.rowsHash();
+  const actualTexts = await Promise.mapSeries(
+    Object.entries(options),
+    ([selectorName]) => actions.getTextByPosition(selectorName, position || 'last')
+  );
+  expect(actualTexts).toStrictEqual(Object.values(options));
+});

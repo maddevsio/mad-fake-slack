@@ -431,10 +431,17 @@ async function waitForAnswer(fn, interval, maxFailCount = 1) {
 
 async function sendMessageFrom(userName, channelName, options) {
   const { type } = options;
-  if (type === 'user_typing') {
-    return scope.context.appUsers[userName].sendUserTypingToChannel(channelName);
-  }
-  return scope.context.appUsers[userName].sendTextMessageToChannel(channelName, options.text);
+  const methodsByTypeMap = {
+    user_typing() {
+      return scope.context.appUsers[userName]
+        .sendUserTypingToChannel(channelName);
+    },
+    message() {
+      return scope.context.appUsers[userName]
+        .sendTextMessageToChannel(channelName, options.text);
+    }
+  };
+  return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
 module.exports = {

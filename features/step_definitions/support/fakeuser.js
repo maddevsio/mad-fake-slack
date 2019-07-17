@@ -2,6 +2,22 @@ const { WebClient } = require('@slack/web-api');
 const { RTMClient } = require('@slack/rtm-api');
 const API_CHANNELS_LIST = 'channels.list';
 
+function throttle(func, limit) {
+  let lastFunc;
+  // eslint-disable-next-line func-names
+  return function () {
+    const context = this;
+    const args = Array.from(arguments);
+    if (lastFunc) {
+      clearTimeout(lastFunc);
+    }
+    // eslint-disable-next-line func-names
+    lastFunc = setTimeout(function () {
+      func.apply(context, args);
+    }, limit);
+  };
+}
+
 function trackArray(array, check, cb) {
   const arrayChangeHandler = {
     set(target, property, value) {
@@ -31,9 +47,9 @@ class FakeUser {
     this.rtmIncomingMessages = trackArray(
       [],
       property => property === 'length',
-      () => {
+      throttle(() => {
         this.incomingLastUpdate = +new Date();
-      }
+      }, 200)
     );
   }
 

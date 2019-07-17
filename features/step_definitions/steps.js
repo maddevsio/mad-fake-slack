@@ -74,7 +74,8 @@ When('I press the {string} keyboard button', async (buttonName) => {
   await actions.pressTheButton(buttonName);
 });
 
-Then('User {string} should receive message {string}', (userName, expectedMessage) => {
+Then('User {string} should receive message {string}', async (userName, expectedMessage) => {
+  await actions.waitWhileUserReceiveIncomingMessage(userName);
   const message = actions.getLastIncomingMessageTextForUser(userName);
   expect(message).toStrictEqual(expectedMessage);
 });
@@ -83,22 +84,25 @@ Given('I click on {string} with text {string}', async (selectorName, text) => {
   await actions.clickOn(selectorName, { text });
 });
 
-Then('User {string} should receive messages:', (userName, dataTable) => {
+Then('User {string} should receive messages:', async (userName, dataTable) => {
   const rows = dataTable.rows();
   const expected = rows.map(row => [...row, true]);
+  await actions.waitWhileUserReceiveIncomingMessage(userName);
   expect(actions.checkIsMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
 
-Then('User {string} should receive status messages:', (userName, dataTable) => {
+Then('User {string} should receive status messages:', async (userName, dataTable) => {
   const rows = dataTable.rows();
   const expected = rows.map(row => [...row, true]);
+  await actions.waitWhileUserReceiveIncomingMessage(userName);
   expect(actions.checkIsStatusMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
 
 Then('User {string} should receive {string} payload with {string} type:', async (userName, messageDirection, payloadType, dataTable) => {
   const payload = dataTable.rows();
   if (messageDirection === 'incoming') {
-    const message = await actions.waitForAnswer(() => actions.getLastIncomingPayloadForUser(userName, payloadType), 1000, 3);
+    await actions.waitWhileUserReceiveIncomingMessage(userName);
+    const message = actions.getLastIncomingPayloadForUser(userName, payloadType);
     expect(actions.validateIncomingMessage(message, payload)).toStrictEqual([]);
   }
 });

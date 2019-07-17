@@ -24,6 +24,12 @@ function groupBy(list, keyGetter) {
   return map;
 }
 
+function checkIsUserRegistered(name) {
+  if (!scope.context.appUsers[name]) {
+    throw new Error(`No registered users with name ${name} to start`);
+  }
+}
+
 async function initBrowser() {
   if (!scope.browser) {
     const useSandbox = process.env.USE_SANDBOX;
@@ -219,20 +225,17 @@ async function getTextsBetween(itemsSelector, afterText, beforeText) {
 }
 
 function createFakeUser(name, params) {
-  if (!scope.context.appUsers[name]) {
+  try {
+    checkIsUserRegistered(name);
+  } catch (e) {
     const bot = user.create(params);
     scope.context.appUsers[name] = bot;
-  } else {
-    throw new Error(`User with name ${name} already exists and can't be created again`);
   }
 }
 
 async function connectFakeUser(name) {
-  if (scope.context.appUsers[name]) {
-    await scope.context.appUsers[name].start();
-  } else {
-    throw new Error(`No registered users with name ${name} to start`);
-  }
+  checkIsUserRegistered(name);
+  await scope.context.appUsers[name].start();
 }
 
 async function typeText(text, options = { delay: 100 }) {
@@ -246,25 +249,21 @@ async function pressTheButton(button) {
 }
 
 function getLastIncomingMessageTextForUser(name) {
-  if (scope.context.appUsers[name]) {
-    const message = scope.context.appUsers[name].getLastIncomingMessage();
-    if (!message) {
-      throw new Error(`No messages found for user ${name}`);
-    }
-    return message.text;
+  checkIsUserRegistered(name);
+  const message = scope.context.appUsers[name].getLastIncomingMessage();
+  if (!message) {
+    throw new Error(`No messages found for user ${name}`);
   }
-  throw new Error(`No registered users with name ${name} to start`);
+  return message.text;
 }
 
 function getLastIncomingPayloadForUser(name, payloadType) {
-  if (scope.context.appUsers[name]) {
-    const message = scope.context.appUsers[name].getLastIncomingPayload(payloadType);
-    if (!message) {
-      throw new Error(`No messages found for user ${name}`);
-    }
-    return message;
+  checkIsUserRegistered(name);
+  const message = scope.context.appUsers[name].getLastIncomingPayload(payloadType);
+  if (!message) {
+    throw new Error(`No messages found for user ${name}`);
   }
-  throw new Error(`No registered users with name ${name} to start`);
+  return message;
 }
 
 async function findElement(options) {
@@ -444,6 +443,14 @@ async function sendMessageFrom(userName, channelName, options) {
   return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
+function waitWhileUserReceiveIncomingMessage(name) {
+  checkIsUserRegistered(name);
+  return Promise.race([
+    scope.context.appUsers[name].waitForIncomingMessages(11),
+    wait(1000)
+  ]);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -474,5 +481,6 @@ module.exports = {
   waitForAnswer,
   checkIsStatusMessagesReceivedByUserFromChannel,
   getLastIncomingPayloadForUser,
-  sendMessageFrom
+  sendMessageFrom,
+  waitWhileUserReceiveIncomingMessage
 };

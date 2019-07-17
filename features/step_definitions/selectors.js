@@ -25,7 +25,9 @@ const mainSelectors = {
   'Message body': '#messages_container .c-message__body',
   'channel item': 'span.p-channel_sidebar__name',
   'Notification bar': '.p-notification_bar__section--left',
-  'Notification bar item': '.p-notification_bar__section--left .p-notification_bar__typing'
+  'Notification bar item': '.p-notification_bar__section--left .p-notification_bar__typing',
+  'Message sender': '#messages_container .c-message__sender_link',
+  'App badge': '#messages_container .c-app_badge'
 };
 
 const selectors = {

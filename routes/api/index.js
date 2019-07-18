@@ -49,32 +49,43 @@ function authTestHandler(req, res) {
   }
 }
 
+function createResponse({
+  ts, text, channel, user, team
+}) {
+  return factories.createMessageResponse(
+    {
+      type: 'message',
+      ts,
+      text,
+      channel
+    },
+    { user, team }
+  );
+}
+
+function broadcastResponse({ response, channel, userId }) {
+  wsManager.broadcast(JSON.stringify(response.message), userId);
+  if (utils.isOpenChannel(channel)) {
+    wsManager.broadcastToBots(JSON.stringify(response.message), userId);
+  }
+  if (utils.isBot(channel, dbManager.db)) {
+    wsManager.broadcastToBot(JSON.stringify(response.message), channel);
+  }
+}
+
 async function postMessageHandler(req, res) {
   const message = dbManager.channel(req.body.channel).createMessage(dbManager.slackUser().id, req.body);
   if (utils.isUrlEncodedForm(req) || utils.isMultipartForm(req)) {
     const channelId = utils.getChannelId(req.body.channel);
     res.redirect(`/messages/${channelId && channelId[0]}`);
   } else {
-    const toChannelId = utils.getChannelId(req.body.channel);
+    const channel = utils.getChannelId(req.body.channel);
     const user = dbManager.slackUser();
     const team = dbManager.slackTeam();
-    const currentUserId = user.id;
-    const response = factories.createMessageResponse(
-      {
-        type: 'message',
-        ts: message.ts,
-        text: req.body.text,
-        channel: toChannelId
-      },
-      { user, team }
-    );
-    wsManager.broadcast(JSON.stringify(response.message), currentUserId);
-    if (utils.isOpenChannel(toChannelId)) {
-      wsManager.broadcastToBots(JSON.stringify(response.message), currentUserId);
-    }
-    if (utils.isBot(toChannelId, dbManager.db)) {
-      wsManager.broadcastToBot(JSON.stringify(response.message), toChannelId);
-    }
+    const response = createResponse({
+      user, team, ts: message.ts, channel, text: req.body.text
+    });
+    broadcastResponse({ response, userId: user.id, channel });
     res.json(response);
   }
 }

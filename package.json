@@ -19,7 +19,7 @@
     "start": "node index.js",
     "example:rtmbot": "SLACK_API=http://localhost:9001/api/ node examples/rtmbot/index.js",
     "example:rtmbot:integration": "npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm run test:jest -- --runInBand examples/rtmbot/",
-    "pretest": "eslint --ignore-path .gitignore .",
+    "pretest": "eslint --ignore-path .gitignore . && npm run lint:hbs",
     "lint:hbs": "ember-template-lint views/* views/**/*",
     "codeclimate:install": "node scripts/codeclimate/check.js && sh scripts/codeclimate/setup.sh",
     "codeclimate:analyze:format:html": "node scripts/codeclimate/check.js && CODECLIMATE_CODE=$(node scripts/volumes/inspect.js) codeclimate analyze -f html > reports/$(date +\"%Y%m%d%H%M%S\").html",

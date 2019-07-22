@@ -6,7 +6,8 @@ module.exports = {
   server: {
     command: 'npm start',
     port: 9001,
-    usedPortAction: 'error'
+    usedPortAction: 'error',
+    launchTimeout: 50000
   },
   browserContext: 'incognito'
 };

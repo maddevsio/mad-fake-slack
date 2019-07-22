@@ -3,6 +3,7 @@ const exec = util.promisify(require('child_process').exec);
 const expect = require('expect');
 const fs = require('fs');
 const chalk = require('chalk');
+// eslint-disable-next-line no-console
 const log = console.log;
 const success = chalk.bold.green;
 const error = chalk.bold.red;

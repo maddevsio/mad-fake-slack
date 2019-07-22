@@ -13,12 +13,6 @@
 ### Demo of interaction with bot from examples folder (Демо взаимодействия с ботом, через UI `mad-fake-slack`)
 <img src="docs/images/demo.gif" width="500px"/>
 
-### VSCode console output demo (Демо вывода информации в консоль VSCode)
-<img src="docs/images/demo_console.gif" width="500px"/>
-
-### Bot + `mad-fake-slack` integration tests example demo (Демо запуска примера интеграционных тестов Bot + `mad-fake-slack`)
-<img src="docs/images/demo_bot_integration_tests.gif" width="500px"/>
-
 # `EN`
 
 # The purpose of this project
@@ -56,6 +50,9 @@
 * Now supported following test api methods:
   * `GET` `/test/api/db/reset` - resets current db (If you will refresh mad-fake-slack ui in your browser, you will see that your conversational data has disappeared)
 
+### [List of NPM commands](docs/NPMCOMMANDS.md)
+### [Local setup and running code analysis using Code Climate](docs/CODECLIMATE.md)
+
 # `RU`
 
 # Цель данного проекта
@@ -92,6 +89,9 @@
 ### Тестовый api
 * Сейчас поддерживаются следующие тестовые апи:
   * `GET` `/test/api/db/reset` - сбрасывает текущую базу данных (если вы обновите пользовательский интерфейс mad-fake-slack в своем браузере, вы увидите, что ваши данные разговора исчезли)
+
+### [Список команд NPM](docs/NPMCOMMANDS.md)
+### [Локальная установка и запуск анализа кода при помощи Code Climate](docs/CODECLIMATE.md)
 
 ### [DOCKER IMAGE | Докер образ](docs/DOCKER.md)
 * [EN] coming soon... 

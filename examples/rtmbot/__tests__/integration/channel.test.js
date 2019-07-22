@@ -14,6 +14,7 @@ describe('Channel communication', () => {
       it('bot should display echo message', async () => {
         await page.keyboard.type('Hello');
         await page.keyboard.press('Enter');
+        await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
           { text: 'You sent text to the channel: Hello' });
       });
@@ -24,11 +25,12 @@ describe('Channel communication', () => {
     describe('when user sent message', () => {
       it('bot should display echo message', async () => {
         await await Promise.all([
-          page.waitForNavigation({ waitUntil: 'load' }),
+          page.waitForNavigation({ waitUntil: 'networkidle0' }),
           expect(page).toClick('span.p-channel_sidebar__name', { text: 'random' })
         ]);
         await page.keyboard.type('Hello from random!');
         await page.keyboard.press('Enter');
+        await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
           { text: 'You sent text to the channel: Hello from random!' });
         const messages = await page.$$eval('span.c-message__body',

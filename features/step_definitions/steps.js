@@ -8,6 +8,7 @@ const {
 } = require('cucumber');
 
 const actions = require('./actions');
+const WithRetryOptions = { wrapperOptions: { retry: 4 }, timeout: 30000 };
 
 Given('I am on {string} page', async (pagePath) => {
   await actions.visitPage(pagePath);
@@ -74,8 +75,7 @@ When('I press the {string} keyboard button', async (buttonName) => {
   await actions.pressTheButton(buttonName);
 });
 
-Then('User {string} should receive message {string}', async (userName, expectedMessage) => {
-  await actions.waitWhileUserReceiveIncomingMessage(userName);
+Then('User {string} should receive message {string}', WithRetryOptions, async (userName, expectedMessage) => {
   const message = actions.getLastIncomingMessageTextForUser(userName);
   expect(message).toStrictEqual(expectedMessage);
 });
@@ -84,24 +84,21 @@ Given('I click on {string} with text {string}', async (selectorName, text) => {
   await actions.clickOn(selectorName, { text });
 });
 
-Then('User {string} should receive messages:', async (userName, dataTable) => {
+Then('User {string} should receive messages:', WithRetryOptions, async (userName, dataTable) => {
   const rows = dataTable.rows();
   const expected = rows.map(row => [...row, true]);
-  await actions.waitWhileUserReceiveIncomingMessage(userName);
   expect(actions.checkIsMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
 
-Then('User {string} should receive status messages:', async (userName, dataTable) => {
+Then('User {string} should receive status messages:', WithRetryOptions, async (userName, dataTable) => {
   const rows = dataTable.rows();
   const expected = rows.map(row => [...row, true]);
-  await actions.waitWhileUserReceiveIncomingMessage(userName);
   expect(actions.checkIsStatusMessagesReceivedByUserFromChannel(userName, rows)).toStrictEqual(expected);
 });
 
-Then('User {string} should receive {string} payload with {string} type:', async (userName, messageDirection, payloadType, dataTable) => {
+Then('User {string} should receive {string} payload with {string} type:', WithRetryOptions, async (userName, messageDirection, payloadType, dataTable) => {
   const payload = dataTable.rows();
   if (messageDirection === 'incoming') {
-    await actions.waitWhileUserReceiveIncomingMessage(userName);
     const message = actions.getLastIncomingPayloadForUser(userName, payloadType);
     expect(actions.validateIncomingMessage(message, payload)).toStrictEqual([]);
   }

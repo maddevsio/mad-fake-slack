@@ -1,3 +1,4 @@
+{{! template-lint-disable no-inline-styles }}
 <form id="msg_form" class="offline" method="POST" action="/api/chat.postMessage" enctype="multipart/form-data">
   <div class="msg_input_wrapper">
     <input type="hidden" name="channel" value={{channel.id}}>
@@ -6,18 +7,18 @@
     <div id="msg_input" class="texty_legacy ql-container focus">
       <div class="ql-editor ql-blank" dir="auto">
         <p>
-          <input
-              id="msg_input_text"
-              autofocus="true"
-              name="text"
-              type="input"
-              class="ql-input-msg"
-              value=""
-              placeholder="Type text here"
-              spellcheck="true"
-              autocorrect="off"
-              autocomplete="off"
-          >
+          <textarea
+            id="msg_input_text"
+            autofocus="true"
+            name="text"
+            class="ql-input-msg"
+            value=""
+            rows="1"
+            placeholder="Type text here"
+            spellcheck="true"
+            autocorrect="off"
+            autocomplete="off"
+            style="resize: none;"></textarea>
         </p>
       </div>
       <div class="ql-clipboard" contenteditable="true" tabindex="-1" aria-hidden="true" role="presentation"
@@ -59,9 +60,32 @@
   </button>
 </form>
 <script>
+
   const msgForm = window.msg_form;
   const msgInputText = window.msg_input_text;
   const msgContainer = window.messages_container;
+  const msgInputArea = window.msg_input;
+  function updateTextAreaHeight() {
+    msgInputArea.setAttribute('style', `height:1px;`);
+    const h = msgInputText.scrollHeight;
+    if (h) {
+      msgInputArea.setAttribute('style', `height:${h > 180 ? 180 : h}px;`);
+      Handlebars.userUtils.scrollToLastMessage();
+    }
+  }
+  msgInputText.addEventListener('keydown', (e) => {
+    setTimeout(updateTextAreaHeight, 0);
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      if (e.ctrlKey || e.shiftKey) {
+        e.target.value = e.target.value + '\n';
+        msgInputText.scrollTop = msgInputText.scrollHeight;
+      } else {
+        const event = new CustomEvent('submit', { "bubbles": true, "cancelable": true });
+        msgForm.dispatchEvent(event);
+      }
+    }
+  });
 
   const throttle = (func, limit) => {
     let lastFunc;

@@ -4,8 +4,8 @@
   * `docker pull codeclimate/codeclimate-structure` size `~ 1.9 Gb` of network traffic
   * `docker pull codeclimate/codeclimate-duplication` size `~ 100 - 200 Mb` of network traffic
   * `docker pull codeclimate/codeclimate` size `~ 100 - 200 Mb` of network traffic
-    * **ATTANTION!!!** After uncompressing `codeclimate/codeclimate-structure` and `codeclimate/codeclimate-duplication` will use `10 Gb` of your disk space.
-* After that, you mast open your `VSCode` in `Remote-Container` using command `Remote-Containers: Open Folder in Container` of commands explorer.
+    * **ATTENTION!!!** After uncompressing `codeclimate/codeclimate-structure` and `codeclimate/codeclimate-duplication` will use `10 Gb` of your disk space.
+* After that, you must open your `VSCode` in `Remote-Container` using command `Remote-Containers: Open Folder in Container` of commands explorer.
 * Inside VSCode terminal execute the following commands:
     * `npm run codeclimate:install` - this command checks presence of docker images and installs codeclimate wrapper to your VSCode docker container.
 

@@ -1,12 +1,16 @@
 let id = 0;
 const isServer = typeof module !== 'undefined';
 let moment;
+let Handlebars;
 
 if (isServer) {
-  // eslint-disable-next-line global-require
+  /* eslint-disable global-require */
   moment = require('moment');
+  Handlebars = require('handlebars');
+  /* eslint-enable global-require */
 } else {
   moment = window.moment;
+  Handlebars = window.Handlebars;
 }
 
 function isEmpty(value) {
@@ -68,6 +72,11 @@ const helpers = {
       return elseOption;
     }
     return trueOption;
+  },
+  breaklines(text) {
+    let message = Handlebars.Utils.escapeExpression(text.trim());
+    message = message.replace(/(\r\n|\n|\r)/gm, '<br>');
+    return new Handlebars.SafeString(message);
   }
 };
 

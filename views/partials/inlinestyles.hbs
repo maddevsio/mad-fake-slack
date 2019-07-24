@@ -890,14 +890,6 @@
 
   #msg_input.texty_legacy {
     padding: 0 0 0 40px;
-
-        {
-            {
-              !-- height: auto;
-            --
-        }
-    }
-
     max-height: none;
     min-height: 41px;
   }
@@ -908,9 +900,6 @@
     min-width: 0;
   }
 
-  .supports_custom_scrollbar #msg_input.texty_legacy .ql-editor {
-    padding-right: 66px;
-  }
 
   #msg_input.texty_legacy .ql-editor {
     max-height: calc(60vh - 75px);
@@ -1037,7 +1026,7 @@
     position: absolute;
     z-index: 1;
     right: 0;
-    top: 0;
+    bottom: 22px;
     width: 30px;
     height: 42px;
     line-height: 42px;
@@ -1346,7 +1335,7 @@
     height: 100%;
     width: calc(100% - 78px);
     border: none;
-    padding: 0 15px;
+    padding: 7px 15px 8px 12px;
   }
 
   .c-message {
@@ -1804,6 +1793,12 @@
     background-clip: initial;
     pointer-events: auto;
     box-shadow: none
+}
+
+#msg_input_text {
+  outline: none;
+	-moz-appearance: none;
+	border: none;
 }
 
 </style>

@@ -83,7 +83,7 @@ async function postMessageHandler(req, res) {
     const user = dbManager.slackUser();
     const team = dbManager.slackTeam();
     const response = createResponse({
-      user, team, ts: message.ts, channel, text: req.body.text
+      user, team, ts: message.ts, channel, text: req.body.text.trim()
     });
     broadcastResponse({ response, userId: user.id, channel });
     res.json(response);

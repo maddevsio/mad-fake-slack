@@ -7,6 +7,7 @@ const { dbManager } = require('../../routes/managers');
 const { CustomJSONSchemaValidator } = require('./support/validators');
 const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
 const jsonSchemaValidator = new Validator();
+const Promise = require('bluebird');
 
 const VIEWPORT = [1920, 1080];
 
@@ -245,7 +246,11 @@ async function typeText(text, options = { delay: 100 }) {
 
 async function pressTheButton(button) {
   await initBrowser();
-  await scope.context.currentPage.keyboard.press(button);
+  const { keyboard } = scope.context.currentPage;
+  const keys = button.split('+').map(k => k.trim());
+  await Promise.mapSeries(keys.slice(0, -1), key => keyboard.down(key));
+  await keyboard.press(keys[keys.length - 1]);
+  await Promise.mapSeries(keys.slice(0, -1), key => keyboard.up(key));
 }
 
 function getLastIncomingMessageTextForUser(name) {
@@ -309,7 +314,7 @@ async function clickOn(selectorName, options = {}) {
   ]);
 }
 
-async function getTextByPosition(selectorName, position) {
+async function getTextByPosition(selectorName, position, attribute = 'textContent', matchRegex = /\s+/g) {
   const FIRST_POSITION = 'first';
   const LAST_POSITION = 'last';
   const page = scope.context.currentPage;
@@ -318,7 +323,7 @@ async function getTextByPosition(selectorName, position) {
   }
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
-  const textContents = await page.$$eval(selector, elements => elements.map(el => el.textContent.replace(/\s+/g, ' ').trim()));
+  const textContents = await page.$$eval(selector, (elements, attr, regex) => elements.map(el => el[attr].replace(regex, ' ').trim()), attribute, matchRegex);
   return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
 }
 
@@ -442,6 +447,13 @@ async function sendMessageFrom(userName, channelName, options) {
   return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
+async function getContentsByParams(options, { position = 'last', attribute = 'textContent', matchRegex = /\s+/g }) {
+  return Promise.mapSeries(
+    Object.entries(options),
+    ([selectorName]) => getTextByPosition(selectorName, position, attribute, matchRegex)
+  );
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -472,5 +484,6 @@ module.exports = {
   waitForAnswer,
   checkIsStatusMessagesReceivedByUserFromChannel,
   getLastIncomingPayloadForUser,
-  sendMessageFrom
+  sendMessageFrom,
+  getContentsByParams
 };

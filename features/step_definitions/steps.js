@@ -120,9 +120,12 @@ When('User {string} send message:', async (userName, dataTable) => {
 
 Then('I should see {string} message with:', async (position, dataTable) => {
   const options = dataTable.rowsHash();
-  const actualTexts = await Promise.mapSeries(
-    Object.entries(options),
-    ([selectorName]) => actions.getTextByPosition(selectorName, position || 'last')
-  );
+  const actualTexts = await actions.getContentsByParams(options, { position });
+  expect(actualTexts).toStrictEqual(Object.values(options));
+});
+
+Then('I should see {string} multiline message with:', async (position, dataTable) => {
+  const options = dataTable.rowsHash();
+  const actualTexts = await actions.getContentsByParams(options, { position, attribute: 'innerText', matchRegex: /\s+^[$]/g });
   expect(actualTexts).toStrictEqual(Object.values(options));
 });

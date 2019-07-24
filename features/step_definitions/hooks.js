@@ -14,7 +14,7 @@ setDefaultTimeout(2 * 60 * 1000);
 
 async function cleanupAppUsers() {
   if (scope.context.appUsers) {
-    await Promise.mapSeries(Object.entries(scope.context.appUsers), ([, bot]) => (bot && bot.close()) || Promise.resolve());
+    await Promise.mapSeries(Object.entries(scope.context.appUsers), ([, bot]) => bot && bot.close());
   }
   scope.context.appUsers = {};
 }

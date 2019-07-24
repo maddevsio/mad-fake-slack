@@ -363,7 +363,6 @@ function checkIsStatusMessagesReceivedByUserFromChannel(userName, rows) {
       set.add(message.type);
       return set;
     }, new Set()).values());
-
     channelMessages.forEach(
       ([type, channel]) => result.push(
         [type, channel, types.includes(type)]
@@ -443,14 +442,6 @@ async function sendMessageFrom(userName, channelName, options) {
   return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
-function waitWhileUserReceiveIncomingMessage(name) {
-  checkIsUserRegistered(name);
-  return Promise.race([
-    scope.context.appUsers[name].waitForIncomingMessages(11),
-    wait(1000)
-  ]);
-}
-
 module.exports = {
   wait,
   goToUrl,
@@ -481,6 +472,5 @@ module.exports = {
   waitForAnswer,
   checkIsStatusMessagesReceivedByUserFromChannel,
   getLastIncomingPayloadForUser,
-  sendMessageFrom,
-  waitWhileUserReceiveIncomingMessage
+  sendMessageFrom
 };

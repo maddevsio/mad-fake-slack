@@ -68,7 +68,7 @@ function broadcastResponse({ response, channel, userId }) {
   if (utils.isOpenChannel(channel)) {
     wsManager.broadcastToBots(JSON.stringify(response.message), userId);
   }
-  if (utils.isBot(channel, dbManager.db)) {
+  if (utils.isBot(channel, dbManager)) {
     wsManager.broadcastToBot(JSON.stringify(response.message), channel);
   }
 }

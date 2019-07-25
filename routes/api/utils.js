@@ -1,3 +1,5 @@
+const helpers = require('../../public/js/helpers');
+
 function copyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -12,7 +14,7 @@ function isOpenChannel(channel) {
 }
 
 function isBot(channel, db) {
-  const users = db.users.filter(u => u.id === channel && (u.is_app_user || u.is_bot));
+  const users = db.users().findById(channel, u => u.is_app_user || u.is_bot);
   return users.length;
 }
 
@@ -24,10 +26,6 @@ function isMultipartForm(req) {
   return req.headers['content-type'] && req.headers['content-type'].startsWith('multipart/form-data');
 }
 
-function createTs(id) {
-  return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, '0')}`;
-}
-
 module.exports = {
   copyObject,
   getChannelId,
@@ -35,5 +33,5 @@ module.exports = {
   isBot,
   isUrlEncodedForm,
   isMultipartForm,
-  createTs
+  createTs: helpers.createTs
 };

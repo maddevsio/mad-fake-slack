@@ -4,6 +4,15 @@ const router = express.Router();
 const { dbManager, wsManager } = require('../managers');
 require('express-ws')(router);
 
+function setupMessageHandler(ws, handlers) {
+  ws.on('message', (msg) => {
+    const jsonMsg = JSON.parse(msg);
+    if (handlers[jsonMsg.type]) {
+      handlers[jsonMsg.type](ws, jsonMsg);
+    }
+  });
+}
+
 const handlers = {
   ping: (ws, msg) => wsManager.sendJson(ws, {
     reply_to: msg.id,
@@ -53,8 +62,8 @@ router.ws('/ws', (ws, req) => {
   /* eslint-disable no-param-reassign */
   ws.clientType = 'bot';
   const uid = req.query && req.query.uid;
-  ws.user = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid])[0];
-  ws.team = dbManager.db.teams.filter(tm => tm.id === ws.user.team_id)[0];
+  ws.user = dbManager.users().findById(dbManager.db.sessions[uid])[0];
+  ws.team = dbManager.teams().findById(ws.user.team_id)[0];
   /* eslint-enable no-param-reassign */
 
   wsManager.slackBots.add(ws);
@@ -63,12 +72,7 @@ router.ws('/ws', (ws, req) => {
     type: 'hello'
   });
 
-  ws.on('message', (msg) => {
-    const jsonMsg = JSON.parse(msg);
-    if (handlers[jsonMsg.type]) {
-      handlers[jsonMsg.type](ws, jsonMsg);
-    }
-  });
+  setupMessageHandler(ws, handlers);
 
   ws.on('close', () => {
     wsManager.slackBots.delete(ws);
@@ -83,12 +87,8 @@ router.ws('/slack', (ws) => {
   /* eslint-enable no-param-reassign */
 
   wsManager.slackWss.add(ws);
-  ws.on('message', (msg) => {
-    const jsonMsg = JSON.parse(msg);
-    if (handlers[jsonMsg.type]) {
-      handlers[jsonMsg.type](ws, jsonMsg);
-    }
-  });
+
+  setupMessageHandler(ws, handlers);
 
   ws.on('close', () => {
     wsManager.slackWss.delete(ws);

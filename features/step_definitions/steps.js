@@ -129,3 +129,7 @@ Then('I should see {string} multiline message with:', async (position, dataTable
   const actualTexts = await actions.getContentsByParams(options, { position, attribute: 'innerText', matchRegex: /\s+^[$]/g });
   expect(actualTexts).toStrictEqual(Object.values(options));
 });
+
+Given('I\'ll wait a little', async () => {
+  await actions.wait(200);
+});

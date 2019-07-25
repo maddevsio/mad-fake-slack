@@ -15,9 +15,9 @@ class WsManager {
     };
   }
 
-  broadcastToBot(msg, botId) {
-    this.slackBots.forEach(client => {
-      if (client.readyState === OPEN && client.user.id === botId) {
+  static sendByCondition(clients, msg, conditionFn = () => false) {
+    clients.forEach(client => {
+      if (client.readyState === OPEN && conditionFn(client)) {
         client.send(msg);
       }
     });
@@ -31,20 +31,16 @@ class WsManager {
     }
   }
 
+  broadcastToBot(msg, botId) {
+    WsManager.sendByCondition(this.slackBots, msg, client => client.user.id === botId);
+  }
+
   broadcast(msg, except) {
-    this.slackWss.forEach(client => {
-      if (client.readyState === OPEN && client.user.id !== except) {
-        client.send(msg);
-      }
-    });
+    WsManager.sendByCondition(this.slackWss, msg, client => client.user.id !== except);
   }
 
   broadcastToBots(msg, except) {
-    this.slackBots.forEach(client => {
-      if (client.readyState === OPEN && client.user.id !== except) {
-        client.send(msg);
-      }
-    });
+    WsManager.sendByCondition(this.slackBots, msg, client => client.user.id !== except);
   }
 }
 

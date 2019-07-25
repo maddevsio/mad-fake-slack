@@ -1,12 +1,12 @@
-const { startBot, waitMs, resetDb } = require('./utils');
+const { waitMs } = require('./utils');
+const shared = require('./shared');
+const actions = require('./actions');
 
 describe('Channel communication', () => {
   let bot = null;
 
   beforeEach(async () => {
-    await resetDb();
-    await page.goto('http://0.0.0.0:9001');
-    bot = await startBot();
+    bot = await shared.setup();
   });
 
   describe('general channel', () => {
@@ -33,8 +33,7 @@ describe('Channel communication', () => {
         await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
           { text: 'You sent text to the channel: Hello from random!' });
-        const messages = await page.$$eval('span.c-message__body',
-          spans => Array.from(spans).map(el => el.textContent));
+        const messages = await actions.getMessages(page);
         expect(messages).toHaveLength(6);
         expect(messages[messages.length - 1].trim()).toEqual('You sent text to the channel: Hello from random!');
       });
@@ -42,10 +41,6 @@ describe('Channel communication', () => {
   });
 
   afterEach(async () => {
-    if (bot) {
-      await bot.destroy();
-      await waitMs(1000);
-      await resetDb();
-    }
+    await shared.teardown(bot);
   });
 });

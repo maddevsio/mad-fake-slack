@@ -57,7 +57,10 @@ const helpers = {
   },
   makeTs() {
     id += 1;
-    return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, '0')}`;
+    return helpers.createTs(id);
+  },
+  createTs(incrementId) {
+    return `${Math.round(+new Date() / 1000)}.${String(incrementId).padStart(6, '0')}`;
   },
   toHumanTime(timestamp) {
     const unixts = +timestamp.split('.')[0];

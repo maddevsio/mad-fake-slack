@@ -4,6 +4,15 @@ const router = express.Router();
 const { dbManager, wsManager } = require('../managers');
 require('express-ws')(router);
 
+function setupMessageHandler(ws, handlers) {
+  ws.on('message', (msg) => {
+    const jsonMsg = JSON.parse(msg);
+    if (handlers[jsonMsg.type]) {
+      handlers[jsonMsg.type](ws, jsonMsg);
+    }
+  });
+}
+
 const handlers = {
   ping: (ws, msg) => wsManager.sendJson(ws, {
     reply_to: msg.id,
@@ -63,12 +72,7 @@ router.ws('/ws', (ws, req) => {
     type: 'hello'
   });
 
-  ws.on('message', (msg) => {
-    const jsonMsg = JSON.parse(msg);
-    if (handlers[jsonMsg.type]) {
-      handlers[jsonMsg.type](ws, jsonMsg);
-    }
-  });
+  setupMessageHandler(ws, handlers);
 
   ws.on('close', () => {
     wsManager.slackBots.delete(ws);
@@ -83,12 +87,8 @@ router.ws('/slack', (ws) => {
   /* eslint-enable no-param-reassign */
 
   wsManager.slackWss.add(ws);
-  ws.on('message', (msg) => {
-    const jsonMsg = JSON.parse(msg);
-    if (handlers[jsonMsg.type]) {
-      handlers[jsonMsg.type](ws, jsonMsg);
-    }
-  });
+
+  setupMessageHandler(ws, handlers);
 
   ws.on('close', () => {
     wsManager.slackWss.delete(ws);

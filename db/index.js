@@ -73,6 +73,22 @@ class DbManager {
     return this.db.teams.filter(t => t.id === this.slackUser().team_id)[0];
   }
 
+  users() {
+    return {
+      findById: (uid, where = () => true) => {
+        return this.db.users.filter(u => u.id === uid && where(u));
+      }
+    };
+  }
+
+  teams() {
+    return {
+      findById: (tid, where = () => true) => {
+        return this.db.teams.filter(tm => tm.id === tid && where(tm));
+      }
+    };
+  }
+
   channel(channelId) {
     this.checkIsDbInitialized();
     return {

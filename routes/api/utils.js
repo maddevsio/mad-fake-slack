@@ -13,8 +13,8 @@ function isOpenChannel(channel) {
   return channel && channel.startsWith('C');
 }
 
-function isBot(channel, db) {
-  const users = db.users().findById(channel, u => u.is_app_user || u.is_bot);
+function isBot(channel, dbManager) {
+  const users = dbManager.users().findById(channel, u => u.is_app_user || u.is_bot);
   return users.length;
 }
 

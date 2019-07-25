@@ -36,7 +36,7 @@ function authTestHandler(req, res) {
     .update(token)
     .digest('hex');
 
-  const users = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid]);
+  const users = dbManager.users().findById(dbManager.db.sessions[uid]);
   if (!users.length) {
     res.json(responses.invalid_auth);
   } else {
@@ -140,7 +140,7 @@ function conversationsListHandler(req, res) {
 
 function userInfoHandler(req, res) {
   let { user: userId } = req.query;
-  const users = dbManager.db.users.filter(u => u.id === userId);
+  const users = dbManager.users().findById(userId);
   if (!users.length) {
     res.json(responses.user_not_found);
   } else {

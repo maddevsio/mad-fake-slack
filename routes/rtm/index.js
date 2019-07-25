@@ -62,8 +62,8 @@ router.ws('/ws', (ws, req) => {
   /* eslint-disable no-param-reassign */
   ws.clientType = 'bot';
   const uid = req.query && req.query.uid;
-  ws.user = dbManager.db.users.filter(u => u.id === dbManager.db.sessions[uid])[0];
-  ws.team = dbManager.db.teams.filter(tm => tm.id === ws.user.team_id)[0];
+  ws.user = dbManager.users().findById(dbManager.db.sessions[uid])[0];
+  ws.team = dbManager.teams().findById(ws.user.team_id)[0];
   /* eslint-enable no-param-reassign */
 
   wsManager.slackBots.add(ws);

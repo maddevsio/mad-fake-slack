@@ -25,8 +25,8 @@ router.get('/', (req, res) => {
 
 router.get('/messages/:id', (req, res) => {
   const selectedChannel = dbManager.db.channels.filter(ch => ch.id === req.params.id);
-  const selectedUser = dbManager.db.users.filter(u => u.id === req.params.id && !u.is_bot && !u.is_app_user);
-  const selectedApp = dbManager.db.users.filter(u => u.id === req.params.id && (u.is_bot || u.is_app_user));
+  const selectedUser = dbManager.users().findById(req.params.id, u => !u.is_bot && !u.is_app_user);
+  const selectedApp = dbManager.users().findById(req.params.id, u => u.is_bot || u.is_app_user);
   const messages = (selectedChannel.length && dbManager.channel(selectedChannel[0].id).messages(MESSAGES_MAX_COUNT))
     || (selectedUser.length && dbManager.channel(selectedUser[0].id).messages(MESSAGES_MAX_COUNT))
     || (selectedApp.length && dbManager.channel(selectedApp[0].id).messages(MESSAGES_MAX_COUNT))

@@ -1,4 +1,5 @@
 const shared = require('./shared');
+const actions = require('./actions');
 
 describe('Direct channel communication', () => {
   let bot = null;
@@ -18,8 +19,7 @@ describe('Direct channel communication', () => {
         await page.keyboard.press('Enter');
         await expect(page).toMatchElement('span.c-message__body',
           { text: 'You sent text to me (direct): Hello from direct!' });
-        const messages = await page.$$eval('span.c-message__body',
-          spans => Array.from(spans).map(el => el.textContent.trim()));
+        const messages = await actions.getMessages(page);
         expect(messages).toHaveLength(2);
         expect(messages[0].trim()).toEqual('Hello from direct!');
         expect(messages[1].trim()).toEqual('You sent text to me (direct): Hello from direct!');

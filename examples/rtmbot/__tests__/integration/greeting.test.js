@@ -1,4 +1,5 @@
 const shared = require('./shared');
+const actions = require('./actions');
 
 describe("Bot's greeting", () => {
   let bot = null;
@@ -10,8 +11,7 @@ describe("Bot's greeting", () => {
   describe('when starts', () => {
     it('should display greeting', async () => {
       await expect(page).toMatchElement('span.c-message__body', { text: 'Hello there! I am a Valera!' });
-      const messages = await page.$$eval('span.c-message__body',
-        spans => Array.from(spans).map(el => el.textContent.trim()));
+      const messages = await actions.getMessages(page);
       expect(messages).toHaveLength(1);
     });
   });

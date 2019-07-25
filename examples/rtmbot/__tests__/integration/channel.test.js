@@ -1,5 +1,6 @@
 const { waitMs } = require('./utils');
 const shared = require('./shared');
+const actions = require('./actions');
 
 describe('Channel communication', () => {
   let bot = null;
@@ -32,8 +33,7 @@ describe('Channel communication', () => {
         await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
           { text: 'You sent text to the channel: Hello from random!' });
-        const messages = await page.$$eval('span.c-message__body',
-          spans => Array.from(spans).map(el => el.textContent));
+        const messages = await actions.getMessages(page);
         expect(messages).toHaveLength(6);
         expect(messages[messages.length - 1].trim()).toEqual('You sent text to the channel: Hello from random!');
       });

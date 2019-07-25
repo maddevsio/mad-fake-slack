@@ -1,12 +1,10 @@
-const { startBot, waitMs, resetDb } = require('./utils');
+const shared = require('./shared');
 
 describe("Bot's greeting", () => {
   let bot = null;
 
   beforeEach(async () => {
-    await resetDb();
-    await page.goto('http://0.0.0.0:9001');
-    bot = await startBot();
+    bot = await shared.setup();
   });
 
   describe('when starts', () => {
@@ -19,10 +17,6 @@ describe("Bot's greeting", () => {
   });
 
   afterEach(async () => {
-    if (bot) {
-      await bot.destroy();
-      await waitMs(1000);
-      await resetDb();
-    }
+    await shared.teardown(bot);
   });
 });

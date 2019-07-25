@@ -1,12 +1,10 @@
-const { startBot, waitMs, resetDb } = require('./utils');
+const shared = require('./shared');
 
 describe('Direct channel communication', () => {
   let bot = null;
 
   beforeEach(async () => {
-    await resetDb();
-    await page.goto('http://0.0.0.0:9001');
-    bot = await startBot();
+    bot = await shared.setup();
   });
 
   describe('bot direct channel', () => {
@@ -30,10 +28,6 @@ describe('Direct channel communication', () => {
   });
 
   afterEach(async () => {
-    if (bot) {
-      await bot.destroy();
-      await waitMs(1000);
-      await resetDb();
-    }
+    await shared.teardown(bot);
   });
 });

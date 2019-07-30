@@ -41,7 +41,7 @@ function escapeChar(chr) {
   return escape[chr];
 }
 
-function escapeExpression(string, possible = /[&<>"'=]/) {
+function escapeExpression(string, possible = /[&<"'=]/) {
   const badChars = new RegExp(possible, 'g');
   if (typeof string !== 'string') {
     // don't escape SafeStrings, since they're already safe
@@ -119,7 +119,7 @@ const helpers = {
   },
   formatMessage(text) {
     let message = escapeExpression(text.trim());
-    const formatter = new Formatter();
+    const formatter = new Formatter(escapeExpression);
     message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Handlebars.SafeString(message);
   }

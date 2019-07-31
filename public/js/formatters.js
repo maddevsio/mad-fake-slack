@@ -15,9 +15,19 @@ const tokens = {
   QUOTE: QUOTE
 };
 
-function spaceOrNothingCheck(index, text) {
+function prevSpaceOrNothingCheck(index, text) {
   let end = index - 1;
   return end < 0 || text.charAt(end) === ' ';
+}
+
+function nextSpaceOrNothingCheck(index, text) {
+  let end = index + 1;
+  return end > text.length - 1 || text.charAt(end) === ' ';
+}
+
+function nextNotSpaceOrNothingCheck(index, text) {
+  let end = index;
+  return end <= text.length - 1 && text.charAt(end) !== ' ';
 }
 
 const delimiters = [
@@ -25,31 +35,39 @@ const delimiters = [
     type: 'PREFORMATTED',
     startToken: PREFORMATTED,
     endToken: PREFORMATTED,
-    checkStarts: spaceOrNothingCheck
+    checkStarts: prevSpaceOrNothingCheck,
+    checkEnds() { return true; }
   },
   {
     type: 'CODE',
     startToken: CODE,
     endToken: CODE,
-    checkStarts: spaceOrNothingCheck
+    checkStarts: prevSpaceOrNothingCheck,
+    checkEnds() { return true; }
   },
   {
     type: 'STRIKE',
     startToken: STRIKE,
     endToken: STRIKE,
-    checkStarts() { return true; }
+    checkStarts() { return true; },
+    checkEnds() { return true; }
   },
   {
     type: 'ITALIC',
     startToken: ITALIC,
     endToken: ITALIC,
-    checkStarts() { return true; }
+    checkStarts: prevSpaceOrNothingCheck,
+    checkEnds() { return true; }
   },
   {
     type: 'BOLD',
     startToken: BOLD,
     endToken: BOLD,
-    checkStarts() { return true; }
+    checkStarts(index, text) {
+      return prevSpaceOrNothingCheck(index, text)
+             && nextNotSpaceOrNothingCheck(index + BOLD.length, text);
+    },
+    checkEnds: nextSpaceOrNothingCheck
   },
   {
     type: 'QUOTE',
@@ -66,7 +84,8 @@ const delimiters = [
         }
       }
       return text.substring(end, index).trim() === '';
-    }
+    },
+    checkEnds() { return true; }
   }
 ];
 
@@ -85,13 +104,16 @@ class Lexer {
   static mapToken(text, index, token) {
     const delimeterLength = token.endToken.length;
     let currentIndex = index;
+    let content = '';
     while (currentIndex < text.length) {
-      if (text.substr(currentIndex, delimeterLength) === token.endToken) {
+      const textPart = text.substr(currentIndex, delimeterLength);
+      if (textPart === token.endToken) {
         break;
       }
+      content += textPart;
       currentIndex += 1;
     }
-    return currentIndex - index;
+    return [content.trim() === '', currentIndex - index];
   }
 
   static getContent(lexem) {
@@ -112,12 +134,12 @@ class Lexer {
 
   static getPositions(start, text, token) {
     let end = start + token.startToken.length;
-    const mapLength = Lexer.mapToken(text, end, token);
+    const [hasEmptyContent, mapLength] = Lexer.mapToken(text, end, token);
     end += mapLength + token.endToken.length;
-    return [start, end];
+    return [start, end, hasEmptyContent];
   }
 
-  clearVariables() {
+  clearPartialTextVariables() {
     this.partText = '';
     this.partType = null;
     this.partStart = null;
@@ -157,7 +179,7 @@ class Lexer {
     } else {
       this.pushLexem(this.partType, this.partStart, this.partEnd, this.partText, true);
       this.pushLexem(block.type, start, end, text.substring(start, end));
-      this.clearVariables();
+      this.clearPartialTextVariables();
     }
   }
 
@@ -165,28 +187,37 @@ class Lexer {
     this.pushLexem(this.partType, this.partStart, this.partEnd, this.partText, true);
   }
 
+  trackContinuousTextParts() {
+    this.trackPartText();
+    this.clearPartialTextVariables();
+  }
+
   lex(text) {
     let otherText = '';
     for (let i = 0; i < text.length;) {
       const [block] = delimiters.filter(delim => byDelimeter(text, delim, i));
       if (block) {
-        const [start, end] = Lexer.getPositions(i, text, block);
+        const [start, end, hasEmptyContent] = Lexer.getPositions(i, text, block);
         this.trackText(otherText);
         otherText = '';
-        this.trackBlock({
-          block, start, end, text
-        });
-        i = end;
+        if (!hasEmptyContent && block.checkEnds(end - 1, text)) {
+          this.trackBlock({
+            block, start, end, text
+          });
+          i = end;
+        } else {
+          this.trackContinuousTextParts();
+          otherText += text.charAt(i);
+          i += 1;
+        }
       } else {
-        this.trackPartText();
-        this.clearVariables();
+        this.trackContinuousTextParts();
         otherText += text.charAt(i);
         i += 1;
       }
     }
     this.trackText(otherText);
-    this.trackPartText();
-    this.clearVariables();
+    this.trackContinuousTextParts();
 
     const result = this.lexems.slice();
     this.lexems = [];
@@ -197,9 +228,10 @@ class Lexer {
 class MdFormatter {
   constructor() {
     this.lexer = new Lexer();
+    const SpaceReplacePattern = '&nbsp;<wbr>';
     this.formatters = {
       PREFORMATTED(block) {
-        if (block.content) {
+        if (block.content.trim()) {
           return `<pre class="c-mrkdwn__pre">${block.content}</pre>`;
         }
         return block.text;
@@ -214,13 +246,19 @@ class MdFormatter {
         return `<blockquote class="c-mrkdwn__quote">${block.content}</blockquote>`;
       },
       STRIKE(block) {
-        return `<s>${block.content}</s>`;
+        return `<s>${block.content.replace(/ /g, SpaceReplacePattern)}</s>`;
       },
       BOLD(block) {
-        return `<b>${block.content}</b>`;
+        if (block.content.trim()) {
+          return `<b>${block.content}</b>`;
+        }
+        return block.text;
       },
       ITALIC(block) {
-        return `<i>${block.content}</i>`;
+        if (block.content.trim()) {
+          return `<i>${block.content.replace(/ /g, SpaceReplacePattern)}</i>`;
+        }
+        return block.text;
       },
       TEXT(block) {
         return block.content;

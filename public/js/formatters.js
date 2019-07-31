@@ -15,18 +15,23 @@ const tokens = {
   QUOTE: QUOTE
 };
 
+function spaceOrNothingCheck(index, text) {
+  let end = index - 1;
+  return end < 0 || text.charAt(end) === ' ';
+}
+
 const delimiters = [
   {
     type: 'PREFORMATTED',
     startToken: PREFORMATTED,
     endToken: PREFORMATTED,
-    checkStarts() { return true; }
+    checkStarts: spaceOrNothingCheck
   },
   {
     type: 'CODE',
     startToken: CODE,
     endToken: CODE,
-    checkStarts() { return true; }
+    checkStarts: spaceOrNothingCheck
   },
   {
     type: 'STRIKE',
@@ -193,33 +198,39 @@ class MdFormatter {
   constructor() {
     this.lexer = new Lexer();
     this.formatters = {
-      PREFORMATTED(content) {
-        return `<pre class="c-mrkdwn__pre">${content}</pre>`;
+      PREFORMATTED(block) {
+        if (block.content) {
+          return `<pre class="c-mrkdwn__pre">${block.content}</pre>`;
+        }
+        return block.text;
       },
-      CODE(content) {
-        return `<code class="c-mrkdwn__code">${content}</code>`;
+      CODE(block) {
+        if (block.content && !block.content.match(/\n/)) {
+          return `<code class="c-mrkdwn__code">${block.content}</code>`;
+        }
+        return block.text;
       },
-      QUOTE(content) {
-        return `<blockquote class="c-mrkdwn__quote">${content}</blockquote>`;
+      QUOTE(block) {
+        return `<blockquote class="c-mrkdwn__quote">${block.content}</blockquote>`;
       },
-      STRIKE(content) {
-        return `<s>${content}</s>`;
+      STRIKE(block) {
+        return `<s>${block.content}</s>`;
       },
-      BOLD(content) {
-        return `<b>${content}</b>`;
+      BOLD(block) {
+        return `<b>${block.content}</b>`;
       },
-      ITALIC(content) {
-        return `<i>${content}</i>`;
+      ITALIC(block) {
+        return `<i>${block.content}</i>`;
       },
-      TEXT(content) {
-        return content;
+      TEXT(block) {
+        return block.content;
       }
     };
   }
 
   format(text) {
     const lexems = this.lexer.lex(text);
-    return lexems.reduce((formatted, block) => `${formatted}${this.formatters[block.type](block.content)}`, '');
+    return lexems.reduce((formatted, block) => `${formatted}${this.formatters[block.type](block)}`, '');
   }
 }
 

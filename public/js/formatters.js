@@ -5,6 +5,12 @@ const CODE = '`';
 const PREFORMATTED = '```';
 const QUOTE = '>';
 const TEXT_TYPE = 'TEXT';
+const PREFORMATTED_TYPE = 'PREFORMATTED';
+const CODE_TYPE = 'CODE';
+const STRIKE_TYPE = 'STRIKE';
+const ITALIC_TYPE = 'ITALIC';
+const BOLD_TYPE = 'BOLD';
+const QUOTE_TYPE = 'QUOTE';
 
 const tokens = {
   STRIKE: STRIKE,
@@ -25,6 +31,11 @@ function nextSpaceOrNothingCheck(index, text) {
   return end > text.length - 1 || text.charAt(end) === ' ';
 }
 
+function nextSpaceOrEndOfStringOrNothingCheck(index, text) {
+  let end = index + 1;
+  return end > text.length - 1 || text.charAt(end).match(/^(\s|\n|\r\n)$/);
+}
+
 function nextNotSpaceOrNothingCheck(index, text) {
   let end = index;
   return end <= text.length - 1 && text.charAt(end) !== ' ';
@@ -32,36 +43,36 @@ function nextNotSpaceOrNothingCheck(index, text) {
 
 const delimiters = [
   {
-    type: 'PREFORMATTED',
+    type: PREFORMATTED_TYPE,
     startToken: PREFORMATTED,
     endToken: PREFORMATTED,
     uselastEndToken: true,
     checkStarts: prevSpaceOrNothingCheck,
-    checkEnds: nextSpaceOrNothingCheck
+    checkEnds: nextSpaceOrEndOfStringOrNothingCheck
   },
   {
-    type: 'CODE',
+    type: CODE_TYPE,
     startToken: CODE,
     endToken: CODE,
     checkStarts: prevSpaceOrNothingCheck,
     checkEnds() { return true; }
   },
   {
-    type: 'STRIKE',
+    type: STRIKE_TYPE,
     startToken: STRIKE,
     endToken: STRIKE,
     checkStarts() { return true; },
     checkEnds() { return true; }
   },
   {
-    type: 'ITALIC',
+    type: ITALIC_TYPE,
     startToken: ITALIC,
     endToken: ITALIC,
     checkStarts: prevSpaceOrNothingCheck,
     checkEnds() { return true; }
   },
   {
-    type: 'BOLD',
+    type: BOLD_TYPE,
     startToken: BOLD,
     endToken: BOLD,
     checkStarts(index, text) {
@@ -71,7 +82,7 @@ const delimiters = [
     checkEnds: nextSpaceOrNothingCheck
   },
   {
-    type: 'QUOTE',
+    type: QUOTE_TYPE,
     startToken: QUOTE,
     endToken: '\n',
     continious: true,
@@ -241,7 +252,7 @@ class MdFormatter {
     this.formatters = {
       PREFORMATTED(block) {
         if (block.content.trim()) {
-          return `<pre class="c-mrkdwn__pre">${block.content}</pre>`;
+          return `<pre class="c-mrkdwn__pre">${block.content.replace(/(\n|\r\n)$/g, '')}</pre>`;
         }
         return block.text;
       },
@@ -275,9 +286,24 @@ class MdFormatter {
     };
   }
 
+  applyFormatting(prevBlock, currBlock) {
+    let currBlockFormatted = this.formatters[currBlock.type](currBlock);
+    if (prevBlock !== undefined) {
+      if (prevBlock.type === PREFORMATTED_TYPE && currBlock.type === TEXT_TYPE) {
+        return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
+      }
+    }
+    return currBlockFormatted;
+  }
+
   format(text) {
     const lexems = this.lexer.lex(text);
-    return lexems.reduce((formatted, block) => `${formatted}${this.formatters[block.type](block)}`, '');
+    let prevBlock;
+    return lexems.reduce((formatted, block) => {
+      const result = `${formatted}${this.applyFormatting(prevBlock, block)}`;
+      prevBlock = block;
+      return result;
+    }, '');
   }
 }
 

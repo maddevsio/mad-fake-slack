@@ -248,7 +248,6 @@ class Lexer {
 class MdFormatter {
   constructor() {
     this.lexer = new Lexer();
-    const SpaceReplacePattern = '&nbsp;<wbr>';
     this.formatters = {
       PREFORMATTED(block) {
         if (block.content.trim()) {
@@ -263,10 +262,10 @@ class MdFormatter {
         return block.text;
       },
       QUOTE(block) {
-        return `<blockquote class="c-mrkdwn__quote">${block.content.replace(/ /g, SpaceReplacePattern)}</blockquote>`;
+        return `<blockquote class="c-mrkdwn__quote">${MdFormatter.replaceSpaces(block.content)}</blockquote>`;
       },
       STRIKE(block) {
-        return `<s>${block.content.replace(/ /g, SpaceReplacePattern)}</s>`;
+        return `<s>${MdFormatter.replaceSpaces(block.content)}</s>`;
       },
       BOLD(block) {
         if (block.content.trim()) {
@@ -276,22 +275,28 @@ class MdFormatter {
       },
       ITALIC(block) {
         if (block.content.trim()) {
-          return `<i>${block.content.replace(/ /g, SpaceReplacePattern)}</i>`;
+          return `<i>${MdFormatter.replaceSpaces(block.content)}</i>`;
         }
         return block.text;
       },
       TEXT(block) {
-        return block.content;
+        return MdFormatter.replaceSpaces(block.content);
       }
     };
   }
 
+  static replaceSpaces(text) {
+    const SpaceReplacePattern = '&nbsp;<wbr>';
+    return text.replace(/ /g, SpaceReplacePattern);
+  }
+
   applyFormatting(prevBlock, currBlock) {
     let currBlockFormatted = this.formatters[currBlock.type](currBlock);
-    if (prevBlock !== undefined) {
-      if (prevBlock.type === PREFORMATTED_TYPE && currBlock.type === TEXT_TYPE) {
-        return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
-      }
+    if (prevBlock && (prevBlock.type === PREFORMATTED_TYPE && currBlock.type === TEXT_TYPE)) {
+      return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
+    }
+    if (prevBlock && prevBlock.type === TEXT_TYPE && currBlock.type === QUOTE_TYPE) {
+      return MdFormatter.replaceSpaces(currBlock.text);
     }
     return currBlockFormatted;
   }
@@ -299,8 +304,8 @@ class MdFormatter {
   format(text) {
     const lexems = this.lexer.lex(text);
     let prevBlock;
-    return lexems.reduce((formatted, block) => {
-      const result = `${formatted}${this.applyFormatting(prevBlock, block)}`;
+    return lexems.reduce((formatted, block, index) => {
+      const result = `${formatted}${this.applyFormatting(prevBlock, block, lexems[index + 1])}`;
       prevBlock = block;
       return result;
     }, '');

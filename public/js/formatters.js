@@ -37,7 +37,7 @@ const delimiters = [
     endToken: PREFORMATTED,
     uselastEndToken: true,
     checkStarts: prevSpaceOrNothingCheck,
-    checkEnds() { return true; }
+    checkEnds: nextSpaceOrNothingCheck
   },
   {
     type: 'CODE',

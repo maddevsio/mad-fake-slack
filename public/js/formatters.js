@@ -263,7 +263,7 @@ class MdFormatter {
         return block.text;
       },
       QUOTE(block) {
-        return `<blockquote class="c-mrkdwn__quote">${block.content}</blockquote>`;
+        return `<blockquote class="c-mrkdwn__quote">${block.content.replace(/ /g, SpaceReplacePattern)}</blockquote>`;
       },
       STRIKE(block) {
         return `<s>${block.content.replace(/ /g, SpaceReplacePattern)}</s>`;

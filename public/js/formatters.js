@@ -35,6 +35,7 @@ const delimiters = [
     type: 'PREFORMATTED',
     startToken: PREFORMATTED,
     endToken: PREFORMATTED,
+    uselastEndToken: true,
     checkStarts: prevSpaceOrNothingCheck,
     checkEnds() { return true; }
   },
@@ -105,9 +106,17 @@ class Lexer {
     const delimeterLength = token.endToken.length;
     let currentIndex = index;
     let content = '';
+    let lastEndIndex;
     while (currentIndex < text.length) {
       const textPart = text.substr(currentIndex, delimeterLength);
       if (textPart === token.endToken) {
+        if (token.uselastEndToken) {
+          lastEndIndex = currentIndex;
+        } else {
+          break;
+        }
+      } else if (token.uselastEndToken && lastEndIndex !== undefined) {
+        currentIndex = lastEndIndex;
         break;
       }
       content += textPart;

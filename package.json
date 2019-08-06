@@ -14,7 +14,8 @@
   "scripts": {
     "test": "npm run test:integration",
     "test:jest": "jest",
-    "test:integration": "npm run pretest && npx cucumber-js --fail-fast",
+    "test:integration": "npm run pretest && npx cucumber-js --fail-fast --tags=\"not @skip\"",
+    "test:integration:event": "npm run test:integration -- -f event-protocol",
     "test:integration:only": "npm run pretest && npx cucumber-js --fail-fast --tags=@only",
     "start": "node index.js",
     "example:rtmbot": "SLACK_API=http://localhost:9001/api/ node examples/rtmbot/index.js",

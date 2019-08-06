@@ -25,7 +25,7 @@ Feature: Sending messages
         And User "Valera" should receive messages:
             | message                        | channel |
             | text message to random channel | random  |
-            
+    @skip
     Scenario: Sending user_typing message to "random" channel
         And I click on "channel item" with text "random"
         When I type "m"

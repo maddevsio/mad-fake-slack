@@ -5,9 +5,6 @@ Feature: Bold message formatting
         Given My timezone is "Asia/Bishkek"
         And Fake slack db is empty
         And I am on "fake slack ui" page
-        And User "Valera" connected to fake slack using parameters:
-            | token | xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT |
-            | url   | http://localhost:9001/api/       |
     
     Scenario: Only one word in bold
         And I type "*bold*"

@@ -32,6 +32,14 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content     |
             | * <b>bold</b> *  |
+    
+    Scenario: Formatting with preserving spaces at the beginning
+        And I type "*       bold*"
+        When I press the "Enter" keyboard button
+        Then I should see "bold" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                             |
+            | <b>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>bold</b> |
 
     Scenario: Word with a star at the beginning without a closing star
         And I type "*bold"

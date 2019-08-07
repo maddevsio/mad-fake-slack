@@ -14,10 +14,10 @@ Feature: Incoming user typing message payload
     Scenario: Send "user_typing" event to "general" channel
         And I type "general text message"
         Then User "Valera" should receive "incoming" payload with "user_typing" type:
-            | field                 | type    | required | format      |
-            | type                  | string  | true     | slackmtypes |
-            | user                  | string  | true     | slackuid    |
-            | channel               | string  | true     | slackchid   |
+            | field    | type   | required | format      |
+            | type     | string | true     | slackmtypes |
+            | user     | string | true     | slackuid    |
+            | channel  | string | true     | slackchid   |
 
     Scenario: Send "user_typing" event to "random" channel
         And I click on "channel item" with text "random"

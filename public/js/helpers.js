@@ -2,15 +2,18 @@ let id = 0;
 const isServer = typeof module !== 'undefined';
 let moment;
 let Handlebars;
+let Formatter;
 
 if (isServer) {
   /* eslint-disable global-require */
   moment = require('moment');
   Handlebars = require('handlebars');
+  Formatter = require('./formatters');
   /* eslint-enable global-require */
 } else {
   moment = window.moment;
   Handlebars = window.Handlebars;
+  Formatter = window.MdFormatter;
 }
 
 function isEmpty(value) {
@@ -23,6 +26,44 @@ function isEmpty(value) {
   }
   return false;
 }
+
+const escape = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
+function escapeChar(chr) {
+  return escape[chr];
+}
+
+function escapeExpression(string, possible = /[&<"'=]/) {
+  const badChars = new RegExp(possible, 'g');
+  if (typeof string !== 'string') {
+    // don't escape SafeStrings, since they're already safe
+    if (string && string.toHTML) {
+      return string.toHTML();
+    } if (string == null) {
+      return '';
+    } if (!string) {
+      return string + '';
+    }
+
+    // Force a string conversion as this will be done by the append regardless and
+    // the regex test will do this transparently behind the scenes, causing issues if
+    // an object's to string has escaped characters in it.
+    // eslint-disable-next-line no-param-reassign
+    string = '' + string;
+  }
+
+  if (!possible.test(string)) { return string; }
+  return string.replace(badChars, escapeChar);
+}
+
 
 const helpers = {
   json(context) {
@@ -76,9 +117,10 @@ const helpers = {
     }
     return trueOption;
   },
-  breaklines(text) {
-    let message = Handlebars.Utils.escapeExpression(text.trim());
-    message = message.replace(/(\r\n|\n|\r)/gm, '<br>');
+  formatMessage(text) {
+    let message = escapeExpression(text.trim());
+    const formatter = new Formatter(escapeExpression);
+    message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Handlebars.SafeString(message);
   }
 };

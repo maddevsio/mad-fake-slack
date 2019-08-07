@@ -327,6 +327,19 @@ async function getTextByPosition(selectorName, position, attribute = 'textConten
   return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
 }
 
+async function getHtmlByPosition(selectorName, position, attribute = 'innerHTML') {
+  const FIRST_POSITION = 'first';
+  const LAST_POSITION = 'last';
+  const page = scope.context.currentPage;
+  if (![LAST_POSITION, FIRST_POSITION].includes(position)) {
+    throw new Error(`[${getHtmlByPosition.name}] Invalid value for "position"! Valid values: [${position}]`);
+  }
+  await initBrowser();
+  const selector = scope.context.currentSelectors[selectorName];
+  const textContents = await page.$$eval(selector, (elements, attr) => elements.map(el => el[attr] && el[attr].trim()), attribute);
+  return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
+}
+
 function iterateLastIncomingMessages(userName, rows, cb) {
   const channelNameColumnIndex = 1;
   const messagesByChannels = groupBy(rows, row => row[channelNameColumnIndex]);
@@ -478,6 +491,7 @@ module.exports = {
   getLastIncomingMessageTextForUser,
   clickOn,
   getTextByPosition,
+  getHtmlByPosition,
   checkIsMessagesReceivedByUserFromChannel,
   validateIncomingMessage,
   resetDb,

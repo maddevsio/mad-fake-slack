@@ -16,3 +16,11 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | <b>bold</b>  |
+    
+    Scenario: Two words in bold sequentially
+        And I type "*bold1* *bold2*"
+        When I press the "Enter" keyboard button
+        Then I should see "bold1 bold2" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content              |
+            | <b>bold1</b> <b>bold2</b> |

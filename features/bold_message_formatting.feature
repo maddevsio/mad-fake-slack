@@ -56,6 +56,14 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | *bold        |
+
+    Scenario: Only 2 stars
+        And I type "**"
+        When I press the "Enter" keyboard button
+        Then I should see "**" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | **           |
     
     Scenario: Word with a double star at the beginning and at the end
         And I type "**bold**"

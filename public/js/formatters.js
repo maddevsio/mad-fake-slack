@@ -59,12 +59,14 @@ const delimiters = [
     endToken: STRIKE,
     checkStarts(index, text) {
       let end = index - 1;
-      // eslint-disable-next-line no-useless-escape
-      return end < 0 || Boolean(text.charAt(end).match(/[ ~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]|\n/));
+      return end < 0 || (!text.charAt(end).match(/[~*_`]|\n/) && text.charAt(end) === ' ');
     },
-    checkEnds() { return true; },
+    checkEnds(index, text) {
+      let end = index + 1;
+      return end >= text.length || (text.charAt(index) === '~' && text.charAt(end).match(/ |\n|\r\n/));
+    },
     isValidContent(content) {
-      return !content.match(/\n|\r\n|( )$/) && content.trim() !== '';
+      return !content.match(/~|( $)|(~$)/g) && content.trim() !== '';
     }
   },
   {

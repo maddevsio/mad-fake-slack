@@ -133,3 +133,9 @@ Then('I should see {string} multiline message with:', async (position, dataTable
 Given('I\'ll wait a little', async () => {
   await actions.wait(200);
 });
+
+Then('Message has the following HTML content at {string} position in {string}:', async (position, selectorName, dataTable) => {
+  const [expectedHtml] = dataTable.rows()[0];
+  const actualHtml = await actions.getHtmlByPosition(selectorName, position || 'last');
+  expect(actualHtml).toStrictEqual(expectedHtml);
+});

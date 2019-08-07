@@ -57,6 +57,22 @@ Feature: Bold message formatting
             | html content                                                                                   |
             | *&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>bold&nbsp;<wbr>* |
 
+    Scenario: Only many stars
+        And I type "****************"
+        When I press the "Enter" keyboard button
+        Then I should see "****************" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content     |
+            | **************** |
+
+    Scenario: Only stars separated with spaces
+        And I type "** * * *  * *   * *     *"
+        When I press the "Enter" keyboard button
+        Then I should see "** * * * * * * * *" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                 |
+            | ** * * *&nbsp;<wbr>&nbsp;<wbr>* *&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>* *&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>* |
+
     Scenario: Word with a star at the beginning without a closing star
         And I type "*bold"
         When I press the "Enter" keyboard button

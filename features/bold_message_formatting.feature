@@ -47,4 +47,16 @@ Feature: Bold message formatting
         Then I should see "*bold**" in "Message body"
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
-            | *bold**     |
+            | *bold**      |
+
+    Scenario: With breakline separator
+        And I type "*first line bold"
+        When I press the "Shift + Enter" keyboard button
+        And I type "second line bold*"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message sender | Valera Petrov                       |
+            | Message body   | *first line bold\nsecond line bold* |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                          |
+            | *first line bold<br>second line bold* |

@@ -40,3 +40,11 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | **bold**     |
+    
+    Scenario: Word with a double star at the end
+        And I type "*bold**"
+        When I press the "Enter" keyboard button
+        Then I should see "*bold**" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | *bold**     |

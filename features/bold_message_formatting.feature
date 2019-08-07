@@ -24,6 +24,14 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content              |
             | <b>bold1</b> <b>bold2</b> |
+    
+    Scenario: Word surrounded with stars which between 2 stars
+        And I type "* *bold* *"
+        When I press the "Enter" keyboard button
+        Then I should see "* bold *" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content     |
+            | * <b>bold</b> *  |
 
     Scenario: Word with a star at the beginning without a closing star
         And I type "*bold"

@@ -41,6 +41,14 @@ Feature: Bold message formatting
             | html content                                                                             |
             | <b>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>bold</b> |
 
+    Scenario: Formatting with more than one word
+        And I type "*  bold line  with spaces   in    it*"
+        When I press the "Enter" keyboard button
+        Then I should see "bold line with spaces in it" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                                                                                                 |
+            | <b>&nbsp;<wbr>&nbsp;<wbr>bold&nbsp;<wbr>line&nbsp;<wbr>&nbsp;<wbr>with&nbsp;<wbr>spaces&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>in&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>it</b> |
+
     Scenario: No bold formatting for word with space before ending star
         And I type "*       bold *"
         When I press the "Enter" keyboard button

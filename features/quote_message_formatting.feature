@@ -6,7 +6,7 @@ Feature: Quote message formatting
         And Fake slack db is empty
         And I am on "fake slack ui" page
     
-    Scenario: Only one word in quote
+    Scenario: Only one word in blockquote
         And I type ">quote"
         When I press the "Enter" keyboard button
         Then I should see "quote" in "Message body"
@@ -14,7 +14,7 @@ Feature: Quote message formatting
             | html content                                           |
             | <blockquote class="c-mrkdwn__quote">quote</blockquote> |
     
-    Scenario: More than one word in quote
+    Scenario: More than one word in blockquote
         And I type ">quote with more than one word"
         When I press the "Enter" keyboard button
         Then I should see "quote with more than one word" in "Message body"
@@ -22,7 +22,7 @@ Feature: Quote message formatting
             | html content                                                                   |
             | <blockquote class="c-mrkdwn__quote">quote with more than one word</blockquote> |
 
-    Scenario: Multiline quote formatting without breaklines
+    Scenario: Multiline blockquote formatting without breaklines
         And I type ">quote line 1"
         And I press the "Shift + Enter" keyboard button
         And I type ">quote line 2"
@@ -35,7 +35,7 @@ Feature: Quote message formatting
             | html content                                                                                  |
             | <blockquote class="c-mrkdwn__quote">quote line 1<br>quote line 2<br>quote line 3</blockquote> |
 
-    Scenario: Multiline quote formatting with breaklines
+    Scenario: Multiline blockquote formatting with breaklines
         And I type ">quote line 1"
         And I press the "Shift + Enter" keyboard button
         And I type ">"
@@ -53,3 +53,16 @@ Feature: Quote message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                                              |
             | <blockquote class="c-mrkdwn__quote">quote line 1<br><br><br><br>quote line 2<br>quote line 3</blockquote> |
+    
+    Scenario: Two blockquote lines separated with text
+        And I type ">quote line 1"
+        And I press the "Shift + Enter" keyboard button
+        And I type "some text"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">quote line 2"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | quote line 1\n\nsome text\n\nquote line 2 |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                                                                |
+            | <blockquote class="c-mrkdwn__quote">quote line 1<br></blockquote>some text<br><blockquote class="c-mrkdwn__quote">quote line 2</blockquote> |

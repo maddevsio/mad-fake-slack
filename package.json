@@ -17,6 +17,7 @@
     "test:integration": "npm run pretest && npx cucumber-js --fail-fast --tags=\"not @skip\"",
     "test:integration:event": "npm run test:integration -- -f event-protocol",
     "test:integration:only": "npm run pretest && npx cucumber-js --fail-fast --tags=@only",
+    "test:integration:only:slow": "SLOW_MO=100 npm run test:integration:only",
     "start": "node index.js",
     "example:rtmbot": "SLACK_API=http://localhost:9001/api/ node examples/rtmbot/index.js",
     "example:rtmbot:integration": "npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm run test:jest -- --runInBand examples/rtmbot/",

@@ -24,9 +24,9 @@ Feature: Quote message formatting
 
     Scenario: Multiline quote formatting without breaklines
         And I type ">quote line 1"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type ">quote line 2"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type ">quote line 3"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -34,3 +34,22 @@ Feature: Quote message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                                  |
             | <blockquote class="c-mrkdwn__quote">quote line 1<br>quote line 2<br>quote line 3</blockquote> |
+
+    Scenario: Multiline quote formatting with breaklines
+        And I type ">quote line 1"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">quote line 2"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">quote line 3"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | quote line 1\n\n\n\nquote line 2\nquote line 3 |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                              |
+            | <blockquote class="c-mrkdwn__quote">quote line 1<br><br><br><br>quote line 2<br>quote line 3</blockquote> |

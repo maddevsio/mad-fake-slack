@@ -66,3 +66,16 @@ Feature: Quote message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                                                                                |
             | <blockquote class="c-mrkdwn__quote">quote line 1<br></blockquote>some text<br><blockquote class="c-mrkdwn__quote">quote line 2</blockquote> |
+
+    Scenario: Do not render next lines as blockquote if starts with spaces
+        And I type ">quote line 1"
+        And I press the "Shift + Enter" keyboard button
+        And I type " >not blockquote 1"
+        And I press the "Shift + Enter" keyboard button
+        And I type "  >not blockquote 2"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | quote line 1\n\n>not blockquote 1\n  >not blockquote 2 |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                                                   |
+            | <blockquote class="c-mrkdwn__quote">quote line 1<br></blockquote> &gt;not blockquote 1<br>&nbsp;<wbr>&nbsp;<wbr>&gt;not blockquote 2 |

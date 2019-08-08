@@ -294,7 +294,7 @@ class MdFormatter {
 
   applyFormatting(prevBlock, currBlock) {
     let currBlockFormatted = this.formatters[currBlock.type](currBlock);
-    const prevBlockEmpty = prevBlock && prevBlock.text.match(/ +/g);
+    const prevBlockEmpty = prevBlock && prevBlock.text.match(/^( +)$/g);
     const prevBlockIsText = prevBlock && prevBlock.type === TEXT_TYPE;
     const prevBlockIsPreformatted = prevBlock && prevBlock.type === PREFORMATTED_TYPE;
     const currBlockIsText = currBlock && currBlock.type === TEXT_TYPE;

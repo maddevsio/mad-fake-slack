@@ -142,7 +142,7 @@ class Lexer {
   static endsWithToken({
     block, start, end, text
   }) {
-    return block.type !== QUOTE_TYPE && text.substring(start, end).endsWith(block.endToken);
+    return text.substring(start, end).endsWith(block.endToken);
   }
 
   static mapToken(text, index, token) {
@@ -222,7 +222,7 @@ class Lexer {
         const checkOptions = {
           block, start, end, text
         };
-        if (!isValidContent || !Lexer.endsWithToken(checkOptions)) {
+        if (!isValidContent || (!block.continious && !Lexer.endsWithToken(checkOptions))) {
           otherText += text.charAt(i);
           i += 1;
         } else {
@@ -292,8 +292,19 @@ class MdFormatter {
     return text !== ' ' ? fixMultipleSpacesIn(text) : text;
   }
 
-  applyFormatting(_, currBlock) {
+  applyFormatting(prevBlock, currBlock) {
     let currBlockFormatted = this.formatters[currBlock.type](currBlock);
+    const prevBlockEmpty = prevBlock && prevBlock.text.match(/ +/g);
+    const prevBlockIsText = prevBlock && prevBlock.type === TEXT_TYPE;
+    const prevBlockIsPreformatted = prevBlock && prevBlock.type === PREFORMATTED_TYPE;
+    const currBlockIsText = currBlock && currBlock.type === TEXT_TYPE;
+    const isCurrentBlockQuote = currBlock.type === QUOTE_TYPE;
+    if (prevBlockIsPreformatted && currBlockIsText) {
+      return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
+    }
+    if (prevBlockIsText && prevBlockEmpty && isCurrentBlockQuote) {
+      return MdFormatter.replaceSpaces(currBlock.text);
+    }
     return currBlockFormatted;
   }
 

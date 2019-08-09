@@ -93,3 +93,11 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | ``           |
+
+    Scenario: No formatting for code block with only spaces in it
+        And I type "`      `"
+        When I press the "Enter" keyboard button
+        Then I should see "` `" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | `&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>` |

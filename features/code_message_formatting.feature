@@ -21,3 +21,11 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                  |
             | <code class="c-mrkdwn__code">some code</code> |
+    
+    Scenario: Two code blocks one by one
+        And I type "`code1` `code2`"
+        When I press the "Enter" keyboard button
+        Then I should see "code1 code2" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                        |
+            | <code class="c-mrkdwn__code">code1</code> <code class="c-mrkdwn__code">code2</code> |

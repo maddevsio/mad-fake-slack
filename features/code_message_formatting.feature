@@ -29,3 +29,11 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                        |
             | <code class="c-mrkdwn__code">code1</code> <code class="c-mrkdwn__code">code2</code> |
+
+    Scenario: Include any count of ` from the end
+        And I type "`code1````"
+        When I press the "Enter" keyboard button
+        Then I should see "code1```" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                 |
+            | <code class="c-mrkdwn__code">code1```</code> |

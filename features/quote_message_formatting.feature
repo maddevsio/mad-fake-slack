@@ -88,3 +88,14 @@ Feature: Quote message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                      |
             | <blockquote class="c-mrkdwn__quote">&nbsp;<wbr>&nbsp;<wbr>quote&nbsp;<wbr>line&nbsp;<wbr>1</blockquote> |
+    
+    Scenario: Preserve spaces inside multiline quote
+        And I type "> quote line 1"
+        And I press the "Shift + Enter" keyboard button
+        And I type ">   quote line 2"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | quote line 1\n   quote line 2 |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                                                                                      |
+            | <blockquote class="c-mrkdwn__quote">&nbsp;<wbr>quote&nbsp;<wbr>line&nbsp;<wbr>1<br>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>quote&nbsp;<wbr>line&nbsp;<wbr>2</blockquote> |

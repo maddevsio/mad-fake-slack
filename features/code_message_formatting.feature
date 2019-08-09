@@ -53,6 +53,22 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                                                                        |
             | <code class="c-mrkdwn__code">code1</code><br><code class="c-mrkdwn__code">code2</code><br><code class="c-mrkdwn__code">code3</code> |
+    
+    Scenario: Three code blocks on separate lines with more than one breaklines
+        And I type "`code1`"
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        And I type "`code2`"
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        And I type "`code3`"
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | code1\n\ncode2\n\ncode3\n |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                                                                                |
+            | <code class="c-mrkdwn__code">code1</code><br><br><code class="c-mrkdwn__code">code2</code><br><br><code class="c-mrkdwn__code">code3</code> |
 
     Scenario: Include any count of ` from the end
         And I type "`code1````"

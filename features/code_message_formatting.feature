@@ -13,3 +13,11 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                             |
             | <code class="c-mrkdwn__code">code</code> |
+
+    Scenario: Two words in code
+        And I type "`some code`"
+        When I press the "Enter" keyboard button
+        Then I should see "some code" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                  |
+            | <code class="c-mrkdwn__code">some code</code> |

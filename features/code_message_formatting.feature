@@ -43,7 +43,7 @@ Feature: Code message formatting
         When I press the "Enter" keyboard button
         Then I should see "code" in "Message body"
         And Message has the following HTML content at "last" position in "Message body":
-            | html content                                 |
+            | html content                                  |
             | <code class="c-mrkdwn__code">  code   </code> |
 
     Scenario: Ignore strike formatting symbol inside
@@ -51,7 +51,7 @@ Feature: Code message formatting
         When I press the "Enter" keyboard button
         Then I should see "~code~" in "Message body"
         And Message has the following HTML content at "last" position in "Message body":
-            | html content                                |
+            | html content                               |
             | <code class="c-mrkdwn__code">~code~</code> |
 
     Scenario: Ignore italic formatting symbol inside
@@ -59,7 +59,7 @@ Feature: Code message formatting
         When I press the "Enter" keyboard button
         Then I should see "_code_" in "Message body"
         And Message has the following HTML content at "last" position in "Message body":
-            | html content                                |
+            | html content                               |
             | <code class="c-mrkdwn__code">_code_</code> |
 
     Scenario: Ignore bold formatting symbol inside

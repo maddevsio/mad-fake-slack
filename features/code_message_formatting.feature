@@ -46,6 +46,14 @@ Feature: Code message formatting
             | html content                                  |
             | <code class="c-mrkdwn__code">  code   </code> |
 
+    Scenario: Format with excluding extra apostrophe at end
+        And I type "`code``"
+        When I press the "Enter" keyboard button
+        Then I should see "`code``" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                              |
+            | <code class="c-mrkdwn__code">code</code>` |
+
     Scenario: Ignore strike formatting symbol inside
         And I type "`~code~`"
         When I press the "Enter" keyboard button

@@ -323,7 +323,13 @@ async function getTextByPosition(selectorName, position, attribute = 'textConten
   }
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
-  const textContents = await page.$$eval(selector, (elements, attr, regex) => elements.map(el => el[attr].replace(regex, ' ').trim()), attribute, matchRegex);
+  const textContents = await page.$$eval(selector,
+    (elements, attr, [regex, flags]) => elements.map(el => el[attr]
+      .replace(new RegExp(regex, flags), ' ')
+      .replace(new RegExp(String.fromCharCode(160), 'g'), ' ')
+      .trim()),
+    attribute,
+    [matchRegex.source, matchRegex.flags]);
   return textContents[position === FIRST_POSITION ? 0 : textContents.length - 1];
 }
 

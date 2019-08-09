@@ -77,3 +77,11 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | `some code   |
+
+    Scenario: No formatting without begin of code block
+        And I type "some code`"
+        When I press the "Enter" keyboard button
+        Then I should see "some code`" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | some code`   |

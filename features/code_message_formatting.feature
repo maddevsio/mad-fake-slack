@@ -117,3 +117,14 @@ Feature: Code message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | ``code`      |
+
+    Scenario: No formatting with breaklines inside code block
+        And I type "`some"
+        When I press the "Shift + Enter" keyboard button
+        And I type "code`"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | `some\ncode` |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content   |
+            | `some<br>code` |

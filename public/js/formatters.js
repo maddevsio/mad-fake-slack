@@ -311,7 +311,6 @@ class MdFormatter {
   format(text) {
     const lexems = this.lexer.lex(text);
     let prevBlock;
-    console.warn('<<<<<<< ', lexems);
     return lexems.reduce((formatted, block, index) => {
       const result = `${formatted}${this.applyFormatting(prevBlock, block, lexems[index + 1])}`;
       prevBlock = block;

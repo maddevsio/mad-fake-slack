@@ -24,7 +24,7 @@ Feature: Preformatted message formatting
 
     Scenario: Two words on different lines
         And I type "```one "
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "two```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -35,9 +35,9 @@ Feature: Preformatted message formatting
 
     Scenario: Two words on different lines with breaklines in the middle
         And I type "```one "
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "two```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -48,7 +48,7 @@ Feature: Preformatted message formatting
 
     Scenario: Two words on different lines as preformatted
         And I type "```one```"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "```two```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -59,7 +59,7 @@ Feature: Preformatted message formatting
 
     Scenario: No breaklines immediately after a preformatted start block
         And I type "```"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "one```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -70,9 +70,9 @@ Feature: Preformatted message formatting
 
     Scenario: No breaklines before a preformatted end block
         And I type "```"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "one"
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
@@ -145,11 +145,11 @@ Feature: Preformatted message formatting
 
     Scenario: Exclude preformatting with breaklines content
         And I type "```"
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
-        When I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Shift + Enter" keyboard button
         And I type "```"
         When I press the "Enter" keyboard button
         Then I should see "``````" in "Message body"

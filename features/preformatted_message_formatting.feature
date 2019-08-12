@@ -67,3 +67,16 @@ Feature: Preformatted message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                         |
             | <pre class="c-mrkdwn__pre">one</pre> |
+
+    Scenario: No breaklines before a preformatted end block
+        And I type "```"
+        When I press the "Shift + Enter" keyboard button
+        And I type "one"
+        When I press the "Shift + Enter" keyboard button
+        And I type "```"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | one |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                         |
+            | <pre class="c-mrkdwn__pre">one</pre> |

@@ -13,3 +13,11 @@ Feature: Preformatted message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                  |
             | <pre class="c-mrkdwn__pre">preformatted</pre> |
+
+    Scenario: Two words as preformatted
+        And I type "```one two```"
+        When I press the "Enter" keyboard button
+        Then I should see "one two" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                             |
+            | <pre class="c-mrkdwn__pre">one two</pre> |

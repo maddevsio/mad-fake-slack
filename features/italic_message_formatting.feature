@@ -29,3 +29,14 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                       |
             | <i>&nbsp;<wbr>_&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>italic&nbsp;<wbr>&nbsp;<wbr></i> _ |
+
+    Scenario: Skip italic block with breakline inside
+        And I type "_italic"
+        And I press the "Shift + Enter" keyboard button
+        And I type "_"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body   | _italic\n_ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | _italic<br>_ |

@@ -49,3 +49,12 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | __italic__   |
+
+    Scenario: Skip italic block with empty content
+        And I type "__"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | __ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | __           |

@@ -80,6 +80,27 @@ Feature: Preformatted message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                         |
             | <pre class="c-mrkdwn__pre">one</pre> |
+
+    Scenario: Display two preformatted blocks separated by text
+        And I type "```"
+        And I press the "Shift + Enter" keyboard button
+        And I type "one"
+        And I press the "Shift + Enter" keyboard button
+        And I type "```"
+        And I press the "Shift + Enter" keyboard button
+        And I type "some text"
+        And I press the "Shift + Enter" keyboard button
+        And I type "```"
+        And I press the "Shift + Enter" keyboard button
+        And I type "two"
+        And I press the "Shift + Enter" keyboard button
+        And I type "```"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | one\nsome text\n\ntwo |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                          |
+            | <pre class="c-mrkdwn__pre">one</pre>some text<br><pre class="c-mrkdwn__pre">two</pre> |
     
     Scenario: Preserve spaces at start and at the end of block and between words
         And I type "```    one two  three ```"

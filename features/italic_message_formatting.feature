@@ -67,3 +67,12 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | _&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>_ |
+
+    Scenario: Skip italic block with underscore content
+        And I type "___"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | ___ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | ___          |

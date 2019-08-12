@@ -250,7 +250,7 @@ class MdFormatter {
     this.formatters = {
       PREFORMATTED(block) {
         if (block.content.trim()) {
-          return `<pre class="c-mrkdwn__pre">${block.content.replace(/(\n|\r\n)$/g, '')}</pre>`;
+          return `<pre class="c-mrkdwn__pre">${block.content.replace(/^(\n|\r\n)|(\n|\r\n)$/g, '')}</pre>`;
         }
         return block.text;
       },

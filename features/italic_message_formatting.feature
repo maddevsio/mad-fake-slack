@@ -13,3 +13,11 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content  |
             | <i>italic</i> |
+
+    Scenario: Only one word with any spaces in italic
+        And I type "_   italic  _"
+        When I press the "Enter" keyboard button
+        Then I should see "italic" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                         |
+            | <i>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>italic&nbsp;<wbr>&nbsp;<wbr></i> |

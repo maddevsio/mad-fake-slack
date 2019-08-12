@@ -45,3 +45,14 @@ Feature: Preformatted message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                         |
             | <pre class="c-mrkdwn__pre">one <br><br><br>two</pre> |
+
+    Scenario: Two words on different lines as preformatted
+        And I type "```one```"
+        When I press the "Shift + Enter" keyboard button
+        And I type "```two```"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | one\ntwo |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                             |
+            | <pre class="c-mrkdwn__pre">one</pre><pre class="c-mrkdwn__pre">two</pre> |

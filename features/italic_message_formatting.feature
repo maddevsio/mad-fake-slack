@@ -40,3 +40,12 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | _italic<br>_ |
+
+    Scenario: Skip italic block surrounded by double underscores
+        And I type "__italic__"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | __italic__ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | __italic__   |

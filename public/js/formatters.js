@@ -75,11 +75,11 @@ const delimiters = [
     endToken: ITALIC,
     checkStarts(index, text) {
       let end = index - 1;
-      return end < 0 || !text.charAt(end).match(/[~*_`]|\n/);
+      return end < 0 || !text.charAt(end).match(/[~*_`]/);
     },
     checkEnds(index, text) {
       let end = index + 1;
-      return end >= text.length || (text.charAt(index) === '_' && text.charAt(end).match(/ |\n|\r\n/));
+      return end >= text.length || (text.charAt(index) === '_' || text.charAt(end).match(/ |\n|\r\n/));
     },
     isValidContent(content) {
       return content.trim() !== '' && !content.match(/(^_)|(__)|(_$)/g);

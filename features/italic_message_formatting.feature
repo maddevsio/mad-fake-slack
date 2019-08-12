@@ -76,3 +76,12 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | ___          |
+
+    Scenario: Skip italic block with double underscore content
+        And I type "____"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | ____ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | ____         |

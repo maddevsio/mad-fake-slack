@@ -58,3 +58,12 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | __           |
+
+    Scenario: Skip italic block with spaced content
+        And I type "_     _"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | _     _ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | _&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>_ |

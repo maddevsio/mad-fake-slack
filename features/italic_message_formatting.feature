@@ -30,6 +30,17 @@ Feature: Italic message formatting
             | html content                                                                       |
             | <i>&nbsp;<wbr>_&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>italic&nbsp;<wbr>&nbsp;<wbr></i> _ |
 
+    Scenario: Two italic blocks on different lines
+        And I type "_one_"
+        And I press the "Shift + Enter" keyboard button
+        And I type "_two_"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | one\ntwo |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content             |
+            | <i>one</i><br><i>two</i> |
+
     Scenario: Skip italic block with breakline inside
         And I type "_italic"
         And I press the "Shift + Enter" keyboard button

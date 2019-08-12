@@ -61,6 +61,15 @@ Feature: Italic message formatting
             | html content |
             | __italic__   |
 
+    Scenario: Skip italic block surrounded by double underscores and spaces
+        And I type "__ italic __"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | __ italic __ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content   |
+            | __ italic __   |
+
     Scenario: Skip italic block with empty content
         And I type "__"
         When I press the "Enter" keyboard button

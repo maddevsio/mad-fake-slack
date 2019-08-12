@@ -21,3 +21,11 @@ Feature: Italic message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                         |
             | <i>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>italic&nbsp;<wbr>&nbsp;<wbr></i> |
+
+    Scenario: Word surrounded with spaces and underscores
+        And I type "_ _   italic  _ _"
+        When I press the "Enter" keyboard button
+        Then I should see "_ italic _" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                                                                       |
+            | <i>&nbsp;<wbr>_&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>italic&nbsp;<wbr>&nbsp;<wbr></i> _ |

@@ -121,3 +121,17 @@ Feature: Preformatted message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | ```    ```   |
+
+    Scenario: Exclude preformatting with breaklines content
+        And I type "```"
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        When I press the "Shift + Enter" keyboard button
+        And I type "```"
+        When I press the "Enter" keyboard button
+        Then I should see "``````" in "Message body"
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content               |
+            | ```<br><br><br><br><br>``` |

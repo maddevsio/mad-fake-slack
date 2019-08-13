@@ -1,4 +1,3 @@
-@only
 Feature: Strike message formatting
     As a user, I want to send some words or all message in strikethrough style
 

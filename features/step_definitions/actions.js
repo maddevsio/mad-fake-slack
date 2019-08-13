@@ -324,7 +324,7 @@ async function getTextByPosition(selectorName, position, attribute = 'textConten
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
   const textContents = await page.$$eval(selector,
-    (elements, attr, [regex, flags]) => elements.map(el => el[attr]
+    (elements, attr, [regex, flags]) => elements.map(el => (el[attr] || el.value || el.innerHTML || el.innerText)
       .replace(new RegExp(regex, flags), ' ')
       .replace(new RegExp(String.fromCharCode(160), 'g'), ' ')
       .trim()),
@@ -473,6 +473,40 @@ async function getContentsByParams(options, { position = 'last', attribute = 'te
   );
 }
 
+async function copyTextToClipboard(text) {
+  const page = scope.context.currentPage;
+  await page.evaluate(textValue => {
+    const input = document.createElement('input');
+    input.setAttribute('value', textValue);
+    document.body.appendChild(input);
+    input.select();
+    const result = document.execCommand('copy');
+    document.body.removeChild(input);
+    return result;
+  }, text);
+}
+
+async function setMemorizeProperty(selectorName, propertyName) {
+  const page = scope.context.currentPage;
+  const selector = scope.context.currentSelectors[selectorName];
+  const propValue = await page.$eval(selector, (el, prop) => {
+    return el[prop];
+  }, propertyName);
+  scope.memo[`${selectorName}:${propertyName}`] = propValue;
+}
+
+function getMemorizeProperty(selectorName, propertyName) {
+  return scope.memo[`${selectorName}:${propertyName}`];
+}
+
+function getPropertyValueBySelector(selectorName, propertyName) {
+  const page = scope.context.currentPage;
+  const selector = scope.context.currentSelectors[selectorName];
+  return page.$eval(selector, (el, prop) => {
+    return el[prop];
+  }, propertyName);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -505,5 +539,9 @@ module.exports = {
   checkIsStatusMessagesReceivedByUserFromChannel,
   getLastIncomingPayloadForUser,
   sendMessageFrom,
-  getContentsByParams
+  getContentsByParams,
+  copyTextToClipboard,
+  setMemorizeProperty,
+  getMemorizeProperty,
+  getPropertyValueBySelector
 };

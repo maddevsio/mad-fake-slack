@@ -65,6 +65,15 @@ Feature: Bold message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content |
             | **first*     |
+
+    Scenario: Skip bold formatting if starts from double stars and spaces
+        And I type "**   first*"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | **   first* |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                              |
+            | **&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>first* |
             
     Scenario: No bold formatting for word with space before ending star
         And I type "*       bold *"

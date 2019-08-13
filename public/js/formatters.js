@@ -58,15 +58,13 @@ const delimiters = [
     startToken: STRIKE,
     endToken: STRIKE,
     checkStarts(index, text) {
-      let end = index - 1;
-      return end < 0 || (!text.charAt(end).match(/[~*_`]|\n/) && text.charAt(end) === ' ');
+      return text.charAt(index) === '~' && text.charAt(index - 1) !== '~';
     },
     checkEnds(index, text) {
-      let end = index + 1;
-      return end >= text.length || (text.charAt(index) === '~' && text.charAt(end).match(/ |\n|\r\n/));
+      return text.charAt(index) === '~' && text.charAt(index + 1) !== '~';
     },
     isValidContent(content) {
-      return !content.match(/~|( $)|(~$)/g) && content.trim() !== '';
+      return !content.match(/~|( $)|\n|\r\n/g) && content.trim() !== '';
     }
   },
   {

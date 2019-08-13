@@ -65,3 +65,12 @@ Feature: Multiline messages
         Then I should see "last" multiline message with:
             | Message sender | Valera Petrov |
             | Message body   | first line 2  |
+
+    Scenario: Paste multiline text from clipboard to messagebox
+        And I copied the following text to the clipboard:
+            | text                 | 
+            | first\nsecond\nthird |
+        And I memorize the "offsetHeight" of "Input message"
+        When I press the "Control + KeyV" keyboard button
+        Then I should see "first\nsecond\nthird" in "Input message"
+        And The "offsetHeight" of the "Input message" must "toBeGreaterThan" last

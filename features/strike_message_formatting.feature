@@ -1,3 +1,4 @@
+@only
 Feature: Strike message formatting
     As a user, I want to send some words or all message in strikethrough style
 
@@ -53,6 +54,35 @@ Feature: Strike message formatting
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                                                                     |
             | ~&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>strike&nbsp;<wbr>~ |
+
+    Scenario: Strike formatting of two words on different lines
+        And I type "~first~"
+        When I press the "Shift + Enter" keyboard button
+        And I type "~second~"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body   | first\nsecond |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                  |
+            | <s>first</s><br><s>second</s> |
+
+    Scenario: Skip strike formatting if starts from double tilde
+        And I type "~~first~"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | ~~first~ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | ~~first~     |
+
+    Scenario: Skip strike formatting if starts from double tilde and spaces
+        And I type "~~   first~"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | ~~   first~ |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                              |
+            | ~~&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>first~ |
 
     Scenario: Only many tildes
         And I type "~~~~~~~~~~~~~~~~"

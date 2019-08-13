@@ -46,6 +46,35 @@ Feature: Bold message formatting
             | html content                                                                                                                                                                 |
             | <b>&nbsp;<wbr>&nbsp;<wbr>bold&nbsp;<wbr>line&nbsp;<wbr>&nbsp;<wbr>with&nbsp;<wbr>spaces&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>in&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>it</b> |
 
+    Scenario: Bold formatting of two words on different lines
+        And I type "*first*"
+        When I press the "Shift + Enter" keyboard button
+        And I type "*second*"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | first\nsecond |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                  |
+            | <b>first</b><br><b>second</b> |
+
+    Scenario: Skip bold formatting if starts from double star
+        And I type "**first*"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | **first* |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content |
+            | **first*     |
+
+    Scenario: Skip bold formatting if starts from double stars and spaces
+        And I type "**   first*"
+        When I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | **   first* |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                              |
+            | **&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>first* |
+            
     Scenario: No bold formatting for word with space before ending star
         And I type "*       bold *"
         When I press the "Enter" keyboard button

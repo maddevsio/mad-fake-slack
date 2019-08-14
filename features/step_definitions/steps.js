@@ -139,3 +139,24 @@ Then('Message has the following HTML content at {string} position in {string}:',
   const actualHtml = await actions.getHtmlByPosition(selectorName, position || 'last');
   expect(actualHtml).toStrictEqual(expectedHtml);
 });
+
+Given('I copied the following text to the clipboard:', async (dataTable) => {
+  const [firstRow] = dataTable.rows();
+  const [text] = firstRow;
+  await actions.copyTextToClipboard(text);
+});
+
+Given('I memorize the {string} of {string}', async (properyName, selectorName) => {
+  await actions.setMemorizeProperty(selectorName, properyName);
+});
+
+Then('The {string} with type {string} of the {string} must {string} last', async (propertyName, valueType, selector, equalityValue) => {
+  const propValue = await actions.getPropertyValueBySelector(selector, propertyName);
+  const prevPropValue = await actions.getMemorizeProperty(selector, propertyName);
+  const ValueType = global[valueType];
+  expect(ValueType(propValue))[equalityValue](ValueType(prevPropValue));
+});
+
+Given('I set the focus on {string}', async (selectorName) => {
+  await actions.setFocus(selectorName);
+});

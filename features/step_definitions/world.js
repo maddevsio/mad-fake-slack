@@ -10,6 +10,7 @@ function World() {
   scope.host = 'http://localhost:9001';
   scope.driver = puppeteer;
   scope.context = {};
+  scope.memo = {};
   scope.interceptRequests = {};
   scope.locale = {};
   scope.locale.languages = ['en-US', 'en'];

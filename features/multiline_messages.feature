@@ -73,3 +73,28 @@ Feature: Multiline messages
         And I memorize the "clientHeight" of "Input message"
         When I press the "Control + KeyV" keyboard button
         And The "clientHeight" with type "Number" of the "Input message" must "toBeGreaterThan" last
+    
+    Scenario: The maximum height growth for the contents of a multi-line message
+        And I memorize the "clientHeight" of "Input message"
+        And I type "line 1"
+        And I press the "Control + Enter" keyboard button
+        And The "clientHeight" with type "Number" of the "Input message" must "toBeGreaterThan" last
+        And I type "line 2"
+        And I press the "Control + Enter" keyboard button
+        And I type "line 3"
+        And I press the "Control + Enter" keyboard button
+        And I type "line 4"
+        And I press the "Control + Enter" keyboard button
+        And I type "line 5"
+        And I press the "Control + Enter" keyboard button
+        And I memorize the "clientHeight" of "Input message"
+        And I type "line 6"
+        And I press the "Control + Enter" keyboard button
+        And The "clientHeight" with type "Number" of the "Input message" must "toBeGreaterThan" last
+        And I type "line 7"
+        When I memorize the "clientHeight" of "Input message"
+        And I press the "Control + Enter" keyboard button
+        And I type "line 8"
+        And I press the "Control + Enter" keyboard button
+        And I type "line 9"
+        Then The "clientHeight" with type "Number" of the "Input message" must "toEqual" last

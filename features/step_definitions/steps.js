@@ -150,8 +150,13 @@ Given('I memorize the {string} of {string}', async (properyName, selectorName) =
   await actions.setMemorizeProperty(selectorName, properyName);
 });
 
-Then('The {string} of the {string} must {string} last', async (propertyName, selector, equalityValue) => {
+Then('The {string} with type {string} of the {string} must {string} last', async (propertyName, valueType, selector, equalityValue) => {
   const propValue = await actions.getPropertyValueBySelector(selector, propertyName);
-  const prevPropValue = await actions.setMemorizeProperty(selector, propertyName);
-  expect(prevPropValue)[equalityValue](propValue);
+  const prevPropValue = await actions.getMemorizeProperty(selector, propertyName);
+  const ValueType = global[valueType];
+  expect(ValueType(propValue))[equalityValue](ValueType(prevPropValue));
+});
+
+Given('I set the focus on {string}', async (selectorName) => {
+  await actions.setFocus(selectorName);
 });

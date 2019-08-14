@@ -68,9 +68,8 @@ Feature: Multiline messages
 
     Scenario: Paste multiline text from clipboard to messagebox
         And I copied the following text to the clipboard:
-            | text                 | 
-            | first\nsecond\nthird |
-        And I memorize the "offsetHeight" of "Input message"
+            | text                     | 
+            | first\nsecond\nthird     |
+        And I memorize the "clientHeight" of "Input message"
         When I press the "Control + KeyV" keyboard button
-        Then I should see "first\nsecond\nthird" in "Input message"
-        And The "offsetHeight" of the "Input message" must "toBeGreaterThan" last
+        And The "clientHeight" with type "Number" of the "Input message" must "toBeGreaterThan" last

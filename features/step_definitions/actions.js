@@ -60,6 +60,9 @@ async function initBrowser() {
       slowMo,
       dumpio
     });
+
+    const context = scope.browser.defaultBrowserContext();
+    await context.overridePermissions(scope.host, ['clipboard-write', 'clipboard-read']);
   }
 
   return scope.browser;
@@ -475,14 +478,8 @@ async function getContentsByParams(options, { position = 'last', attribute = 'te
 
 async function copyTextToClipboard(text) {
   const page = scope.context.currentPage;
-  await page.evaluate(textValue => {
-    const input = document.createElement('input');
-    input.setAttribute('value', textValue);
-    document.body.appendChild(input);
-    input.select();
-    const result = document.execCommand('copy');
-    document.body.removeChild(input);
-    return result;
+  return page.evaluate(textValue => {
+    return navigator.clipboard.writeText(textValue);
   }, text);
 }
 
@@ -505,6 +502,12 @@ function getPropertyValueBySelector(selectorName, propertyName) {
   return page.$eval(selector, (el, prop) => {
     return el[prop];
   }, propertyName);
+}
+
+function setFocus(selectorName) {
+  const page = scope.context.currentPage;
+  const selector = scope.context.currentSelectors[selectorName];
+  return page.focus(selector);
 }
 
 module.exports = {
@@ -543,5 +546,6 @@ module.exports = {
   copyTextToClipboard,
   setMemorizeProperty,
   getMemorizeProperty,
-  getPropertyValueBySelector
+  getPropertyValueBySelector,
+  setFocus
 };

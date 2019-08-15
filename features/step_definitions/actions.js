@@ -515,6 +515,19 @@ function runTimes(times, action) {
   return Promise.mapSeries(calls, c => c());
 }
 
+function setTextPositionTo(position) {
+  const page = scope.context.currentPage;
+  return page.evaluate(pos => {
+    const inputField = window.msg_input_text;
+    const textLength = inputField.value.length || 1;
+    const mapTextPosition = textPos => ({ starting: 1, ending: textLength }[textPos] || 1);
+    // eslint-disable-next-line no-restricted-globals
+    const textPosition = !isNaN(pos) ? Number(pos) : mapTextPosition(pos);
+    inputField.focus();
+    inputField.selectionEnd = textPosition;
+  }, position);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -553,5 +566,6 @@ module.exports = {
   getMemorizeProperty,
   getPropertyValueBySelector,
   setFocus,
-  runTimes
+  runTimes,
+  setTextPositionTo
 };

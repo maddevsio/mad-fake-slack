@@ -510,6 +510,11 @@ function setFocus(selectorName) {
   return page.focus(selector);
 }
 
+function runTimes(times, action) {
+  const calls = new Array(Number(times)).fill(action);
+  return Promise.mapSeries(calls, c => c());
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -547,5 +552,6 @@ module.exports = {
   setMemorizeProperty,
   getMemorizeProperty,
   getPropertyValueBySelector,
-  setFocus
+  setFocus,
+  runTimes
 };

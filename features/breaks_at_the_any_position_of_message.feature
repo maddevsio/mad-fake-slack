@@ -16,3 +16,14 @@ Feature: Breaks in the middle of message
         And Message has the following HTML content at "last" position in "Message body":
             | html content               |
             | first line<br> second line |
+
+    Scenario: Insert a break at the closest starting position of the typed message
+        And I type "first line second line"
+        And I set cursor to the "1" position of the text
+        And I press the "Shift + Enter" keyboard button
+        And I press the "Enter" keyboard button
+        Then I should see "last" multiline message with:
+            | Message body | f\nirst line second line |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content               |
+            | f<br>irst line second line |

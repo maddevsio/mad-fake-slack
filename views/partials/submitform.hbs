@@ -74,6 +74,22 @@
     }
   }
 
+  function pasteIntoInput(el, text) {
+    el.focus();
+    if (typeof el.selectionStart == "number"
+      && typeof el.selectionEnd == "number") {
+      var val = el.value;
+      var selStart = el.selectionStart;
+      el.value = val.slice(0, selStart) + text + val.slice(el.selectionEnd);
+      el.selectionEnd = el.selectionStart = selStart + text.length;
+    } else if (typeof document.selection != "undefined") {
+      var textRange = document.selection.createRange();
+      textRange.text = text;
+      textRange.collapse(false);
+      textRange.select();
+    }
+  }
+
   msgInputText.addEventListener('keyup', (e) => {
       setTimeout(updateTextAreaHeight, 0);
   });
@@ -82,7 +98,7 @@
     if (e.keyCode === 13) {
       e.preventDefault();
       if (e.ctrlKey || e.shiftKey) {
-        e.target.value = e.target.value + '\n';
+        pasteIntoInput(e.currentTarget, '\n');
         msgInputText.scrollTop = msgInputText.scrollHeight;
       } else {
         const event = new CustomEvent('submit', { "bubbles": true, "cancelable": true });

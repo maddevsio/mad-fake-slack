@@ -160,3 +160,11 @@ Then('The {string} with type {string} of the {string} must {string} last', async
 Given('I set the focus on {string}', async (selectorName) => {
   await actions.setFocus(selectorName);
 });
+
+Given('I press the {string} keyboard button {string} times', async (buttonNames, times) => {
+  await actions.runTimes(times, () => actions.pressTheButton(buttonNames));
+});
+
+Given('I set cursor to the {string} position of the text', async (position) => {
+  await actions.setTextPositionTo(position);
+});

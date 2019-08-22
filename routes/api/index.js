@@ -30,7 +30,7 @@ function beforeAllHandler(req, res, next) {
 }
 
 function authTestHandler(req, res) {
-  const token = (req.body && req.body.token) || req.headers.Authorization;
+  const token = (req.body && req.body.token) || req.headers.Authorization || req.headers.authorization;
   const uid = crypto
     .createHash('md5')
     .update(token)

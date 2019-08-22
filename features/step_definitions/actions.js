@@ -2,12 +2,14 @@ const expect = require('expect');
 const scope = require('./support/scope');
 const selectors = require('./selectors');
 const pages = require('./pages');
-const { user } = require('./support/services');
+const { user, ui } = require('./support/services');
 const { dbManager } = require('../../routes/managers');
 const { CustomJSONSchemaValidator } = require('./support/validators');
 const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
 const jsonSchemaValidator = new Validator();
+const fetch = require('node-fetch');
 const Promise = require('bluebird');
+fetch.Promise = Promise;
 
 const VIEWPORT = [1920, 1080];
 
@@ -528,6 +530,29 @@ function setTextPositionTo(position) {
   }, position);
 }
 
+async function restartApiServerWithEnvs(envs) {
+  await ui.server.close();
+  await ui.server.start(envs);
+}
+
+async function restartApiServer() {
+  await ui.server.close();
+  await ui.server.start();
+}
+
+async function makeJsonRequest({
+  httpMethod,
+  url,
+  body = {},
+  headers = { 'Content-Type': 'application/json' }
+}) {
+  return fetch(url, {
+    method: httpMethod.toLowerCase(),
+    headers,
+    body: JSON.stringify(body)
+  }).then(res => res.json());
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -567,5 +592,8 @@ module.exports = {
   getPropertyValueBySelector,
   setFocus,
   runTimes,
-  setTextPositionTo
+  setTextPositionTo,
+  restartApiServerWithEnvs,
+  restartApiServer,
+  makeJsonRequest
 };

@@ -179,7 +179,7 @@ When('I send {string} request to {string} with conditions', async (httpMethod, u
     httpMethod,
     url,
     body: request.body,
-    header: request.headers
+    headers: request.headers
   });
   expect(actualResponse).toStrictEqual(response);
 });

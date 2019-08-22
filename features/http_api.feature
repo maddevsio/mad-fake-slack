@@ -30,7 +30,9 @@ Feature: Http API request/response
                 }
             }
             """
-        And I restart the server with default envs
+        And Restart the api server with the following envs:
+            | PORT   | 9001                   |
+            | WS_URL | http://localhost:9001/ |
 
     Scenario: Make auth.test POST request with token in auth header
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
@@ -52,7 +54,9 @@ Feature: Http API request/response
                 }
             }
             """
-        And I restart the server with default envs
+        And Restart the api server with the following envs:
+            | PORT   | 9001                   |
+            | WS_URL | http://localhost:9001/ |
 
     Scenario: Make auth.test POST request without token
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
@@ -69,4 +73,6 @@ Feature: Http API request/response
                 }
             }
             """
-        And I restart the server with default envs
+        And Restart the api server with the following envs:
+            | PORT   | 9001                   |
+            | WS_URL | http://localhost:9001/ |

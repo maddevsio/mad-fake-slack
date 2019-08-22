@@ -543,14 +543,17 @@ async function restartApiServer() {
 async function makeJsonRequest({
   httpMethod,
   url,
-  body = {},
+  body,
   headers = { 'Content-Type': 'application/json' }
 }) {
-  return fetch(url, {
+  const data = {
     method: httpMethod.toLowerCase(),
-    headers,
-    body: JSON.stringify(body)
-  }).then(res => res.json());
+    headers
+  };
+  if (body) {
+    data.body = JSON.stringify(body);
+  }
+  return fetch(url, data).then(res => res.json());
 }
 
 module.exports = {

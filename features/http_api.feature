@@ -31,3 +31,25 @@ Feature: Http API request/response
             }
             """
         And I restart the server with default envs
+
+    Scenario: Make auth.test POST request with token in auth header
+        When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT"
+                    }
+                },
+                "response": {
+                    "ok": true,
+                    "url": "http://localhost:3000/",
+                    "team": "BotFactory",
+                    "user": "valera",
+                    "team_id": "T12345678",
+                    "user_id": "W12345679"
+                }
+            }
+            """
+        And I restart the server with default envs

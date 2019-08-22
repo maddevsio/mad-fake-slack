@@ -53,3 +53,20 @@ Feature: Http API request/response
             }
             """
         And I restart the server with default envs
+
+    Scenario: Make auth.test POST request without token
+        When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json"
+                    }
+                },
+                "response": {
+                    "ok": false,
+                    "error": "invalid_auth"
+                }
+            }
+            """
+        And I restart the server with default envs

@@ -168,3 +168,22 @@ Given('I press the {string} keyboard button {string} times', async (buttonNames,
 Given('I set cursor to the {string} position of the text', async (position) => {
   await actions.setTextPositionTo(position);
 });
+
+Given('Restart the api server with the following envs:', async (dataTable) => {
+  await actions.restartApiServerWithEnvs(dataTable.rowsHash());
+});
+
+When('I send {string} request to {string} with conditions', async (httpMethod, url, docString) => {
+  const { request, response } = JSON.parse(docString);
+  const actualResponse = await actions.makeJsonRequest({
+    httpMethod,
+    url,
+    body: request.body,
+    header: request.headers
+  });
+  expect(actualResponse).toStrictEqual(response);
+});
+
+Then('I restart the server with default envs', () => {
+  return actions.restartApiServer();
+});

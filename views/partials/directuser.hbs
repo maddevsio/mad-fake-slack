@@ -2,7 +2,7 @@
 <div role="listitem" style="height: 26px;">
   <div class="p-channel_sidebar__close_container">
     <a class="c-link p-channel_sidebar__channel p-channel_sidebar__channel--im {{inlineIf (eq user.id selectedUser.id) "p-channel_sidebar__channel--selected"}}"
-      href="http://localhost:9001/messages/{{user.id}}">
+      href="/messages/{{user.id}}">
       {{#if (eq user.id "USLACKBOT") }}
         <span class="p-channel_sidebar__name">
           <i class="im im-heart active"></i>

@@ -29,7 +29,8 @@
     "codeclimate:analyze:format:text": "node scripts/codeclimate/check.js && CODECLIMATE_CODE=$(node scripts/volumes/inspect.js) codeclimate analyze -f text > reports/$(date +\"%Y%m%d%H%M%S\").txt",
     "codeclimate:analyze": "npm run codeclimate:analyze:format:$REPORT_FORMAT",
     "glitch:pack": "node ./scripts/glitch.js",
-    "glitch:unpack": "unzip -o glitch_release_*.zip -d . && rm glitch_release_*.zip"
+    "glitch:unpack": "unzip -o glitch_release_*.zip -d . && rm glitch_release_*.zip && refresh",
+    "example:rtmbot:glitch": "SLACK_API=http://localhost:3000/api/ node bot.js"
   },
   "repository": {
     "type": "git",

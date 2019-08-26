@@ -72,3 +72,32 @@ Feature: Http API request/response
             """
         And Restart the api server with the following envs:
             | PORT | 9001 |
+
+    Scenario: Set URL_SCHEMA to "https" and make auth.test POST request
+        And Restart the api server with the following envs:
+            | PORT       | 3000  |
+            | URL_SCHEMA | https |
+        When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "body": {
+                        "token": "xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT"
+                    }
+                },
+                "response": {
+                    "ok": true,
+                    "url": "https://localhost:3000/",
+                    "team": "BotFactory",
+                    "user": "valera",
+                    "team_id": "T12345678",
+                    "user_id": "W12345679"
+                }
+            }
+            """
+        And Restart the api server with the following envs:
+            | PORT       | 9001 |
+            | URL_SCHEMA |      |

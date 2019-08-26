@@ -33,14 +33,22 @@ function checkIsUserRegistered(name) {
   }
 }
 
+function parseBoolean(value) {
+  let boolValue = value;
+  if (typeof value === 'string') {
+    boolValue = boolValue.trim().toLowerCase();
+  }
+  return ['true', 1].includes(boolValue);
+}
+
 async function initBrowser() {
   if (!scope.browser) {
-    const useSandbox = process.env.USE_SANDBOX;
-    const headless = (process.env.HEADLESS === undefined ? 'true' : process.env.HEADLESS).trim().toLowerCase() === 'true';
+    const useSandbox = parseBoolean(process.env.USE_SANDBOX);
+    const headless = parseBoolean(process.env.HEADLESS);
     const slowMo = parseInt((process.env.SLOW_MO || '0').trim(), 10);
-    const dumpio = !!process.env.DUMPIO;
+    const dumpio = parseBoolean(process.env.DUMPIO || '0');
     const executablePath = process.env.EXECUTABLE_BROWSER_PATH || 'google-chrome-stable';
-    const useRemoteDebug = (process.env.USE_REMOTE_DUBUG === undefined ? 'true' : process.env.USE_REMOTE_DUBUG).trim().toLowerCase() === 'true';
+    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG);
 
     const args = [
       `--window-size=${VIEWPORT}`

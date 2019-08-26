@@ -50,7 +50,9 @@ function authTestHandler(req, res) {
     const exampleResponse = responses['auth.test'];
     exampleResponse.team_id = team.id;
     exampleResponse.user_id = user.id;
-    exampleResponse.url = process.env.WS_URL || `http://${process.env.HOST}${process.env.PORT ? ':' + process.env.PORT : ''}/`;
+    const port = process.env.PORT ? ':' + process.env.PORT : '';
+    const schema = process.env.URL_SCHEMA || 'http';
+    exampleResponse.url = `${schema}://${team.domain}${port}/`;
     exampleResponse.team = team.name || exampleResponse.team;
     exampleResponse.user = user.name || exampleResponse.team;
     res.json(exampleResponse);

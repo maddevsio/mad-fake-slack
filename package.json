@@ -27,7 +27,9 @@
     "codeclimate:analyze:format:html": "node scripts/codeclimate/check.js && CODECLIMATE_CODE=$(node scripts/volumes/inspect.js) codeclimate analyze -f html > reports/$(date +\"%Y%m%d%H%M%S\").html",
     "codeclimate:analyze:format:json": "node scripts/codeclimate/check.js && CODECLIMATE_CODE=$(node scripts/volumes/inspect.js) codeclimate analyze -f json > reports/$(date +\"%Y%m%d%H%M%S\").json",
     "codeclimate:analyze:format:text": "node scripts/codeclimate/check.js && CODECLIMATE_CODE=$(node scripts/volumes/inspect.js) codeclimate analyze -f text > reports/$(date +\"%Y%m%d%H%M%S\").txt",
-    "codeclimate:analyze": "npm run codeclimate:analyze:format:$REPORT_FORMAT"
+    "codeclimate:analyze": "npm run codeclimate:analyze:format:$REPORT_FORMAT",
+    "glitch:pack": "node ./scripts/glitch.js",
+    "glitch:unpack": "unzip -o glitch_release_*.zip -d . && rm glitch_release_*.zip"
   },
   "repository": {
     "type": "git",
@@ -53,6 +55,7 @@
   "devDependencies": {
     "@slack/rtm-api": "^5.0.1",
     "@slack/web-api": "^5.0.1",
+    "archiver": "^3.1.1",
     "bluebird": "^3.5.5",
     "chalk": "^2.4.2",
     "cucumber": "^5.1.0",

@@ -119,7 +119,9 @@ function rtmConnectHandler(req, res) {
   response.team.id = teamId;
   response.team.domain = domain;
   response.team.name = teamName;
-  response.url = `${response.url}?uid=${tokenHash}`;
+  const port = process.env.PORT ? ':' + process.env.PORT : '';
+  const schema = process.env.URL_SCHEMA || 'http';
+  response.url = `${schema === 'http' ? 'ws' : 'wss'}://${domain}${port}/ws?uid=${tokenHash}`;
   res.json(response);
 }
 

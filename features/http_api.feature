@@ -5,8 +5,7 @@ Feature: Http API request/response
     Background:
         Given My timezone is "Asia/Bishkek"
         And Restart the api server with the following envs:
-            | PORT   | 3000                   |
-            | WS_URL | http://localhost:3000/ | 
+            | PORT | 3000 |
 
     Scenario: Make auth.test POST request with token in body
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
@@ -31,8 +30,7 @@ Feature: Http API request/response
             }
             """
         And Restart the api server with the following envs:
-            | PORT   | 9001                   |
-            | WS_URL | http://localhost:9001/ |
+            | PORT | 9001 |
 
     Scenario: Make auth.test POST request with token in auth header
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
@@ -55,8 +53,7 @@ Feature: Http API request/response
             }
             """
         And Restart the api server with the following envs:
-            | PORT   | 9001                   |
-            | WS_URL | http://localhost:9001/ |
+            | PORT | 9001 |
 
     Scenario: Make auth.test POST request without token
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
@@ -74,5 +71,4 @@ Feature: Http API request/response
             }
             """
         And Restart the api server with the following envs:
-            | PORT   | 9001                   |
-            | WS_URL | http://localhost:9001/ |
+            | PORT | 9001 |

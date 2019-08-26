@@ -9,5 +9,5 @@
         "id": "T12345678",
         "name": "BotFactory"
     },
-    "url": "ws://localhost:9001/ws"
+    "url": "WS_CONNECTION_PLACEHOLDER"
 }

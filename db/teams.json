@@ -2,8 +2,8 @@
     {
         "id": "T12345678",
         "name": "BotFactory",
-        "domain": "example",
-        "email_domain": "example.com",
+        "domain": "localhost",
+        "email_domain": "localhost",
         "icon": {
             "image_34": "/images/slack_user.png",
             "image_44": "/images/slack_user.png",

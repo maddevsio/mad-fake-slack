@@ -1,8 +1,8 @@
 {
     "ok": true,
-    "url": "http://localhost:9001/",
-    "team": "BotFactory",
-    "user": "valera.petrov",
-    "team_id": "T12345678",
-    "user_id": "W12345678"
+    "url": "PLACEHOLDER_WS_URL",
+    "team": "PLACEHOLDER_TEAM_NAME",
+    "user": "PLACEHOLDER_USER_NAME",
+    "team_id": "PLACEHOLDER_TEAM_ID",
+    "user_id": "PLACEHOLDER_USER_ID"
 }

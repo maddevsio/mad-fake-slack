@@ -30,7 +30,12 @@ function beforeAllHandler(req, res, next) {
 }
 
 function authTestHandler(req, res) {
-  const token = (req.body && req.body.token) || req.headers.Authorization;
+  const token = (req.body && req.body.token) || req.headers.Authorization || req.headers.authorization;
+  if (!token) {
+    res.json(responses.invalid_auth);
+    return;
+  }
+
   const uid = crypto
     .createHash('md5')
     .update(token)
@@ -45,6 +50,11 @@ function authTestHandler(req, res) {
     const exampleResponse = responses['auth.test'];
     exampleResponse.team_id = team.id;
     exampleResponse.user_id = user.id;
+    const port = process.env.PORT ? ':' + process.env.PORT : '';
+    const schema = process.env.URL_SCHEMA || 'http';
+    exampleResponse.url = `${schema}://${team.domain}${port}/`;
+    exampleResponse.team = team.name || exampleResponse.team;
+    exampleResponse.user = user.name || exampleResponse.team;
     res.json(exampleResponse);
   }
 }

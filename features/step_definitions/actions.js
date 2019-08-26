@@ -2,12 +2,14 @@ const expect = require('expect');
 const scope = require('./support/scope');
 const selectors = require('./selectors');
 const pages = require('./pages');
-const { user } = require('./support/services');
+const { user, ui } = require('./support/services');
 const { dbManager } = require('../../routes/managers');
 const { CustomJSONSchemaValidator } = require('./support/validators');
 const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
 const jsonSchemaValidator = new Validator();
+const fetch = require('node-fetch');
 const Promise = require('bluebird');
+fetch.Promise = Promise;
 
 const VIEWPORT = [1920, 1080];
 
@@ -31,14 +33,23 @@ function checkIsUserRegistered(name) {
   }
 }
 
+function parseBoolean(value, defaultValue) {
+  let boolValue = value;
+  if (typeof value === 'undefined') return defaultValue;
+  if (typeof value === 'string') {
+    boolValue = boolValue.trim().toLowerCase();
+  }
+  return ['true', 1, '1'].includes(boolValue);
+}
+
 async function initBrowser() {
   if (!scope.browser) {
-    const useSandbox = process.env.USE_SANDBOX;
-    const headless = (process.env.HEADLESS === undefined ? 'true' : process.env.HEADLESS).trim().toLowerCase() === 'true';
+    const useSandbox = parseBoolean(process.env.USE_SANDBOX, false);
+    const headless = parseBoolean(process.env.HEADLESS, true);
     const slowMo = parseInt((process.env.SLOW_MO || '0').trim(), 10);
-    const dumpio = !!process.env.DUMPIO;
+    const dumpio = parseBoolean(process.env.DUMPIO, false);
     const executablePath = process.env.EXECUTABLE_BROWSER_PATH || 'google-chrome-stable';
-    const useRemoteDebug = (process.env.USE_REMOTE_DUBUG === undefined ? 'true' : process.env.USE_REMOTE_DUBUG).trim().toLowerCase() === 'true';
+    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG);
 
     const args = [
       `--window-size=${VIEWPORT}`
@@ -528,6 +539,32 @@ function setTextPositionTo(position) {
   }, position);
 }
 
+async function restartApiServerWithEnvs(envs) {
+  await ui.server.close();
+  await ui.server.start(envs);
+}
+
+async function restartApiServer() {
+  await ui.server.close();
+  await ui.server.start();
+}
+
+async function makeJsonRequest({
+  httpMethod,
+  url,
+  body,
+  headers = { 'Content-Type': 'application/json' }
+}) {
+  const data = {
+    method: httpMethod.toLowerCase(),
+    headers
+  };
+  if (body) {
+    data.body = JSON.stringify(body);
+  }
+  return fetch(url, data).then(res => res.json());
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -567,5 +604,8 @@ module.exports = {
   getPropertyValueBySelector,
   setFocus,
   runTimes,
-  setTextPositionTo
+  setTextPositionTo,
+  restartApiServerWithEnvs,
+  restartApiServer,
+  makeJsonRequest
 };

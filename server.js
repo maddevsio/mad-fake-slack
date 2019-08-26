@@ -9,6 +9,7 @@ const apiRouter = require('./routes/api');
 const appRouter = require('./routes/app');
 const testApiRouter = require('./routes/testapi');
 const rtmRouter = require('./routes/rtm');
+const { spawn } = require('child_process');
 
 const port = process.env.PORT || 9001;
 const host = process.env.HOST || '0.0.0.0';
@@ -82,8 +83,13 @@ function createUIServer({ httpPort, httpHost }) {
 }
 
 if (require.main === module) {
-  /* eslint-disable-next-line */
-  app.listen(port, host, () => console.log(`Example app listening on port ${port}!`));
+  app.listen(port, host, () => {
+    if (fs.existsSync('bot.js')) {
+      spawn('npm', ['run', 'example:rtmbot:glitch']);
+    }
+    /* eslint-disable-next-line */
+    console.log(`Example app listening on port ${port}!`);
+  });
 } else {
   module.exports = createUIServer;
 }

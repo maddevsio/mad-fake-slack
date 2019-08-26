@@ -35,13 +35,21 @@ archive.on('error', (err) => {
 archive.pipe(output);
 
 archive.directory('views/', 'views');
-archive.directory('db/', 'db');
+archive.glob('db/**/*', { ignore: ['db/teams.json'] });
 archive.directory('public/', 'public');
 archive.directory('routes/', 'routes');
 archive.file('examples/rtmbot/index.js', { name: 'bot.js' });
-archive.file('package.json', { name: 'package.json' });
 archive.file('package-lock.json', { name: 'package-lock.json' });
 archive.file('README.md', { name: 'README.md' });
 archive.file('server.js', { name: 'server.js' });
 archive.file('helpers.js', { name: 'helpers.js' });
+
+const teams = JSON.parse(fs.readFileSync('./db/teams.json', 'utf8'));
+teams[0].domain = 'mad-fake-slack.glitch.me';
+archive.append(JSON.stringify(teams, ' ', 2), { name: 'db/teams.json' });
+
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+packageJson.scripts.start = `URL_SCHEMA=https ${packageJson.scripts.start}`;
+archive.append(JSON.stringify(packageJson, ' ', 2), { name: 'package.json' });
+
 archive.finalize();

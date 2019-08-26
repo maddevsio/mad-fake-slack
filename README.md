@@ -1,3 +1,13 @@
+<div align="center">
+    <br>
+    <br>
+    <img width="360" src="docs/images/logo.png" alt="mad-fake-slack">
+    <br>
+    <br>
+    <p align="center">Your fake service #1!</p>
+    <br>
+</div>
+
 # mad-fake-slack
 
 [![Developed by Mad Devs](https://mdbadge.glitch.me/badge.svg?theme=red-white)](https://maddevs.io)

@@ -51,8 +51,8 @@ app.use((req, res, next) => {
 
 app.use('/', rtmRouter);
 app.use('/', appRouter);
+app.use('/api/db', testApiRouter);
 app.use('/api', apiRouter);
-app.use('/test', testApiRouter);
 
 function createUIServer({ httpPort, httpHost }) {
   const server = http.createServer(app);

@@ -31,7 +31,8 @@
 
 ### Testing api
 * Now supported following test api methods:
-  * `GET` `/test/api/db/reset` - resets current db (If you will refresh mad-fake-slack ui in your browser, you will see that your conversational data has disappeared)
+  * `GET` `/api/db/reset` - resets current db (If you will refresh mad-fake-slack ui in your browser, you will see that your conversational data has disappeared)
+  * `GET` `/api/db/current/team?domain=NEW_DOMAIN_VALUE` - Sets the domain value for the current team (by default, value for `team.domain` equal to `localhost:9001`). Affects the domain for the URL when constructing a websocket url and workspace url.
 
 ### [List of NPM commands](NPMCOMMANDS.md)
 ### [Local setup and running code analysis using Code Climate](CODECLIMATE.md)

@@ -16,7 +16,7 @@ describe('Channel communication', () => {
         await page.keyboard.press('Enter');
         await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
-          { text: 'You sent text to the channel: Hello' });
+          { text: 'You sent text to the general channel: Hello' });
       });
     });
   });
@@ -32,10 +32,10 @@ describe('Channel communication', () => {
         await page.keyboard.press('Enter');
         await waitMs(500);
         await expect(page).toMatchElement('span.c-message__body',
-          { text: 'You sent text to the channel: Hello from random!' });
+          { text: 'You sent text to the random channel: Hello from random!' });
         const messages = await actions.getMessages(page);
         expect(messages).toHaveLength(6);
-        expect(messages[messages.length - 1].trim()).toEqual('You sent text to the channel: Hello from random!');
+        expect(messages[messages.length - 1].trim()).toEqual('You sent text to the random channel: Hello from random!');
       });
     });
   });

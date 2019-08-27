@@ -5,6 +5,8 @@ const archive = archiver('zip', {
   zlib: { level: 9 } // Sets the compression level.
 });
 
+const DomainHost = 'mad-fake-slack.glitch.me';
+
 output.on('close', () => {
   // eslint-disable-next-line no-console
   console.log(`${archive.pointer()} total bytes`);
@@ -45,7 +47,8 @@ archive.file('server.js', { name: 'server.js' });
 archive.file('helpers.js', { name: 'helpers.js' });
 
 const teams = JSON.parse(fs.readFileSync('./db/teams.json', 'utf8'));
-teams[0].domain = 'mad-fake-slack.glitch.me';
+teams[0].domain = DomainHost;
+teams[0].email_domain = DomainHost;
 archive.append(JSON.stringify(teams, ' ', 2), { name: 'db/teams.json' });
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));

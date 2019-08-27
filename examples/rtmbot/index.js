@@ -10,26 +10,28 @@ const rtm = new RTMClient(BOT_TOKEN, { slackApiUrl: SLACK_API, logLevel: LogLeve
 // Calling `rtm.on(eventName, eventHandler)` allows you to handle events (see: https://api.slack.com/events)
 // When the connection is active, the 'ready' event will be triggered
 let botUserId = null;
+let listOfChannels = [];
 
 rtm.on('ready', async () => {
   const { user_id: userId, user: userName } = await web.auth.test();
   botUserId = userId;
   // eslint-disable-next-line no-console
   console.warn('[i] bot userId:', userId, ' and user name ', userName);
-  const listOfChannels = await web.channels.list({ exclude_archived: 1 });
+  listOfChannels = await web.channels.list({ exclude_archived: 1 });
   const { id } = listOfChannels.channels.filter(({ name }) => name === 'general')[0];
   // eslint-disable-next-line no-console
   console.warn('Channnel ID: ', id);
-  const res = await rtm.sendMessage('Hello there! I am a Valera!', id);
+  const res = await rtm.sendMessage('`Hello there!` _I_ ~am~ a *Valera*!', id);
   // eslint-disable-next-line no-console
   console.warn('[i] Message sent: ', res.ts);
 });
 
 rtm.on('message', async (event) => {
+  const channels = listOfChannels.channels.filter(({ id }) => id === event.channel);
   const res = await rtm.sendMessage(
-    `You sent text to ${botUserId === event.channel
-      ? 'me (direct)'
-      : 'the channel'}: ${event.text}`, event.channel
+    `*You sent text to* ${botUserId === event.channel
+      ? '`me` (direct)'
+      : `the \`${channels[0].name}\` _channel_`}:\r\n ${event.text}`, event.channel
   );
   // eslint-disable-next-line no-console
   console.warn('[i] Message sent: ', res.ts);

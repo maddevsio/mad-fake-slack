@@ -8,14 +8,29 @@
     <br>
 </div>
 
-# mad-fake-slack
-
 [![Developed by Mad Devs](https://mdbadge.glitch.me/badge.svg?theme=red-white)](https://maddevs.io)
+[![Build Status](https://api.cirrus-ci.com/github/maddevsio/mad-fake-slack.svg)](https://cirrus-ci.com/github/maddevsio/mad-fake-slack)
+[![CircleCI](https://circleci.com/gh/maddevsio/mad-fake-slack.svg?style=svg)](https://circleci.com/gh/maddevsio/mad-fake-slack)
+[![Build Status](https://travis-ci.org/maddevsio/mad-fake-slack.svg?branch=master)](https://travis-ci.org/maddevsio/mad-fake-slack)
 
 ### About project ([`RU`](docs/ABOUT_RU.md))
 This project is designed to help test your Slack bots in isolation from the actual Slack service. This approach allows you to run tests on CI and simulate various situations with data in the chat.
 The project consists of two parts: user interface and API.
 All communication of your bot is carried out through API methods identical to those described in the Slack API documentation. Server side is written in node.js.
+
+### Highlights
+* [Demo mad-fake-slack + example bot](https://mad-fake-slack.glitch.me)
+* [UI feaures](#the_user_interface_gives_you_the_ability_to)
+* [API features](#the-api-gives-you-the-ability-to)
+* [For developers](#for-developers-en)
+* [Для разработчиков](#%D0%B4%D0%BB%D1%8F-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%87%D0%B8%D0%BA%D0%BE%D0%B2-ru)
+* [DOCKER IMAGE | Докер образ](#docker-image--%D0%B4%D0%BE%D0%BA%D0%B5%D1%80-%D0%BE%D0%B1%D1%80%D0%B0%D0%B7)
+* [ROADMAP | Путь развития](#roadmap--%D0%BF%D1%83%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D1%8F)
+
+### Demo of interaction with bot from examples folder (Демо взаимодействия с ботом, через UI `mad-fake-slack`)
+<div align="center">
+    <img src="docs/images/demo.gif" width="560px"/>
+</div>
 
 #### The user interface gives you the ability to:
 * See current chat situation
@@ -33,17 +48,9 @@ All communication of your bot is carried out through API methods identical to th
 * Receive / send `typing` or `user_typing` messages (via RTM)
 * User information request
 
-### [Demo mad-fake-slack + example bot](https://mad-fake-slack.glitch.me)
-
-### Demo of interaction with bot from examples folder (Демо взаимодействия с ботом, через UI `mad-fake-slack`)
-<img src="docs/images/demo.gif" width="500px"/>
-
-### CI status badges
+### Badges
 [![Dependabot](https://badgen.net/badge/Dependabot/enabled/blue?icon=dependabot)](https://dependabot.com/)
 [![Maintainability](https://api.codeclimate.com/v1/badges/684a8d656c2148c12850/maintainability)](https://codeclimate.com/github/maddevsio/mad-fake-slack/maintainability)
-[![Build Status](https://api.cirrus-ci.com/github/maddevsio/mad-fake-slack.svg)](https://cirrus-ci.com/github/maddevsio/mad-fake-slack)
-[![CircleCI](https://circleci.com/gh/maddevsio/mad-fake-slack.svg?style=svg)](https://circleci.com/gh/maddevsio/mad-fake-slack)
-[![Build Status](https://travis-ci.org/maddevsio/mad-fake-slack.svg?branch=master)](https://travis-ci.org/maddevsio/mad-fake-slack)
 [![dependencies Status](https://david-dm.org/maddevsio/mad-fake-slack.svg)](https://david-dm.org/maddevsio/mad-fake-slack)
 [![devDependencies Status](https://david-dm.org/maddevsio/mad-fake-slack/dev-status.svg)](https://david-dm.org/maddevsio/mad-fake-slack?type=dev)
 [![Known Vulnerabilities](https://snyk.io/test/github/maddevsio/mad-fake-slack/badge.svg)](https://snyk.io/test/github/maddevsio/mad-fake-slack)

@@ -1,4 +1,4 @@
-const createUIServer = require('../../../index');
+const createUIServer = require('../../../server');
 const FakeUser = require('./fakeuser');
 
 module.exports = {

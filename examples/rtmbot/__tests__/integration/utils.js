@@ -16,7 +16,7 @@ async function startBot() {
 }
 
 async function resetDb() {
-  return fetch(`${SLACK_URL}/test/api/db/reset`);
+  return fetch(`${SLACK_URL}/api/db/reset`);
 }
 
 module.exports = {

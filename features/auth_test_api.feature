@@ -8,6 +8,20 @@ Feature: Http API request/response
             | PORT | 3000 |
 
     Scenario: Make auth.test POST request with token in body
+        Then I send "GET" request to "http://localhost:3000/api/db/current/team?domain=localhost:3000" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT"
+                    }
+                },
+                "response": {
+                    "ok": true
+                }
+            }
+            """
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
             """
             {
@@ -33,6 +47,20 @@ Feature: Http API request/response
             | PORT | 9001 |
 
     Scenario: Make auth.test POST request with token in auth header
+        Then I send "GET" request to "http://localhost:3000/api/db/current/team?domain=localhost:3000" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT"
+                    }
+                },
+                "response": {
+                    "ok": true
+                }
+            }
+            """
         When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
             """
             {
@@ -75,9 +103,22 @@ Feature: Http API request/response
 
     Scenario: Set URL_SCHEMA to "https" and make auth.test POST request
         And Restart the api server with the following envs:
-            | PORT       | 3000  |
             | URL_SCHEMA | https |
-        When I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
+        When I send "GET" request to "http://localhost:3000/api/db/current/team?domain=localhost:3000" with conditions
+            """
+            {
+                "request": {
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT"
+                    }
+                },
+                "response": {
+                    "ok": true
+                }
+            }
+            """
+        Then I send "POST" request to "http://localhost:3000/api/auth.test" with conditions
             """
             {
                 "request": {

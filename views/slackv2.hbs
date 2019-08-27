@@ -309,8 +309,8 @@
   });
 
   Handlebars.userUtils.scrollToLastMessage();
-
-  const socket = new WebSocket(`ws://${location.hostname}:${location.port}/slack`);
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const socket = new WebSocket(`${protocol}//${location.hostname}:${location.port}/slack`);
   socket.emit = function (type, data) {
     socket.send(JSON.stringify({ type, data }))
   };

@@ -12,7 +12,7 @@ describe('Direct channel communication', () => {
     describe('when user sent message', () => {
       it('bot should display echo message', async () => {
         await await Promise.all([
-          page.waitForNavigation({ waitUntil: 'load' }),
+          page.waitForNavigation({ waitUntil: 'networkidle0' }),
           expect(page).toClick('span.p-channel_sidebar__name', { text: /^Valera$/ })
         ]);
         await page.keyboard.type('Hello from direct!');

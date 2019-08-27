@@ -50,9 +50,8 @@ function authTestHandler(req, res) {
     const exampleResponse = responses['auth.test'];
     exampleResponse.team_id = team.id;
     exampleResponse.user_id = user.id;
-    const port = process.env.PORT ? ':' + process.env.PORT : '';
     const schema = process.env.URL_SCHEMA || 'http';
-    exampleResponse.url = `${schema}://${team.domain}${port}/`;
+    exampleResponse.url = `${schema}://${team.domain}/`;
     exampleResponse.team = team.name || exampleResponse.team;
     exampleResponse.user = user.name || exampleResponse.team;
     res.json(exampleResponse);
@@ -119,9 +118,8 @@ function rtmConnectHandler(req, res) {
   response.team.id = teamId;
   response.team.domain = domain;
   response.team.name = teamName;
-  const port = process.env.PORT ? ':' + process.env.PORT : '';
   const schema = process.env.URL_SCHEMA || 'http';
-  response.url = `${schema === 'http' ? 'ws' : 'wss'}://${domain}${port}/ws?uid=${tokenHash}`;
+  response.url = `${schema === 'http' ? 'ws' : 'wss'}://${domain}/ws?uid=${tokenHash}`;
   res.json(response);
 }
 

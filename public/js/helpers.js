@@ -101,7 +101,7 @@ const helpers = {
     return helpers.createTs(id);
   },
   createTs(incrementId) {
-    return `${Math.round(+new Date() / 1000)}.${String(incrementId).padStart(6, '0')}`;
+    return `${+moment.utc().unix()}.${String(incrementId).padStart(6, '0')}`;
   },
   toHumanTime(timestamp) {
     const unixts = +timestamp.split('.')[0];
@@ -122,6 +122,26 @@ const helpers = {
     const formatter = new Formatter(escapeExpression);
     message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Handlebars.SafeString(message);
+  },
+  canHideHeader(currenUserId, currentTs, lastMessage) {
+    const { ts: lastTs, user_id: lastUserId } = lastMessage;
+    const lastTsDate = moment.utc(Number(lastTs.split('.')[0]) * 1000);
+    const currentTsDate = moment.utc(Number(currentTs.split('.')[0]) * 1000);
+    const diffInSeconds = Math.round((currentTsDate - lastTsDate) / 1000);
+    return String(lastUserId) === String(currenUserId) && diffInSeconds <= 1 * 60;
+  },
+  findFirstMessageByUser(messages, userId) {
+    const keys = Object.keys(messages);
+    let firstMessageFromUser = null;
+    for (let i = keys.length - 1; i >= 0; i -= 1) {
+      const message = messages[keys[i]];
+      if (message.user_id !== userId) {
+        break;
+      } else {
+        firstMessageFromUser = message;
+      }
+    }
+    return firstMessageFromUser;
   }
 };
 

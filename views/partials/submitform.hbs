@@ -142,12 +142,14 @@
       const context = {
         message: {
             team: { id: Handlebars.context.me.team_id },
+            team_id: Handlebars.context.me.team_id,
             user: Handlebars.createFrame(Handlebars.context.me),
+            user_id: Handlebars.context.me.id,
             ts: Handlebars.helpers.makeTs(),
             text: data.get('text')
         }
       };
-      Handlebars.render(msgContainer, "message", context);
+      Handlebars.renderClientMessage(msgContainer, "message", context);
       Handlebars.userUtils.scrollToLastMessage();
       msgInputText.value = "";
       const result = await Handlebars.userUtils.postJson(msgForm.action, {

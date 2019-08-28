@@ -207,6 +207,7 @@
     bots: {{{ json bots }}},
     team: {{{ json team }}},
     me: {{{ json me }}},
+    messages: {{{ json messages }}},
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
     }
@@ -217,6 +218,18 @@
   Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
     const html = Handlebars.templates[templateName](context)
     containerEl.insertAdjacentHTML(options.position, html);
+  }
+
+  Handlebars.renderClientMessage = function (containerEl, templateName, context, options) {
+    let messages = Handlebars.context.messages;
+    const countOfMessages = messages.length;
+    if (countOfMessages > 0) {
+      const firstMessage = Handlebars.helpers.findFirstMessageByUser(messages, Handlebars.context.me.id);
+      context.message.hideHeader = firstMessage && Handlebars.helpers.canHideHeader(Handlebars.context.me.id, context.message.ts, firstMessage);
+    } else {
+      messages.push(context.message);
+    }
+    Handlebars.render(containerEl, templateName, context, options);
   }
 
   Handlebars.userUtils = {

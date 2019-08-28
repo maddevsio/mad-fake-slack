@@ -4,7 +4,11 @@ const faker = require('faker');
 let generationId = 1;
 
 function createMessageResponse({
-  type, ts, text, channel
+  type,
+  ts,
+  text,
+  channel,
+  hideHeader
 }, { user, team }) {
   const response = utils.copyObject(responses['chat.postMessage']);
   const msgTs = ts || utils.createTs(generationId);
@@ -22,7 +26,8 @@ function createMessageResponse({
     source_team: team.id,
     channel,
     event_ts: msgTs,
-    ts: msgTs
+    ts: msgTs,
+    hideHeader
   };
 
   response.message = {

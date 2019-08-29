@@ -7,11 +7,10 @@ function createMessageResponse({
   type,
   ts,
   text,
-  channel,
-  hideHeader
+  channel
 }, { user, team }) {
   const response = utils.copyObject(responses['chat.postMessage']);
-  const msgTs = ts || utils.createTs(generationId);
+  const msgTs = typeof ts === 'undefined' ? utils.createTs(generationId) : ts;
   generationId += 1;
   response.ts = msgTs;
   response.channel = channel;
@@ -26,8 +25,7 @@ function createMessageResponse({
     source_team: team.id,
     channel,
     event_ts: msgTs,
-    ts: msgTs,
-    hideHeader
+    ts: msgTs
   };
 
   response.message = {

@@ -123,12 +123,22 @@ const helpers = {
     message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Handlebars.SafeString(message);
   },
-  canHideHeader(currenUserId, currentTs, lastMessage) {
-    const { ts: lastTs, user_id: lastUserId } = lastMessage;
-    const lastTsDate = moment.utc(Number(lastTs.split('.')[0]) * 1000);
-    const currentTsDate = moment.utc(Number(currentTs.split('.')[0]) * 1000);
-    const diffInSeconds = Math.round((currentTsDate - lastTsDate) / 1000);
-    return String(lastUserId) === String(currenUserId) && diffInSeconds <= 1 * 60;
+  getTsDiffInSeconds(firstTs, secondTs) {
+    const firstUnixTs = Number(firstTs.split('.')[0]);
+    const secondUnixTs = Number(secondTs.split('.')[0]);
+
+    const maxTs = Math.max(firstUnixTs, secondUnixTs);
+    const minTs = Math.min(firstUnixTs, secondUnixTs);
+    const minDate = moment.utc(minTs * 1000);
+    const maxDate = moment.utc(maxTs * 1000);
+
+    return Math.round((maxDate - minDate) / 1000);
+  },
+  canHideHeader(currentMessage, baseMessage, interval = 0) {
+    const { ts: baseTs, user_id: baseUserId } = baseMessage;
+    const { ts: currentTs, user_id: currentUserId } = currentMessage;
+    const diffInSeconds = helpers.getTsDiffInSeconds(currentTs, baseTs);
+    return String(baseUserId) === String(currentUserId) && diffInSeconds <= interval;
   },
   findFirstMessageByUser(messages, userId) {
     const keys = Object.keys(messages);
@@ -142,6 +152,61 @@ const helpers = {
       }
     }
     return firstMessageFromUser;
+  },
+  measureMessageItems(prevItem, item, intervalInSeconds) {
+    if (prevItem && prevItem.user_id === item.user_id) {
+      const messageDiffInSeconds = helpers.getTsDiffInSeconds(prevItem.ts, item.ts);
+      if (messageDiffInSeconds >= intervalInSeconds) {
+        return [item, { ...item, hideHeader: false }];
+      }
+      const hideHeader = helpers.canHideHeader(item, prevItem, intervalInSeconds);
+      return [prevItem, { ...item, hideHeader }];
+    }
+    return [item, { ...item, hideHeader: false }];
+  },
+  eachMessage(context, options) {
+    let currentContext = context;
+    let prevItem;
+    const intervalInSeconds = 1 * 10;
+
+    if (!options) {
+      throw new Error('Must pass iterator to #eachMessage');
+    }
+
+    let fn = options.fn;
+    let inverse = options.inverse;
+    let data;
+
+    if (typeof currentContext === 'function') {
+      currentContext = currentContext.call(this);
+    }
+
+    if (options.data) {
+      data = Handlebars.createFrame(options.data);
+    }
+
+    function execIteration(field, index, last) {
+      if (data) {
+        data.key = field;
+        data.index = index;
+        data.first = index === 0;
+        data.last = !!last;
+      }
+      let item = currentContext[field];
+      [prevItem, item] = helpers.measureMessageItems(prevItem, item, intervalInSeconds);
+      return fn(item, {
+        data: data,
+        blockParams: [item, field]
+      });
+    }
+
+    if (currentContext && typeof currentContext === 'object') {
+      return Object.keys(currentContext).reduce((acc, key, index, arr) => {
+        return [acc, execIteration(key, index, arr.length - 1 === index)].join('');
+      }, '');
+    }
+
+    return inverse(this);
   }
 };
 

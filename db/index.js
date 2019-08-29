@@ -63,7 +63,7 @@ class DbManager {
   }
 
   static createTs(id) {
-    return `${+moment.utc(new Date()).unix()}.${String(id).padStart(6, '0')}`;
+    return `${+moment.utc().unix()}.${String(id).padStart(6, '0')}`;
   }
 
   slackUser() {
@@ -99,19 +99,15 @@ class DbManager {
         this.initMessages(channelId);
         const messages = this.db.messages[channelId];
         messages.meta.last_id += 1;
-        const id = DbManager.createTs(messages.meta.last_id);
-        const firstMessage = this.helpers.findFirstMessageByUser(messages, userId);
-        let hideHeader = false;
-
-        if (firstMessage) {
-          hideHeader = this.helpers.canHideHeader(userId, id, firstMessage);
+        let id = DbManager.createTs(messages.meta.last_id);
+        if (!messages[message.ts]) {
+          id = message.ts;
         }
 
         messages[id] = {
           type: 'message',
           user_id: userId,
           text: message.text,
-          hideHeader,
           ts: id
         };
         return messages[id];

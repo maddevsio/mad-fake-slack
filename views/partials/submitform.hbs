@@ -139,26 +139,28 @@
     if (e.target.id !== "msg_form") return;
     const data = new FormData(e.target);
     if (data.get('text').trim()) {
+      const ts = Handlebars.helpers.makeTs();
+      data.set('ts', ts);
+
       const context = {
         message: {
             team: { id: Handlebars.context.me.team_id },
             team_id: Handlebars.context.me.team_id,
             user: Handlebars.createFrame(Handlebars.context.me),
             user_id: Handlebars.context.me.id,
-            ts: Handlebars.helpers.makeTs(),
+            ts,
             text: data.get('text')
         }
       };
-      Handlebars.renderClientMessage(msgContainer, "message", context);
+
+      Handlebars.render(msgContainer, "message", context);
       Handlebars.userUtils.scrollToLastMessage();
       msgInputText.value = "";
-      const result = await Handlebars.userUtils.postJson(msgForm.action, {
-        ...Array.from(data.entries()).reduce((o, [k, v]) => {
-            o[k] = v;
-            return o;
-        }, {}),
-        ts: Handlebars.helpers.makeTs()
-      });
+      const formData = Array.from(data.entries()).reduce((o, [k, v]) => {
+        o[k] = v;
+        return o;
+      }, {});
+      const result = await Handlebars.userUtils.postJson(msgForm.action, formData);
     }
   });
 </script>

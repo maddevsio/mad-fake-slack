@@ -139,9 +139,9 @@
         <div id="client_body">
           <div id="col_messages">
             <div id="messages_container">
-                {{#each messages as |message|}}
+                {{#eachMessage messages as |message|}}
                   {{> message message=message}}
-                {{/each}}
+                {{/eachMessage}}
             </div>
             <div id="footer">
               <div id="footer_msgs">
@@ -208,6 +208,7 @@
     team: {{{ json team }}},
     me: {{{ json me }}},
     messages: {{{ json messages }}},
+    prevMessage: null,
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
     }
@@ -216,20 +217,16 @@
   Handlebars.context.allUsers = Handlebars.context.users.concat(Handlebars.context.bots);
 
   Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
+    let messages = Handlebars.context.messages;
+    if (!Handlebars.context.prevMessage) {
+      Handlebars.context.prevMessage = messages.length ? messages[messages.length - 1] : null;
+    }
+    const [prevMessage, message] = Handlebars.helpers.measureMessageItems(Handlebars.context.prevMessage, context.message, 1 * 10);
+    Handlebars.context.prevMessage = prevMessage;
+    context.message = message;
+    messages.push(context.message);
     const html = Handlebars.templates[templateName](context)
     containerEl.insertAdjacentHTML(options.position, html);
-  }
-
-  Handlebars.renderClientMessage = function (containerEl, templateName, context, options) {
-    let messages = Handlebars.context.messages;
-    const countOfMessages = messages.length;
-    if (countOfMessages > 0) {
-      const firstMessage = Handlebars.helpers.findFirstMessageByUser(messages, Handlebars.context.me.id);
-      context.message.hideHeader = firstMessage && Handlebars.helpers.canHideHeader(Handlebars.context.me.id, context.message.ts, firstMessage);
-    } else {
-      messages.push(context.message);
-    }
-    Handlebars.render(containerEl, templateName, context, options);
   }
 
   Handlebars.userUtils = {

@@ -104,6 +104,7 @@ const helpers = {
     return `${+moment.utc().unix()}.${String(incrementId).padStart(6, '0')}`;
   },
   toHumanTime(timestamp) {
+    if (!timestamp) return '00:00';
     const unixts = +timestamp.split('.')[0];
     return moment.unix(unixts).format('h:mm A');
   },

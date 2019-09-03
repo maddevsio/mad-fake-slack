@@ -35,3 +35,29 @@ Feature: Hide header for sequence of messages from one user
             | Message sender | Valera            |
             | App badge      | APP               |
             | Message body   | first bot message |
+
+    Scenario: Display only header only for first message in sequence between bot and client
+        And I send "first message" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+        And I send "second message" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | <not exists>   |
+            | Message body   | second message |
+        When User "Valera" send message:
+            | type    | message           |
+            | text    | first bot message |
+            | channel | general           |
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera            |
+            | App badge      | APP               |
+            | Message body   | first bot message |
+        When User "Valera" send message:
+            | type    | message            |
+            | text    | second bot message |
+            | channel | general            |
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | <not exists>       |
+            | App badge      | <not exists>       |
+            | Message body   | second bot message |

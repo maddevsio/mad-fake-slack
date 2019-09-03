@@ -130,6 +130,12 @@ Then('I should see {string} multiline message with:', async (position, dataTable
   expect(actualTexts).toStrictEqual(Object.values(options));
 });
 
+When('I should see {string} multiline {string} with:', async (position, itemSelectorName, dataTable) => {
+  const options = dataTable.rowsHash();
+  const lastItem = await actions.getItemContentsByParams(options, itemSelectorName, { position });
+  expect(lastItem).toStrictEqual(options);
+});
+
 Given('I\'ll wait a little', async () => {
   await actions.wait(200);
 });

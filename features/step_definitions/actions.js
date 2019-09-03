@@ -487,6 +487,33 @@ async function getContentsByParams(options, { position = 'last', attribute = 'te
   );
 }
 
+async function getItemContentsByParams(options, itemSelectorName, { position = 'last' }) {
+  await initBrowser();
+  const itemSelector = scope.context.currentSelectors[itemSelectorName];
+  const page = scope.context.currentPage;
+  const itemHandler = (items, opts, selectorsFromContext) => {
+    return Array.from(items).map(
+      item => Object.keys(opts).reduce(
+        (accum, itemChildSelectorName) => {
+          const itemChildSelector = selectorsFromContext[itemChildSelectorName];
+          const itemChildEl = item.querySelector(itemChildSelector);
+          const itemContent = (itemChildEl && (itemChildEl.textContent || itemChildEl.value || itemChildEl.innerHTML || itemChildEl.innerText)) || '<not exists>';
+          return {
+            ...accum,
+            // eslint-disable-next-line no-useless-escape
+            [itemChildSelectorName]: itemContent.replace(new RegExp('\\s+', 'g'), ' ')
+              .replace(new RegExp(String.fromCharCode(160), 'g'), ' ')
+              .trim()
+          };
+        },
+        {}
+      )
+    );
+  };
+  const elements = await page.$$eval(itemSelector, itemHandler, options, scope.context.currentSelectors);
+  return elements[({ last: elements.length - 1, first: 0 })[position] || 0];
+}
+
 async function copyTextToClipboard(text) {
   const page = scope.context.currentPage;
   return page.evaluate(textValue => {
@@ -607,5 +634,6 @@ module.exports = {
   setTextPositionTo,
   restartApiServerWithEnvs,
   restartApiServer,
-  makeJsonRequest
+  makeJsonRequest,
+  getItemContentsByParams
 };

@@ -136,10 +136,8 @@ const helpers = {
     return Math.round((maxDate - minDate) / 1000);
   },
   canHideHeader(currentMessage, baseMessage, interval = 0) {
-    const { ts: baseTs, user_id: baseUserId } = baseMessage;
-    const { ts: currentTs, user_id: currentUserId } = currentMessage;
-    const diffInSeconds = helpers.getTsDiffInSeconds(currentTs, baseTs);
-    return String(baseUserId) === String(currentUserId) && diffInSeconds <= interval;
+    const diffInSeconds = helpers.getTsDiffInSeconds(currentMessage.ts, baseMessage.ts);
+    return String(baseMessage.user_id) === String(currentMessage.user_id) && diffInSeconds <= interval;
   },
   findFirstMessageByUser(messages, userId) {
     const keys = Object.keys(messages);

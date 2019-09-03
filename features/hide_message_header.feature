@@ -20,3 +20,18 @@ Feature: Hide header for sequence of messages from one user
         And I should see "last" multiline "Message item" with:
             | Message sender | <not exists>   |
             | Message body   | second message |
+
+    Scenario: Display header for message sequence between bot and client one by one
+        And I type "first message"
+        And I press the "Enter" keyboard button
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+        When User "Valera" send message:
+            | type    | message           |
+            | text    | first bot message |
+            | channel | general           |
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera            |
+            | App badge      | APP               |
+            | Message body   | first bot message |

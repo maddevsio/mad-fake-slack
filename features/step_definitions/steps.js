@@ -193,3 +193,8 @@ When('I send {string} request to {string} with conditions', async (httpMethod, u
 Then('I restart the server with default envs', () => {
   return actions.restartApiServer();
 });
+
+Given('I send {string} to chat', async (text) => {
+  await actions.typeText(text);
+  await actions.pressTheButton('Enter');
+});

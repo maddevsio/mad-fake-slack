@@ -99,9 +99,12 @@ class DbManager {
         this.initMessages(channelId);
         const messages = this.db.messages[channelId];
         messages.meta.last_id += 1;
-        let id = DbManager.createTs(messages.meta.last_id);
-        if (!messages[message.ts]) {
+
+        let id;
+        if (message.ts && !messages[message.ts]) {
           id = message.ts;
+        } else {
+          id = DbManager.createTs(messages.meta.last_id);
         }
 
         messages[id] = {

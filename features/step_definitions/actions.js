@@ -49,11 +49,12 @@ async function initBrowser() {
     const slowMo = parseInt((process.env.SLOW_MO || '0').trim(), 10);
     const dumpio = parseBoolean(process.env.DUMPIO, false);
     const executablePath = process.env.EXECUTABLE_BROWSER_PATH || 'google-chrome-stable';
-    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG);
+    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG, false);
 
     const args = [
       `--window-size=${VIEWPORT}`
     ];
+
     if (useRemoteDebug) {
       args.push(
         '--remote-debugging-address=0.0.0.0',

@@ -61,3 +61,15 @@ Feature: Hide header for sequence of messages from one user
             | Message sender | <not exists>       |
             | App badge      | <not exists>       |
             | Message body   | second bot message |
+
+    Scenario: Show message header if time interval passed
+        And Now is the date and time "2019-09-04T06:50:53.953Z"
+        And I send "first message" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+        When Now "2" minutes passed
+        And I send "second message" to chat
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov  |
+            | Message body   | second message |

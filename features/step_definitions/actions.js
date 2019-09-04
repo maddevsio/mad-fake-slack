@@ -89,7 +89,7 @@ async function visitPage(currentPageName) {
     'Accept-Language': scope.locale.language[0]
   });
 
-  await scope.context.currentPage.evaluateOnNewDocument((locale) => {
+  await scope.context.currentPage.evaluateOnNewDocument((locale, mockDate) => {
     Object.defineProperty(navigator, 'language', {
       get() {
         return locale.language;
@@ -114,7 +114,44 @@ async function visitPage(currentPageName) {
         year: 'numeric'
       })
     });
-  }, scope.locale);
+
+    window.OrigDate = window.Date;
+    window.Date = class MockDate extends Date {
+      constructor(date) {
+        if (!MockDate.mockedDate) {
+          return super(date);
+        }
+        return super(MockDate.mockedDate.getTime());
+      }
+
+      static mockDateIncreaseMinutes(minutes = 0) {
+        if (MockDate.mockedDate) {
+          MockDate.mockedDate.setMinutes(MockDate.mockedDate.getMinutes() + minutes);
+        }
+      }
+
+      static now() {
+        if (MockDate.mockedDate) {
+          return MockDate.mockedDate.getTime();
+        }
+        return window.OrigDate.now();
+      }
+
+      static mockDate(date) {
+        MockDate.mockedDate = date;
+      }
+
+      static unmockDate() {
+        MockDate.mockedDate = null;
+      }
+    };
+
+    if (mockDate) {
+      window.Date.mockDate(mockDate);
+    } else {
+      window.Date.unmockDate();
+    }
+  }, scope.locale, scope.mockDate && scope.mockedDate.getTime());
 
   scope.context.currentPage.on('request', async request => {
     const interceptRequests = scope.interceptRequests;
@@ -147,6 +184,18 @@ function setLanguages(langs = ['en-US', 'en']) {
 
 function setTimezone(timeZone) {
   scope.locale.timeZone = timeZone;
+}
+
+async function setTodayDate(dateISOString) {
+  await scope.context.currentPage.evaluate((dateISO) => {
+    window.Date.mockDate(new Date(dateISO));
+  }, dateISOString);
+}
+
+async function increaseTodayDateByMinutes(countOfMinutes) {
+  await scope.context.currentPage.evaluate((minutes) => {
+    window.Date.mockDateIncreaseMinutes(minutes);
+  }, countOfMinutes);
 }
 
 async function waitForNavigation() {
@@ -183,7 +232,7 @@ async function goToUrl(url) {
 }
 
 async function reloadPage() {
-  await scope.context.currentPage.reload();
+  await scope.context.currentPage.reload({ waitUntil: 'networkidle2' });
 }
 
 function loadPageSelectors(currentPageName) {
@@ -636,5 +685,7 @@ module.exports = {
   restartApiServerWithEnvs,
   restartApiServer,
   makeJsonRequest,
-  getItemContentsByParams
+  getItemContentsByParams,
+  setTodayDate,
+  increaseTodayDateByMinutes
 };

@@ -28,6 +28,14 @@ Given('My timezone is {string}', (timezoneName) => {
   actions.setTimezone(timezoneName);
 });
 
+Given('Now is the date and time {string}', async (strDateAndTime) => {
+  await actions.setTodayDate(strDateAndTime);
+});
+
+Given('Now {string} minutes passed', async (minutesCount) => {
+  actions.increaseTodayDateByMinutes(Number(minutesCount));
+});
+
 Then('I should see following channels between {string} and {string}:', async (afterText, beforeText, dataTable) => {
   const texts = await actions.getTextsBetween('[role="listitem"]', afterText, beforeText);
   expect(texts).toStrictEqual(dataTable.rows().map(row => row[0]));

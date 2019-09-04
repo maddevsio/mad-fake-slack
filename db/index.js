@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const moment = require('moment');
 const helpers = require('../helpers');
 
 class DbReader {
@@ -63,7 +62,8 @@ class DbManager {
   }
 
   static createTs(id) {
-    return `${+moment.utc().unix()}.${String(id).padStart(6, '0')}`;
+    const dateNow = Date.now();
+    return `${Math.floor(dateNow / 1000)}.${String(id).padStart(6, '0')}`;
   }
 
   slackUser() {

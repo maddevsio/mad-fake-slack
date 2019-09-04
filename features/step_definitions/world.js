@@ -16,6 +16,7 @@ function World() {
   scope.locale.languages = ['en-US', 'en'];
   scope.locale.language = ['en-US'];
   scope.locale.timeZone = 'Asia/Almaty';
+  scope.mockDate = null;
 }
 
 setWorldConstructor(World);

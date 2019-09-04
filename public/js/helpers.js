@@ -101,7 +101,8 @@ const helpers = {
     return helpers.createTs(id);
   },
   createTs(incrementId) {
-    return `${+moment.utc().unix()}.${String(incrementId).padStart(6, '0')}`;
+    const dateNow = Date.now();
+    return `${Math.floor(dateNow / 1000)}.${String(incrementId).padStart(6, '0')}`;
   },
   toHumanTime(timestamp) {
     if (!timestamp) return '00:00';
@@ -127,13 +128,9 @@ const helpers = {
   getTsDiffInSeconds(firstTs, secondTs) {
     const firstUnixTs = Number(firstTs.split('.')[0]);
     const secondUnixTs = Number(secondTs.split('.')[0]);
-
     const maxTs = Math.max(firstUnixTs, secondUnixTs);
     const minTs = Math.min(firstUnixTs, secondUnixTs);
-    const minDate = moment.utc(minTs * 1000);
-    const maxDate = moment.utc(maxTs * 1000);
-
-    return Math.round((maxDate - minDate) / 1000);
+    return Math.round(maxTs - minTs);
   },
   canHideHeader(currentMessage, baseMessage, interval = 0) {
     const diffInSeconds = helpers.getTsDiffInSeconds(currentMessage.ts, baseMessage.ts);

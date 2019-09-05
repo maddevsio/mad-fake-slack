@@ -80,7 +80,7 @@ Feature: Hide header for sequence of messages from one user
         And I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov |
             | Message body   | first message |
-        When Now "3" minutes passed
+        And Now "3" minutes passed
         And User "Valera" send message:
             | type    | message           |
             | text    | first bot message |
@@ -88,8 +88,26 @@ Feature: Hide header for sequence of messages from one user
         And I should see "last" multiline "Message item" with:
             | Message sender | Valera            |
             | Message body   | first bot message |
-        And Now "4" minutes passed
+        When Now "4" minutes passed
         And I send "second message" to chat
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov  |
             | Message body   | second message |
+    
+    Scenario: Hide message header after first bot message in sequence
+        And Now is the date and time "2019-09-04T06:50:53.953Z"
+        And User "Valera" send message:
+            | type    | message           |
+            | text    | first bot message |
+            | channel | general           |
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera            |
+            | Message body   | first bot message |
+        And Now "1" minutes passed
+        When User "Valera" send message:
+            | type    | message           |
+            | text    | second bot message |
+            | channel | general           |
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | <not exists>      |
+            | Message body   | second bot message |

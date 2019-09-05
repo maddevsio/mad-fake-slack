@@ -68,7 +68,7 @@ Feature: Hide header for sequence of messages from one user
         And I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov |
             | Message body   | first message |
-        When Now "2" minutes passed
+        When Now "6" minutes passed
         And I send "second message" to chat
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov  |

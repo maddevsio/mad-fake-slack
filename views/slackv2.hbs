@@ -218,7 +218,7 @@
   Handlebars.context.allUsers = Handlebars.context.users.concat(Handlebars.context.bots);
 
   Handlebars.renderTemplate = function renderTemplate({ containerEl, templateName, context, options = { position: 'beforeend' } }) {
-    const html = Handlebars.templates[templateName](context)
+    const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } })
     containerEl.insertAdjacentHTML(options.position, html);
   }
 
@@ -253,7 +253,7 @@
       if (!Handlebars.context.prevMessage) {
         Handlebars.context.prevMessage = messages.length ? messages[messages.length - 1] : null;
       }
-      const [prevMessage, message] = Handlebars.helpers.measureMessageItems(Handlebars.context.prevMessage, context.message, 1 * 10);
+      const [prevMessage, message] = Handlebars.helpers.measureMessageItems(Handlebars.context.prevMessage, context.message);
       Handlebars.context.prevMessage = prevMessage;
       context.message = message;
       messages.push(context.message);

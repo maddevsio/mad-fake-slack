@@ -13,6 +13,9 @@ const { spawn } = require('child_process');
 
 const port = process.env.PORT || 9001;
 const host = process.env.HOST || '0.0.0.0';
+if (!process.env.DEFAULT_HEADER_HIDE_TIME_INTERVAL_IN_MIN) {
+  process.env.DEFAULT_HEADER_HIDE_TIME_INTERVAL_IN_MIN = 5;
+}
 
 /* eslint-disable-next-line */
 const format =

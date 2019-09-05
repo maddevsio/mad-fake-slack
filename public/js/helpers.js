@@ -3,17 +3,20 @@ const isServer = typeof module !== 'undefined';
 let moment;
 let Handlebars;
 let Formatter;
+let getConstants;
 
 if (isServer) {
   /* eslint-disable global-require */
   moment = require('moment');
   Handlebars = require('handlebars');
   Formatter = require('./formatters');
+  getConstants = () => require('../../routes/constants');
   /* eslint-enable global-require */
 } else {
   moment = window.moment;
   Handlebars = window.Handlebars;
   Formatter = window.MdFormatter;
+  getConstants = () => Handlebars.context && Handlebars.context.constants;
 }
 
 function isEmpty(value) {
@@ -149,7 +152,8 @@ const helpers = {
     }
     return firstMessageFromUser;
   },
-  measureMessageItems(prevItem, item, intervalInSeconds) {
+  measureMessageItems(prevItem, item) {
+    const intervalInSeconds = getConstants().HIDE_HEADER_TIME_INTERVAL_IN_SECONDS;
     if (prevItem && prevItem.user_id === item.user_id) {
       const messageDiffInSeconds = helpers.getTsDiffInSeconds(prevItem.ts, item.ts);
       if (messageDiffInSeconds >= intervalInSeconds) {
@@ -163,8 +167,7 @@ const helpers = {
   eachMessage(context, options) {
     let currentContext = context;
     let prevItem;
-    const intervalInSeconds = 1 * 10;
-
+    const intervalInSeconds = getConstants().HIDE_HEADER_TIME_INTERVAL_IN_SECONDS;
     if (!options) {
       throw new Error('Must pass iterator to #eachMessage');
     }

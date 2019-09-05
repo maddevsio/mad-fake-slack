@@ -17,7 +17,7 @@ Feature: Hide header for sequence of messages from one user
             | Message body   | first message |
         When I type "second message"
         And I press the "Enter" keyboard button
-        And I should see "last" multiline "Message item" with:
+        Then I should see "last" multiline "Message item" with:
             | Message sender | <not exists>   |
             | Message body   | second message |
 
@@ -45,7 +45,7 @@ Feature: Hide header for sequence of messages from one user
         And I should see "last" multiline "Message item" with:
             | Message sender | <not exists>   |
             | Message body   | second message |
-        When User "Valera" send message:
+        And User "Valera" send message:
             | type    | message           |
             | text    | first bot message |
             | channel | general           |
@@ -69,6 +69,26 @@ Feature: Hide header for sequence of messages from one user
             | Message sender | Valera Petrov |
             | Message body   | first message |
         When Now "6" minutes passed
+        And I send "second message" to chat
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov  |
+            | Message body   | second message |
+
+    Scenario: Show message header for message which break the sequence
+        And Now is the date and time "2019-09-04T06:50:53.953Z"
+        And I send "first message" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+        When Now "3" minutes passed
+        And User "Valera" send message:
+            | type    | message           |
+            | text    | first bot message |
+            | channel | general           |
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera            |
+            | Message body   | first bot message |
+        And Now "4" minutes passed
         And I send "second message" to chat
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov  |

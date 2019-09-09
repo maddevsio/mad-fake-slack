@@ -1,3 +1,4 @@
+require('./config/default')();
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -11,11 +12,8 @@ const testApiRouter = require('./routes/testapi');
 const rtmRouter = require('./routes/rtm');
 const { spawn } = require('child_process');
 
-const port = process.env.PORT || 9001;
-const host = process.env.HOST || '0.0.0.0';
-if (!process.env.DEFAULT_HEADER_HIDE_TIME_INTERVAL_IN_MIN) {
-  process.env.DEFAULT_HEADER_HIDE_TIME_INTERVAL_IN_MIN = 5;
-}
+const port = process.env.PORT;
+const host = process.env.HOST;
 
 /* eslint-disable-next-line */
 const format =

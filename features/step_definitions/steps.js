@@ -126,6 +126,14 @@ When('User {string} send message:', async (userName, dataTable) => {
   await actions.sendMessageFrom(userName, channel, options);
 });
 
+Given('Now is the date and time {string} for {string} user', (isoDate, userName) => {
+  actions.setTodayBotDate(userName, isoDate);
+});
+
+Given('Now {string} minutes passed for {string} user', (minutesCount, userName) => {
+  actions.increaseTodayBotDateByMinutes(userName, Number(minutesCount));
+});
+
 Then('I should see {string} message with:', async (position, dataTable) => {
   const options = dataTable.rowsHash();
   const actualTexts = await actions.getContentsByParams(options, { position });

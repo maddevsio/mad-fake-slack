@@ -1,3 +1,42 @@
+let mockDate = null;
+
+global.OrigDate = global.Date;
+global.Date = class MockDate extends global.Date {
+  constructor(date) {
+    if (!MockDate.mockedDate) {
+      return super(date);
+    }
+    return super(MockDate.mockedDate.getTime());
+  }
+
+  static mockDateIncreaseMinutes(minutes = 0) {
+    if (MockDate.mockedDate) {
+      MockDate.mockedDate.setMinutes(MockDate.mockedDate.getMinutes() + minutes);
+    }
+  }
+
+  static now() {
+    if (MockDate.mockedDate) {
+      return MockDate.mockedDate.getTime();
+    }
+    return global.OrigDate.now();
+  }
+
+  static mockDate(date) {
+    MockDate.mockedDate = date;
+  }
+
+  static unmockDate() {
+    MockDate.mockedDate = null;
+  }
+};
+
+if (mockDate) {
+  global.Date.mockDate(mockDate);
+} else {
+  global.Date.unmockDate();
+}
+
 const { WebClient } = require('@slack/web-api');
 const { RTMClient } = require('@slack/rtm-api');
 const API_CHANNELS_LIST = 'channels.list';
@@ -25,6 +64,16 @@ class FakeUser {
     return new Promise(resolve => {
       this.resolveStart = resolve;
     });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  setMockDate(isoDate) {
+    global.Date.mockDate(isoDate);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  increaseMockDateByMinutes(minutes = 0) {
+    global.Date.mockDateIncreaseMinutes(minutes);
   }
 
   getChannelIdByName(channelName) {

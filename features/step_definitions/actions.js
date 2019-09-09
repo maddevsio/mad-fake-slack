@@ -49,11 +49,12 @@ async function initBrowser() {
     const slowMo = parseInt((process.env.SLOW_MO || '0').trim(), 10);
     const dumpio = parseBoolean(process.env.DUMPIO, false);
     const executablePath = process.env.EXECUTABLE_BROWSER_PATH || 'google-chrome-stable';
-    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG);
+    const useRemoteDebug = parseBoolean(process.env.USE_REMOTE_DUBUG, false);
 
     const args = [
       `--window-size=${VIEWPORT}`
     ];
+
     if (useRemoteDebug) {
       args.push(
         '--remote-debugging-address=0.0.0.0',
@@ -88,7 +89,7 @@ async function visitPage(currentPageName) {
     'Accept-Language': scope.locale.language[0]
   });
 
-  await scope.context.currentPage.evaluateOnNewDocument((locale) => {
+  await scope.context.currentPage.evaluateOnNewDocument((locale, mockDate) => {
     Object.defineProperty(navigator, 'language', {
       get() {
         return locale.language;
@@ -113,7 +114,44 @@ async function visitPage(currentPageName) {
         year: 'numeric'
       })
     });
-  }, scope.locale);
+
+    window.OrigDate = window.Date;
+    window.Date = class MockDate extends Date {
+      constructor(date) {
+        if (!MockDate.mockedDate) {
+          return super(date);
+        }
+        return super(MockDate.mockedDate.getTime());
+      }
+
+      static mockDateIncreaseMinutes(minutes = 0) {
+        if (MockDate.mockedDate) {
+          MockDate.mockedDate.setMinutes(MockDate.mockedDate.getMinutes() + minutes);
+        }
+      }
+
+      static now() {
+        if (MockDate.mockedDate) {
+          return MockDate.mockedDate.getTime();
+        }
+        return window.OrigDate.now();
+      }
+
+      static mockDate(date) {
+        MockDate.mockedDate = date;
+      }
+
+      static unmockDate() {
+        MockDate.mockedDate = null;
+      }
+    };
+
+    if (mockDate) {
+      window.Date.mockDate(mockDate);
+    } else {
+      window.Date.unmockDate();
+    }
+  }, scope.locale, scope.mockDate && scope.mockedDate.getTime());
 
   scope.context.currentPage.on('request', async request => {
     const interceptRequests = scope.interceptRequests;
@@ -146,6 +184,18 @@ function setLanguages(langs = ['en-US', 'en']) {
 
 function setTimezone(timeZone) {
   scope.locale.timeZone = timeZone;
+}
+
+async function setTodayDate(dateISOString) {
+  await scope.context.currentPage.evaluate((dateISO) => {
+    window.Date.mockDate(new Date(dateISO));
+  }, dateISOString);
+}
+
+async function increaseTodayDateByMinutes(countOfMinutes) {
+  await scope.context.currentPage.evaluate((minutes) => {
+    window.Date.mockDateIncreaseMinutes(minutes);
+  }, countOfMinutes);
 }
 
 async function waitForNavigation() {
@@ -182,7 +232,7 @@ async function goToUrl(url) {
 }
 
 async function reloadPage() {
-  await scope.context.currentPage.reload();
+  await scope.context.currentPage.reload({ waitUntil: 'networkidle2' });
 }
 
 function loadPageSelectors(currentPageName) {
@@ -253,7 +303,7 @@ async function connectFakeUser(name) {
   await scope.context.appUsers[name].start();
 }
 
-async function typeText(text, options = { delay: 100 }) {
+async function typeText(text, options = { delay: 0 }) {
   await initBrowser();
   await scope.context.currentPage.keyboard.type(text, options);
 }
@@ -480,11 +530,46 @@ async function sendMessageFrom(userName, channelName, options) {
   return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
+function setTodayBotDate(userName, isoDate) {
+  scope.context.appUsers[userName].setMockDate(new Date(isoDate));
+}
+
+function increaseTodayBotDateByMinutes(userName, minutes) {
+  scope.context.appUsers[userName].increaseMockDateByMinutes(minutes);
+}
+
 async function getContentsByParams(options, { position = 'last', attribute = 'textContent', matchRegex = /\s+/g }) {
   return Promise.mapSeries(
     Object.entries(options),
     ([selectorName]) => getTextByPosition(selectorName, position, attribute, matchRegex)
   );
+}
+
+async function getItemContentsByParams(options, itemSelectorName, { position = 'last' }) {
+  await initBrowser();
+  const itemSelector = scope.context.currentSelectors[itemSelectorName];
+  const page = scope.context.currentPage;
+  const itemHandler = (items, opts, selectorsFromContext) => {
+    return Array.from(items).map(
+      item => Object.keys(opts).reduce(
+        (accum, itemChildSelectorName) => {
+          const itemChildSelector = selectorsFromContext[itemChildSelectorName];
+          const itemChildEl = item.querySelector(itemChildSelector);
+          const itemContent = (itemChildEl && (itemChildEl.textContent || itemChildEl.value || itemChildEl.innerHTML || itemChildEl.innerText)) || '<not exists>';
+          return {
+            ...accum,
+            // eslint-disable-next-line no-useless-escape
+            [itemChildSelectorName]: itemContent.replace(new RegExp('\\s+', 'g'), ' ')
+              .replace(new RegExp(String.fromCharCode(160), 'g'), ' ')
+              .trim()
+          };
+        },
+        {}
+      )
+    );
+  };
+  const elements = await page.$$eval(itemSelector, itemHandler, options, scope.context.currentSelectors);
+  return elements[({ last: elements.length - 1, first: 0 })[position] || 0];
 }
 
 async function copyTextToClipboard(text) {
@@ -607,5 +692,10 @@ module.exports = {
   setTextPositionTo,
   restartApiServerWithEnvs,
   restartApiServer,
-  makeJsonRequest
+  makeJsonRequest,
+  getItemContentsByParams,
+  setTodayDate,
+  increaseTodayDateByMinutes,
+  setTodayBotDate,
+  increaseTodayBotDateByMinutes
 };

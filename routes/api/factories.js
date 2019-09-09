@@ -4,10 +4,13 @@ const faker = require('faker');
 let generationId = 1;
 
 function createMessageResponse({
-  type, ts, text, channel
+  type,
+  ts,
+  text,
+  channel
 }, { user, team }) {
   const response = utils.copyObject(responses['chat.postMessage']);
-  const msgTs = ts || utils.createTs(generationId);
+  const msgTs = typeof ts === 'undefined' ? utils.createTs(generationId) : ts;
   generationId += 1;
   response.ts = msgTs;
   response.channel = channel;

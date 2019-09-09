@@ -3,17 +3,20 @@ const isServer = typeof module !== 'undefined';
 let moment;
 let Handlebars;
 let Formatter;
+let getConstants;
 
 if (isServer) {
   /* eslint-disable global-require */
   moment = require('moment');
   Handlebars = require('handlebars');
   Formatter = require('./formatters');
+  getConstants = () => require('../../routes/constants');
   /* eslint-enable global-require */
 } else {
   moment = window.moment;
   Handlebars = window.Handlebars;
   Formatter = window.MdFormatter;
+  getConstants = () => Handlebars.context && Handlebars.context.constants;
 }
 
 function isEmpty(value) {
@@ -101,9 +104,11 @@ const helpers = {
     return helpers.createTs(id);
   },
   createTs(incrementId) {
-    return `${Math.round(+new Date() / 1000)}.${String(incrementId).padStart(6, '0')}`;
+    const dateNow = Date.now();
+    return `${Math.floor(dateNow / 1000)}.${String(incrementId).padStart(6, '0')}`;
   },
   toHumanTime(timestamp) {
+    if (!timestamp) return '00:00';
     const unixts = +timestamp.split('.')[0];
     return moment.unix(unixts).format('h:mm A');
   },
@@ -122,6 +127,85 @@ const helpers = {
     const formatter = new Formatter(escapeExpression);
     message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Handlebars.SafeString(message);
+  },
+  getTsDiffInSeconds(firstTs, secondTs) {
+    const firstUnixTs = Number(firstTs.split('.')[0]);
+    const secondUnixTs = Number(secondTs.split('.')[0]);
+    const maxTs = Math.max(firstUnixTs, secondUnixTs);
+    const minTs = Math.min(firstUnixTs, secondUnixTs);
+    return Math.round(maxTs - minTs);
+  },
+  canHideHeader(currentMessage, baseMessage, interval = 0) {
+    const diffInSeconds = helpers.getTsDiffInSeconds(currentMessage.ts, baseMessage.ts);
+    return String(baseMessage.user_id) === String(currentMessage.user_id) && diffInSeconds <= interval;
+  },
+  findFirstMessageByUser(messages, userId) {
+    const keys = Object.keys(messages);
+    let firstMessageFromUser = null;
+    for (let i = keys.length - 1; i >= 0; i -= 1) {
+      const message = messages[keys[i]];
+      if (message.user_id !== userId) {
+        break;
+      } else {
+        firstMessageFromUser = message;
+      }
+    }
+    return firstMessageFromUser;
+  },
+  measureMessageItems(prevItem, item) {
+    const intervalInSeconds = getConstants().HIDE_HEADER_TIME_INTERVAL_IN_SECONDS;
+    if (prevItem && prevItem.user_id === item.user_id) {
+      const messageDiffInSeconds = helpers.getTsDiffInSeconds(prevItem.ts, item.ts);
+      if (messageDiffInSeconds >= intervalInSeconds) {
+        return [item, { ...item, hideHeader: false }];
+      }
+      const hideHeader = helpers.canHideHeader(item, prevItem, intervalInSeconds);
+      return [prevItem, { ...item, hideHeader }];
+    }
+    return [item, { ...item, hideHeader: false }];
+  },
+  eachMessage(context, options) {
+    let currentContext = context;
+    let prevItem;
+    const intervalInSeconds = getConstants().HIDE_HEADER_TIME_INTERVAL_IN_SECONDS;
+    if (!options) {
+      throw new Error('Must pass iterator to #eachMessage');
+    }
+
+    let fn = options.fn;
+    let inverse = options.inverse;
+    let data;
+
+    if (typeof currentContext === 'function') {
+      currentContext = currentContext.call(this);
+    }
+
+    if (options.data) {
+      data = Handlebars.createFrame(options.data);
+    }
+
+    function execIteration(field, index, last) {
+      if (data) {
+        data.key = field;
+        data.index = index;
+        data.first = index === 0;
+        data.last = !!last;
+      }
+      let item = currentContext[field];
+      [prevItem, item] = helpers.measureMessageItems(prevItem, item, intervalInSeconds);
+      return fn(item, {
+        data: data,
+        blockParams: [item, field]
+      });
+    }
+
+    if (currentContext && typeof currentContext === 'object') {
+      return Object.keys(currentContext).reduce((acc, key, index, arr) => {
+        return [acc, execIteration(key, index, arr.length - 1 === index)].join('');
+      }, '');
+    }
+
+    return inverse(this);
   }
 };
 

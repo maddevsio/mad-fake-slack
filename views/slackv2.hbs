@@ -139,9 +139,9 @@
         <div id="client_body">
           <div id="col_messages">
             <div id="messages_container">
-                {{#each messages as |message|}}
+                {{#eachMessage messages as |message|}}
                   {{> message message=message}}
-                {{/each}}
+                {{/eachMessage}}
             </div>
             <div id="footer">
               <div id="footer_msgs">
@@ -207,6 +207,9 @@
     bots: {{{ json bots }}},
     team: {{{ json team }}},
     me: {{{ json me }}},
+    messages: {{{ json messages }}},
+    prevMessage: null,
+    constants: {{{ json constants }}},
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
     }
@@ -214,9 +217,49 @@
 
   Handlebars.context.allUsers = Handlebars.context.users.concat(Handlebars.context.bots);
 
-  Handlebars.render = function (containerEl, templateName, context, options = { position: 'beforeend' }) {
-    const html = Handlebars.templates[templateName](context)
+  Handlebars.renderTemplate = function renderTemplate({ containerEl, templateName, context, options = { position: 'beforeend' } }) {
+    const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } })
     containerEl.insertAdjacentHTML(options.position, html);
+  }
+
+  function removeFirstMessage(containerEl) {
+      const firstMessage = containerEl.querySelector('.list__item');
+      if (firstMessage) {
+        firstMessage.remove();
+      }
+  }
+
+  function shrinkMessagesListIfNeeded({ containerEl, templateName, context } = {}) {
+    if (Handlebars.context.messages.length > Handlebars.context.constants.MESSAGES_MAX_COUNT) {
+      Handlebars.context.messages = Handlebars.context.messages.slice(1);
+      let messages = Handlebars.context.messages;
+      removeFirstMessage(containerEl);
+      if (messages[0].hideHeader) {
+        removeFirstMessage(containerEl);
+        messages[0].hideHeader = false;
+        Handlebars.renderTemplate({
+          containerEl,
+          templateName,
+          context: { ...context, message: messages[0] },
+          options: { position: 'afterbegin' }
+        });
+      }
+    }
+  }
+
+  Handlebars.render = function render(containerEl, templateName, context, options = { position: 'beforeend' }) {
+    if (templateName === 'message') {
+      let messages = Handlebars.context.messages;
+      if (!Handlebars.context.prevMessage) {
+        Handlebars.context.prevMessage = messages.length ? messages[messages.length - 1] : null;
+      }
+      const [prevMessage, message] = Handlebars.helpers.measureMessageItems(Handlebars.context.prevMessage, context.message);
+      Handlebars.context.prevMessage = prevMessage;
+      context.message = message;
+      messages.push(context.message);
+      shrinkMessagesListIfNeeded({ containerEl, templateName, context });
+    }
+    Handlebars.renderTemplate({ containerEl, templateName, context, options });
   }
 
   Handlebars.userUtils = {
@@ -253,7 +296,9 @@
       const context = {
         message: {
           team: message.team,
+          team_id: message.team.team_id,
           user: message.user,
+          user_id: message.user.id,
           ts: message.ts,
           text: message.text
         }

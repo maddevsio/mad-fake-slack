@@ -28,6 +28,14 @@ Given('My timezone is {string}', (timezoneName) => {
   actions.setTimezone(timezoneName);
 });
 
+Given('Now is the date and time {string}', async (strDateAndTime) => {
+  await actions.setTodayDate(strDateAndTime);
+});
+
+Given('Now {string} minutes passed', async (minutesCount) => {
+  actions.increaseTodayDateByMinutes(Number(minutesCount));
+});
+
 Then('I should see following channels between {string} and {string}:', async (afterText, beforeText, dataTable) => {
   const texts = await actions.getTextsBetween('[role="listitem"]', afterText, beforeText);
   expect(texts).toStrictEqual(dataTable.rows().map(row => row[0]));
@@ -118,6 +126,14 @@ When('User {string} send message:', async (userName, dataTable) => {
   await actions.sendMessageFrom(userName, channel, options);
 });
 
+Given('Now is the date and time {string} for {string} user', (isoDate, userName) => {
+  actions.setTodayBotDate(userName, isoDate);
+});
+
+Given('Now {string} minutes passed for {string} user', (minutesCount, userName) => {
+  actions.increaseTodayBotDateByMinutes(userName, Number(minutesCount));
+});
+
 Then('I should see {string} message with:', async (position, dataTable) => {
   const options = dataTable.rowsHash();
   const actualTexts = await actions.getContentsByParams(options, { position });
@@ -128,6 +144,12 @@ Then('I should see {string} multiline message with:', async (position, dataTable
   const options = dataTable.rowsHash();
   const actualTexts = await actions.getContentsByParams(options, { position, attribute: 'innerText', matchRegex: /\s+^[$]/g });
   expect(actualTexts).toStrictEqual(Object.values(options));
+});
+
+When('I should see {string} multiline {string} with:', async (position, itemSelectorName, dataTable) => {
+  const options = dataTable.rowsHash();
+  const lastItem = await actions.getItemContentsByParams(options, itemSelectorName, { position });
+  expect(lastItem).toStrictEqual(options);
 });
 
 Given('I\'ll wait a little', async () => {
@@ -186,4 +208,9 @@ When('I send {string} request to {string} with conditions', async (httpMethod, u
 
 Then('I restart the server with default envs', () => {
   return actions.restartApiServer();
+});
+
+Given('I send {string} to chat', async (text) => {
+  await actions.typeText(text);
+  await actions.pressTheButton('Enter');
 });

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const helpers = require('../helpers');
 
 class DbReader {
   constructor(dirname) {
@@ -26,9 +27,10 @@ class DbReader {
 }
 
 class DbManager {
-  constructor(dbReader) {
+  constructor(dbReader, helpersObj) {
     this.db = null;
     this.dbReader = dbReader;
+    this.helpers = helpersObj;
     this.initDb();
   }
 
@@ -60,7 +62,8 @@ class DbManager {
   }
 
   static createTs(id) {
-    return `${Math.round(+new Date() / 1000)}.${String(id).padStart(6, '0')}`;
+    const dateNow = Date.now();
+    return `${Math.floor(dateNow / 1000)}.${String(id).padStart(6, '0')}`;
   }
 
   slackUser() {
@@ -96,7 +99,14 @@ class DbManager {
         this.initMessages(channelId);
         const messages = this.db.messages[channelId];
         messages.meta.last_id += 1;
-        const id = DbManager.createTs(messages.meta.last_id);
+
+        let id;
+        if (message.ts && !messages[message.ts]) {
+          id = message.ts;
+        } else {
+          id = DbManager.createTs(messages.meta.last_id);
+        }
+
         messages[id] = {
           type: 'message',
           user_id: userId,
@@ -125,7 +135,10 @@ class DbManager {
 }
 
 function createDbManager() {
-  return new DbManager(new DbReader(__dirname));
+  return new DbManager(
+    new DbReader(__dirname),
+    helpers
+  );
 }
 
 module.exports = {

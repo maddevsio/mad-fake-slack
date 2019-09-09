@@ -59,14 +59,14 @@ function authTestHandler(req, res) {
 }
 
 function createResponse({
-  ts, text, channel, user, team
+  user,
+  team,
+  ...other
 }) {
   return factories.createMessageResponse(
     {
       type: 'message',
-      ts,
-      text,
-      channel
+      ...other
     },
     { user, team }
   );
@@ -92,7 +92,12 @@ async function postMessageHandler(req, res) {
     const user = dbManager.slackUser();
     const team = dbManager.slackTeam();
     const response = createResponse({
-      user, team, ts: message.ts, channel, text: req.body.text.trim()
+      user,
+      team,
+      ts: message.ts,
+      channel,
+      text: req.body.text.trim(),
+      hideHeader: message.hideHeader
     });
     broadcastResponse({ response, userId: user.id, channel });
     res.json(response);

@@ -303,7 +303,7 @@ async function connectFakeUser(name) {
   await scope.context.appUsers[name].start();
 }
 
-async function typeText(text, options = { delay: 100 }) {
+async function typeText(text, options = { delay: 0 }) {
   await initBrowser();
   await scope.context.currentPage.keyboard.type(text, options);
 }
@@ -530,6 +530,14 @@ async function sendMessageFrom(userName, channelName, options) {
   return methodsByTypeMap[type] && methodsByTypeMap[type]();
 }
 
+function setTodayBotDate(userName, isoDate) {
+  scope.context.appUsers[userName].setMockDate(new Date(isoDate));
+}
+
+function increaseTodayBotDateByMinutes(userName, minutes) {
+  scope.context.appUsers[userName].increaseMockDateByMinutes(minutes);
+}
+
 async function getContentsByParams(options, { position = 'last', attribute = 'textContent', matchRegex = /\s+/g }) {
   return Promise.mapSeries(
     Object.entries(options),
@@ -687,5 +695,7 @@ module.exports = {
   makeJsonRequest,
   getItemContentsByParams,
   setTodayDate,
-  increaseTodayDateByMinutes
+  increaseTodayDateByMinutes,
+  setTodayBotDate,
+  increaseTodayBotDateByMinutes
 };

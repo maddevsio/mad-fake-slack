@@ -40,6 +40,7 @@ archive.directory('views/', 'views');
 archive.glob('db/**/*', { ignore: ['db/teams.json'] });
 archive.directory('public/', 'public');
 archive.directory('routes/', 'routes');
+archive.directory('config/', 'config');
 archive.file('examples/rtmbot/index.js', { name: 'bot.js' });
 archive.file('package-lock.json', { name: 'package-lock.json' });
 archive.file('README.md', { name: 'README.md' });

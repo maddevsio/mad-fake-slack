@@ -140,7 +140,11 @@
           <div id="col_messages">
             <div id="messages_container">
                 {{#eachMessage messages as |message|}}
-                  {{> message message=message}}
+                  {{#if (eq @last true)}}
+                    {{> message_edit message=message}}
+                  {{else}}
+                    {{> message message=message}}
+                  {{/if}}
                 {{/eachMessage}}
             </div>
             <div id="footer">

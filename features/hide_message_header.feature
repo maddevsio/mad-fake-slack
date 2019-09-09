@@ -105,9 +105,27 @@ Feature: Hide header for sequence of messages from one user
             | Message body   | first bot message |
         And Now "1" minutes passed
         When User "Valera" send message:
-            | type    | message           |
+            | type    | message            |
             | text    | second bot message |
-            | channel | general           |
+            | channel | general            |
         Then I should see "last" multiline "Message item" with:
-            | Message sender | <not exists>      |
+            | Message sender | <not exists>       |
+            | Message body   | second bot message |
+
+    Scenario: Show message header after time interval passed for next bot message
+        And Now is the date and time "2019-09-04T06:50:53.953Z" for "Valera" user
+        And User "Valera" send message:
+            | type    | message           |
+            | text    | first bot message |
+            | channel | general           |
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera            |
+            | Message body   | first bot message |
+        And Now "6" minutes passed for "Valera" user
+        When User "Valera" send message:
+            | type    | message            |
+            | text    | second bot message |
+            | channel | general            |
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera             |
             | Message body   | second bot message |

@@ -140,11 +140,7 @@
           <div id="col_messages">
             <div id="messages_container">
                 {{#eachMessage messages as |message|}}
-                  {{#if (eq @last true)}}
-                    {{> message_edit message=message}}
-                  {{else}}
-                    {{> message message=message}}
-                  {{/if}}
+                  {{> message message=message}}
                 {{/eachMessage}}
             </div>
             <div id="footer">
@@ -196,6 +192,9 @@
 <script name="statustyping" type="text/x-handlebars-template">
   {{{include "partials" "statustyping"}}}
 </script>
+<script name="message_edit" type="text/x-handlebars-template">
+  {{{include "partials" "message_edit"}}}
+</script>
 <script>
   function textAreaAdjust(el) {
     el.style.height = 'auto';
@@ -216,6 +215,13 @@
     constants: {{{ json constants }}},
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
+    },
+    getLastMessage() {
+      const countOfMessages = Handlebars.context.messages.length - 1;
+      if (countOfMessages >= 0) {
+        return Handlebars.context.messages[countOfMessages];
+      }
+      return null;
     }
   };
 
@@ -224,6 +230,7 @@
   Handlebars.renderTemplate = function renderTemplate({ containerEl, templateName, context, options = { position: 'beforeend' } }) {
     const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } })
     containerEl.insertAdjacentHTML(options.position, html);
+    return containerEl.children[containerEl.children.length - 1];
   }
 
   function removeFirstMessage(containerEl) {
@@ -263,7 +270,7 @@
       messages.push(context.message);
       shrinkMessagesListIfNeeded({ containerEl, templateName, context });
     }
-    Handlebars.renderTemplate({ containerEl, templateName, context, options });
+    return Handlebars.renderTemplate({ containerEl, templateName, context, options });
   }
 
   Handlebars.userUtils = {

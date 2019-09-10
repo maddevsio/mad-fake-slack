@@ -1271,7 +1271,6 @@
     tab-size: 4;
     -moz-tab-size: 4;
     text-align: left;
-    white-space: pre-wrap;
     word-wrap: break-word;
   }
 
@@ -1905,7 +1904,7 @@ pre {
 
 .c-texty_input--multi_line .ql-editor {
   min-height: 22px;
-  line-height: 6px;
+  line-height: 1.43423;
   font-size: 15px;
   width: calc(100% - 36px);
   padding-right: 36px;
@@ -1913,11 +1912,11 @@ pre {
   height: auto;
   padding: 0;
 }
-å
+
 .c-texty_input .ql-editor {
   font-variant-ligatures: none;
+  line-height: 1.46668;
   overflow: auto;
-  width: 100%;
   box-sizing: content-box;
   -webkit-tab-size: 8;
   -moz-tab-size: 8;
@@ -1926,6 +1925,10 @@ pre {
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+}
+
+.c-message__editor__input .ql-editor {
+  padding-top: 6px;
 }
 
 .ql-editor p {

@@ -60,11 +60,67 @@
   </button>
 </form>
 <script>
+  function setEndOfContenteditable(contentEditableElement) {
+      var range, selection;
+      if (document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
+      {
+        range = document.createRange();//Create a range (a range is a like the selection but invisible)
+        range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+        selection = window.getSelection();//get the selection object (allows you to change selection)
+        selection.removeAllRanges();//remove any selections already made
+        selection.addRange(range);//make the range you have just created the visible selection
+      }
+      else if (document.selection)//IE 8 and lower
+      {
+        range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
+        range.moveToElementText(contentEditableElement);//Select the entire contents of the element with the range
+        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+        range.select();//Select the range (make it the visible selection
+      }
+  }
+
+  class InlineEditLastMessage {
+    constructor(container) {
+      this.replaceMsgMessageEl = container.children[container.children.length - 1];
+      this.container = container;
+      this.editEl = null;
+    }
+
+    setFocus() {
+      if (this.editorEl) {
+        const lastMessage = Handlebars.context.getLastMessage();
+        this.editorEl.focus();
+        setEndOfContenteditable(this.editorEl);
+      }
+    }
+
+    edit() {
+      this.replaceMsgMessageEl.remove();
+      const lastMessage = Handlebars.context.getLastMessage();
+      this.editEl = Handlebars.render(this.container, "message_edit", { message: lastMessage });
+      this.editorEl = this.editEl.querySelector('.ql-editor');
+      Handlebars.userUtils.scrollToLastMessage();
+      this.setFocus();
+    }
+
+    cancel() {
+      const lastMessage = Handlebars.context.getLastMessage();
+      if (this.editEl) {
+        this.editEl.remove();
+        this.editEl = null;
+        this.editorEl = null;
+      }
+      Handlebars.render(this.container, "message", lastMessage);
+      Handlebars.userUtils.scrollToLastMessage();
+    }
+  }
 
   const msgForm = window.msg_form;
   const msgInputText = window.msg_input_text;
   const msgContainer = window.messages_container;
   const msgInputArea = window.msg_input;
+  let inlineEditor = null;
   function updateTextAreaHeight() {
     msgInputArea.setAttribute('style', `height:1px;`);
     const h = msgInputText.scrollHeight;
@@ -95,6 +151,13 @@
   });
 
   msgInputText.addEventListener('keydown', (e) => {
+    if (e.keyCode === 38) {
+      e.preventDefault();
+      if (!inlineEditor) {
+        inlineEditor = new InlineEditLastMessage(msgContainer);
+        inlineEditor.edit();
+      }
+    }
     if (e.keyCode === 13) {
       e.preventDefault();
       if (e.ctrlKey || e.shiftKey) {

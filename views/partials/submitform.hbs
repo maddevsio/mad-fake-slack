@@ -129,17 +129,18 @@
 
     setFocus() {
       if (this.editorEl) {
-        const lastMessage = Handlebars.context.getLastMessage();
         this.editorEl.focus();
         setEndOfContenteditable(this.editorEl);
       }
     }
 
     edit() {
-      this.replaceMsgMessageEl = this.container.children[this.container.children.length - 1];
+      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
+      if (lastMessageIndex === null || typeof lastMessageIndex === 'undefined') return;
+      const lastMessage = Handlebars.context.messages[lastMessageIndex];
+      this.replaceMsgMessageEl = this.container.children[lastMessageIndex];
       this.replaceMsgMessageEl.remove();
-      const lastMessage = Handlebars.context.getLastMessage();
-      this.editEl = Handlebars.render(this.container, "message_edit", { message: lastMessage });
+      this.editEl = Handlebars.renderAtIndex(lastMessageIndex, this.container, "message_edit", { message: lastMessage });
       this.editorEl = this.editEl.querySelector('.ql-editor');
       this.cancelBtn = window.emd_cancel_button;
       this.saveBtn = window.emd_save_button;
@@ -151,14 +152,15 @@
     }
 
     cancel() {
-      const lastMessage = Handlebars.context.getLastMessage();
+      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
+      const lastMessage = Handlebars.context.messages[lastMessageIndex];
       this.cleanupEvents();
       if (this.editEl) {
         this.editEl.remove();
         this.editEl = null;
         this.editorEl = null;
       }
-      Handlebars.render(this.container, "message", { message: lastMessage });
+      Handlebars.renderAtIndex(lastMessageIndex, this.container, "message", { message: lastMessage });
       Handlebars.userUtils.scrollToLastMessage();
       this.editMode = false;
     }

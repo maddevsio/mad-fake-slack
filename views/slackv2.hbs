@@ -216,10 +216,11 @@
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
     },
-    getLastMessage() {
-      const countOfMessages = Handlebars.context.messages.length - 1;
-      if (countOfMessages >= 0) {
-        return Handlebars.context.messages[countOfMessages];
+    getLastMyMessageIndex() {
+      const reversedMsgs = Handlebars.context.messages.slice().reverse();
+      const msgIndex = reversedMsgs.findIndex(msg => msg.user_id == Handlebars.context.me.id);
+      if (msgIndex >= 0) {
+        return Handlebars.context.messages.length - 1 - msgIndex;
       }
       return null;
     }
@@ -231,6 +232,18 @@
     const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } })
     containerEl.insertAdjacentHTML(options.position, html);
     return containerEl.children[containerEl.children.length - 1];
+  }
+
+  Handlebars.renderTemplateAtIndex = function renderTemplate({ index, containerEl, templateName, context }) {
+    const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } });
+    let before = containerEl.children[index];
+    let position = 'beforebegin';
+    if (!before) {
+      before = containerEl;
+      position = 'beforeend';
+    }
+    before.insertAdjacentHTML(position, html);
+    return containerEl.children[index];
   }
 
   function removeFirstMessage(containerEl) {
@@ -271,6 +284,10 @@
       shrinkMessagesListIfNeeded({ containerEl, templateName, context });
     }
     return Handlebars.renderTemplate({ containerEl, templateName, context, options });
+  }
+
+  Handlebars.renderAtIndex = function renderAtIndex(index, containerEl, templateName, context) {
+    return Handlebars.renderTemplateAtIndex({ index, containerEl, templateName, context });
   }
 
   Handlebars.userUtils = {

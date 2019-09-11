@@ -81,25 +81,49 @@
   }
 
   class InlineEditLastMessage {
-    constructor(container) {
-      this.replaceMsgMessageEl = container.children[container.children.length - 1];
+    constructor(container, messageInput) {
       this.container = container;
+      this.messageInput = messageInput;
       this.editEl = null;
+      this.editMode = false;
     }
 
-    handlerEditInput(e) {
+    handlerEditInput = (e) => {
       Handlebars.userUtils.scrollToLastMessage();
+    }
+
+    handlerEditKeyDown = (e) => {
+      if (e.keyCode == 27) {
+        e.preventDefault();
+        this.cancel();
+        setTimeout(() => {
+          this.messageInput.focus();
+        }, 0);
+      }
+    }
+
+    handlerCancel = (e) => {
+      e.preventDefault();
+      this.cancel();
     }
 
     setupEvents() {
       if (this.editorEl) {
         this.editorEl.addEventListener('input', this.handlerEditInput);
+        this.editorEl.addEventListener('keydown', this.handlerEditKeyDown);
+      }
+      if (this.cancelBtn) {
+        this.cancelBtn.addEventListener('click', this.handlerCancel);
       }
     }
 
     cleanupEvents() {
       if (this.editorEl) {
         this.editorEl.removeEventListener('input', this.handlerEditInput);
+        this.editorEl.removeEventListener('keydown', this.handlerEditKeyDown);
+      }
+      if (this.cancelBtn) {
+        this.cancelBtn.removeEventListener('click', this.handlerCancel);
       }
     }
 
@@ -112,13 +136,18 @@
     }
 
     edit() {
+      this.replaceMsgMessageEl = this.container.children[this.container.children.length - 1];
       this.replaceMsgMessageEl.remove();
       const lastMessage = Handlebars.context.getLastMessage();
       this.editEl = Handlebars.render(this.container, "message_edit", { message: lastMessage });
       this.editorEl = this.editEl.querySelector('.ql-editor');
+      this.cancelBtn = window.emd_cancel_button;
+      this.saveBtn = window.emd_save_button;
+
       this.setupEvents();
       Handlebars.userUtils.scrollToLastMessage();
       this.setFocus();
+      this.editMode = true;
     }
 
     cancel() {
@@ -129,8 +158,13 @@
         this.editEl = null;
         this.editorEl = null;
       }
-      Handlebars.render(this.container, "message", lastMessage);
+      Handlebars.render(this.container, "message", { message: lastMessage });
       Handlebars.userUtils.scrollToLastMessage();
+      this.editMode = false;
+    }
+
+    isInEditMode() {
+      return this.editMode;
     }
   }
 
@@ -172,7 +206,9 @@
     if (e.keyCode === 38) {
       e.preventDefault();
       if (!inlineEditor) {
-        inlineEditor = new InlineEditLastMessage(msgContainer);
+        inlineEditor = new InlineEditLastMessage(msgContainer, msgInputText);
+      }
+      if (!inlineEditor.isInEditMode()) {
         inlineEditor.edit();
       }
     }

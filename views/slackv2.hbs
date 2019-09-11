@@ -297,6 +297,13 @@
           lastMessage.scrollIntoView(false);
       }
     },
+    scrollToMessageAtIndex(index) {
+      const msgContainer = window.messages_container;
+      const lastMessage = msgContainer.children[index];
+      if (lastMessage) {
+        lastMessage.scrollIntoView(false);
+      }
+    },
     cleanEventListeners(el) {
       for (let eventType in getEventListeners(el)) {
         getEventListeners(el)[eventType].forEach(

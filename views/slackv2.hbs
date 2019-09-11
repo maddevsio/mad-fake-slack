@@ -277,7 +277,7 @@
     scrollToLastMessage() {
       const lastMessage = document.querySelector('.list__item:last-child');
       if (lastMessage) {
-          lastMessage.scrollIntoView()
+          lastMessage.scrollIntoView(false);
       }
     },
     cleanEventListeners(el) {

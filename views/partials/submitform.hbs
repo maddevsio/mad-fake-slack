@@ -146,7 +146,7 @@
       this.saveBtn = window.emd_save_button;
 
       this.setupEvents();
-      Handlebars.userUtils.scrollToLastMessage();
+      Handlebars.userUtils.scrollToMessageAtIndex(lastMessageIndex);
       this.setFocus();
       this.editMode = true;
     }
@@ -161,7 +161,7 @@
         this.editorEl = null;
       }
       Handlebars.renderAtIndex(lastMessageIndex, this.container, "message", { message: lastMessage });
-      Handlebars.userUtils.scrollToLastMessage();
+      Handlebars.userUtils.scrollToMessageAtIndex(lastMessageIndex);
       this.editMode = false;
     }
 

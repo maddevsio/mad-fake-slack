@@ -87,6 +87,22 @@
       this.editEl = null;
     }
 
+    handlerEditInput(e) {
+      Handlebars.userUtils.scrollToLastMessage();
+    }
+
+    setupEvents() {
+      if (this.editorEl) {
+        this.editorEl.addEventListener('input', this.handlerEditInput);
+      }
+    }
+
+    cleanupEvents() {
+      if (this.editorEl) {
+        this.editorEl.removeEventListener('input', this.handlerEditInput);
+      }
+    }
+
     setFocus() {
       if (this.editorEl) {
         const lastMessage = Handlebars.context.getLastMessage();
@@ -100,12 +116,14 @@
       const lastMessage = Handlebars.context.getLastMessage();
       this.editEl = Handlebars.render(this.container, "message_edit", { message: lastMessage });
       this.editorEl = this.editEl.querySelector('.ql-editor');
+      this.setupEvents();
       Handlebars.userUtils.scrollToLastMessage();
       this.setFocus();
     }
 
     cancel() {
       const lastMessage = Handlebars.context.getLastMessage();
+      this.cleanupEvents();
       if (this.editEl) {
         this.editEl.remove();
         this.editEl = null;

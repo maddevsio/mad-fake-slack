@@ -168,14 +168,46 @@ function userInfoHandler(req, res) {
   }
 }
 
+function chatUpdateHandler(req, res) {
+  const token = (req.body && req.body.token) || req.headers.Authorization;
+  if (!token) {
+    res.json(responses.cant_update_message);
+    return;
+  }
+
+  const { channel, ts, text } = req.body;
+  const messageInDb = dbManager.channel(req.body.channel).findMessageByTs(ts);
+  const user = dbManager.slackUser();
+
+  if (!messageInDb || messageInDb.user_id !== user.id) {
+    res.json(responses.cant_update_message);
+    return;
+  }
+
+  dbManager.channel(req.body.channel).updateMessage({
+    ...messageInDb,
+    text
+  });
+
+  res.json({
+    ok: true,
+    channel,
+    ts,
+    text
+  });
+}
+
 router.use('*', beforeAllHandler);
+
 router.post('/auth.test', authTestHandler);
 router.post('/chat.postMessage', postMessageHandler);
 router.post('/channels.list', channelsListHandler);
-router.get('/rtm.connect', rtmConnectHandler);
 router.post('/rtm.connect', rtmConnectHandler);
-router.get('/rtm.start', rtmConnectHandler);
 router.post('/rtm.start', rtmConnectHandler);
+router.post('/chat.update', chatUpdateHandler);
+
+router.get('/rtm.connect', rtmConnectHandler);
+router.get('/rtm.start', rtmConnectHandler);
 router.get('/users.info', userInfoHandler);
 router.get('/conversations.list', conversationsListHandler);
 

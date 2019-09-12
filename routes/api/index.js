@@ -169,17 +169,11 @@ function userInfoHandler(req, res) {
 }
 
 function chatUpdateHandler(req, res) {
-  const token = (req.body && req.body.token) || req.headers.Authorization;
-  if (!token) {
-    res.json(responses.cant_update_message);
-    return;
-  }
-
   const { channel, ts, text } = req.body;
   const messageInDb = dbManager.channel(req.body.channel).findMessageByTs(ts);
   const user = dbManager.slackUser();
 
-  if (!messageInDb || messageInDb.user_id !== user.id) {
+  if (!messageInDb || messageInDb.user_id !== user.id || !text) {
     res.json(responses.cant_update_message);
     return;
   }

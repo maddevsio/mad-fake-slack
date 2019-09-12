@@ -165,6 +165,21 @@
       Handlebars.userUtils.scrollToMessageAtIndex(index);
     }
 
+    async sendUpdate({ text, ts }) {
+      const selectedChannel = Handlebars.context.getSelectedChannel();
+      if (!text || !text.trim()) {
+        throw new Error('Text is required');
+      }
+      const result = await Handlebars.userUtils.postJson('/api/chat.update', {
+        text,
+        ts,
+        channel: selectedChannel.id
+      });
+      if (!result.ok) {
+        throw new Error(result.error);
+      }
+    }
+
     edit() {
       const [lastMessage, lastMessageIndex] = this.getLastMessage();
       if (!lastMessage) return;
@@ -185,7 +200,7 @@
     done() {
       const [lastMessage] = this.getLastMessage();
       lastMessage.text = this.editorEl.textContent;
-      this.complete();
+      this.sendUpdate(lastMessage).then(() => this.complete());
     }
 
     complete() {

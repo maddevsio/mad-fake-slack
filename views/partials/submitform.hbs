@@ -107,6 +107,11 @@
       this.cancel();
     }
 
+    handlerSave = (e) => {
+      e.preventDefault();
+      this.done();
+    }
+
     setupEvents() {
       if (this.editorEl) {
         this.editorEl.addEventListener('input', this.handlerEditInput);
@@ -114,6 +119,9 @@
       }
       if (this.cancelBtn) {
         this.cancelBtn.addEventListener('click', this.handlerCancel);
+      }
+      if(this.saveBtn) {
+        this.saveBtn.addEventListener('click', this.handlerSave);
       }
     }
 
@@ -125,6 +133,14 @@
       if (this.cancelBtn) {
         this.cancelBtn.removeEventListener('click', this.handlerCancel);
       }
+      if (this.saveBtn) {
+        this.saveBtn.removeEventListener('click', this.handlerSave);
+      }
+    }
+
+    getLastMessage() {
+      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
+      return [Handlebars.context.messages[lastMessageIndex], lastMessageIndex];
     }
 
     setFocus() {
@@ -134,32 +150,52 @@
       }
     }
 
-    edit() {
-      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
-      if (lastMessageIndex === null || typeof lastMessageIndex === 'undefined') return;
-      const lastMessage = Handlebars.context.messages[lastMessageIndex];
-      this.replaceMsgMessageEl = this.container.children[lastMessageIndex];
-      this.replaceMsgMessageEl.remove();
-      this.editEl = Handlebars.renderAtIndex(lastMessageIndex, this.container, "message_edit", { message: lastMessage });
+    setupElements([message, index]) {
+      this.editEl = this.renderMessage([message, index]);
       this.editorEl = this.editEl.querySelector('.ql-editor');
       this.cancelBtn = window.emd_cancel_button;
       this.saveBtn = window.emd_save_button;
+    }
 
+    renderMessage([message, index]) {
+      return Handlebars.renderAtIndex(index, this.container, "message_edit", { message });
+    }
+
+    scrollToIndex(index) {
+      Handlebars.userUtils.scrollToMessageAtIndex(index);
+    }
+
+    edit() {
+      const [lastMessage, lastMessageIndex] = this.getLastMessage();
+      if (!lastMessage) return;
+      this.replaceMsgMessageEl = this.container.children[lastMessageIndex];
+      this.replaceMsgMessageEl.remove();
+      this.setupElements([lastMessage, lastMessageIndex]);
       this.setupEvents();
-      Handlebars.userUtils.scrollToMessageAtIndex(lastMessageIndex);
+      this.scrollToIndex(lastMessageIndex);
       this.setFocus();
       this.editMode = true;
     }
 
     cancel() {
-      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
-      const lastMessage = Handlebars.context.messages[lastMessageIndex];
+      const [lastMessage] = this.getLastMessage();
+      this.complete();
+    }
+
+    done() {
+      const [lastMessage] = this.getLastMessage();
+      lastMessage.text = this.editorEl.textContent;
+      this.complete();
+    }
+
+    complete() {
       this.cleanupEvents();
       if (this.editEl) {
         this.editEl.remove();
         this.editEl = null;
         this.editorEl = null;
       }
+      const [lastMessage, lastMessageIndex] = this.getLastMessage();
       Handlebars.renderAtIndex(lastMessageIndex, this.container, "message", { message: lastMessage });
       Handlebars.userUtils.scrollToMessageAtIndex(lastMessageIndex);
       this.editMode = false;

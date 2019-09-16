@@ -27,7 +27,9 @@ const mainSelectors = {
   'Notification bar': '.p-notification_bar__section--left',
   'Notification bar item': '.p-notification_bar__section--left .p-notification_bar__typing',
   'Message sender': '#messages_container .c-message__sender_link',
-  'App badge': '#messages_container .c-app_badge'
+  'App badge': '#messages_container .c-app_badge',
+  button: '.c-button',
+  'Inline Message Editor': '.c-message__editor'
 };
 
 const selectors = {

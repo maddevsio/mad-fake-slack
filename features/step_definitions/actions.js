@@ -42,6 +42,17 @@ function parseBoolean(value, defaultValue) {
   return ['true', 1, '1'].includes(boolValue);
 }
 
+async function getActivePage() {
+  const page = await Promise.filter(scope.browser.pages(), async (p) => {
+    return p === scope.context.currentPage;
+  }).get(0);
+  if (!page) {
+    throw new Error('Unable to get active page');
+  }
+  scope.context.currentPage = page;
+  return page;
+}
+
 async function initBrowser() {
   if (!scope.browser) {
     const useSandbox = parseBoolean(process.env.USE_SANDBOX, false);
@@ -187,52 +198,61 @@ function setTimezone(timeZone) {
 }
 
 async function setTodayDate(dateISOString) {
-  await scope.context.currentPage.evaluate((dateISO) => {
+  const page = await getActivePage();
+  await page.evaluate((dateISO) => {
     window.Date.mockDate(new Date(dateISO));
   }, dateISOString);
 }
 
 async function increaseTodayDateByMinutes(countOfMinutes) {
-  await scope.context.currentPage.evaluate((minutes) => {
+  const page = await getActivePage();
+  await page.evaluate((minutes) => {
     window.Date.mockDateIncreaseMinutes(minutes);
   }, countOfMinutes);
 }
 
 async function waitForNavigation() {
-  await scope.context.currentPage.waitForNavigation();
+  const page = await getActivePage();
+  await page.waitForNavigation();
 }
 
 async function waitForUrl(pageName) {
   const expecetedUrl = pages[pageName];
-  const url = await scope.context.currentPage.url();
+  const page = await getActivePage();
+  const url = await page.url();
   expect(url).toEqual(`${scope.host}${expecetedUrl}`);
 }
 
 async function waitForText(text) {
-  await scope.context.currentPage.waitForXPath(
+  const page = await getActivePage();
+  await page.waitForXPath(
     `//*[contains(normalize-space(string(.)), '${text}')]`
   );
 }
 
 async function waitForElementHides(elementType, elementName) {
   const selector = scope.context.currentSelectors[elementType][elementName];
-  await scope.context.currentPage.waitForXPath(selector, {
+  const page = await getActivePage();
+  await page.waitForXPath(selector, {
     hidden: true
   });
 }
 
 async function wait(ms) {
-  await scope.context.currentPage.waitFor(ms);
+  const page = await getActivePage();
+  await page.waitFor(ms);
 }
 
 async function goToUrl(url) {
-  return scope.context.currentPage.goto(url, {
+  const page = await getActivePage();
+  return page.goto(url, {
     waitUntil: 'networkidle2'
   });
 }
 
 async function reloadPage() {
-  await scope.context.currentPage.reload({ waitUntil: 'networkidle2' });
+  const page = await getActivePage();
+  await page.reload({ waitUntil: 'networkidle2' });
 }
 
 function loadPageSelectors(currentPageName) {
@@ -246,27 +266,31 @@ function interceptRequest(url, response) {
 async function getText(selectorName) {
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
-  await scope.context.currentPage.waitForSelector(selector, { visible: true });
-  return scope.context.currentPage.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(' '));
+  const page = await getActivePage();
+  await page.waitForSelector(selector, { visible: true });
+  return page.$eval(selector, element => Array.from(element.textContent.matchAll(/\S+/g)).join(' '));
 }
 
 async function hasElement(containerSelectorName, elementSelectorName) {
   await initBrowser();
   const containerSelector = scope.context.currentSelectors[containerSelectorName];
   const elementSelector = scope.context.currentSelectors[elementSelectorName];
-  return !!scope.context.currentPage.$(`${containerSelector} > ${elementSelector}`);
+  const page = await getActivePage();
+  return !!page.$(`${containerSelector} > ${elementSelector}`);
 }
 
 async function countOfElements(containerSelectorName, elementSelectorName) {
   await initBrowser();
   const containerSelector = scope.context.currentSelectors[containerSelectorName];
   const elementSelector = scope.context.currentSelectors[elementSelectorName];
-  return scope.context.currentPage.$$eval(`${containerSelector} > ${elementSelector}`, elements => elements.length);
+  const page = await getActivePage();
+  return page.$$eval(`${containerSelector} > ${elementSelector}`, elements => elements.length);
 }
 
 async function getTextsBetween(itemsSelector, afterText, beforeText) {
   await initBrowser();
-  return scope.context.currentPage.$$eval(itemsSelector, (elements, beginText, endText) => {
+  const page = await getActivePage();
+  return page.$$eval(itemsSelector, (elements, beginText, endText) => {
     const texts = [];
     let beginTextFound = false;
     // eslint-disable-next-line no-restricted-syntax
@@ -305,12 +329,14 @@ async function connectFakeUser(name) {
 
 async function typeText(text, options = { delay: 0 }) {
   await initBrowser();
-  await scope.context.currentPage.keyboard.type(text, options);
+  const page = await getActivePage();
+  await page.keyboard.type(text, options);
 }
 
 async function pressTheButton(button) {
   await initBrowser();
-  const { keyboard } = scope.context.currentPage;
+  const page = await getActivePage();
+  const { keyboard } = page;
   const keys = button.split('+').map(k => k.trim());
   await Promise.mapSeries(keys.slice(0, -1), key => keyboard.down(key));
   await keyboard.press(keys[keys.length - 1]);
@@ -336,7 +362,7 @@ function getLastIncomingPayloadForUser(name, payloadType) {
 }
 
 async function findElement(options) {
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   return page.waitForFunction(({ text, selector: elementSelector }) => {
     if (text) {
       const elements = Array.from(document.querySelectorAll(elementSelector));
@@ -363,14 +389,24 @@ async function findElement(options) {
   }, {}, options);
 }
 
-async function clickOn(selectorName, options = {}) {
+async function clickOn(selectorName, options = {}, noNav = false) {
   await initBrowser();
   const selector = scope.context.currentSelectors[selectorName];
   if (!selector) {
     throw new Error(`[${clickOn.name}] Selector by name ${selectorName} not found!`);
   }
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   const element = await findElement({ selector, ...options });
+  if (!element) {
+    throw new Error(`No element found with selector ${selector} and name ${selectorName}`);
+  }
+
+  if (noNav) {
+    return Promise.race([
+      wait(1000),
+      element.click()
+    ]);
+  }
 
   return Promise.all([
     page.waitForNavigation(),
@@ -381,7 +417,7 @@ async function clickOn(selectorName, options = {}) {
 async function getTextByPosition(selectorName, position, attribute = 'textContent', matchRegex = /\s+/g) {
   const FIRST_POSITION = 'first';
   const LAST_POSITION = 'last';
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   if (![LAST_POSITION, FIRST_POSITION].includes(position)) {
     throw new Error(`[${getTextByPosition.name}] Invalid value for "position"! Valid values: [${position}]`);
   }
@@ -400,7 +436,7 @@ async function getTextByPosition(selectorName, position, attribute = 'textConten
 async function getHtmlByPosition(selectorName, position, attribute = 'innerHTML') {
   const FIRST_POSITION = 'first';
   const LAST_POSITION = 'last';
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   if (![LAST_POSITION, FIRST_POSITION].includes(position)) {
     throw new Error(`[${getHtmlByPosition.name}] Invalid value for "position"! Valid values: [${position}]`);
   }
@@ -548,7 +584,8 @@ async function getContentsByParams(options, { position = 'last', attribute = 'te
 async function getItemContentsByParams(options, itemSelectorName, { position = 'last' }) {
   await initBrowser();
   const itemSelector = scope.context.currentSelectors[itemSelectorName];
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
+
   const itemHandler = (items, opts, selectorsFromContext) => {
     return Array.from(items).map(
       item => Object.keys(opts).reduce(
@@ -573,14 +610,14 @@ async function getItemContentsByParams(options, itemSelectorName, { position = '
 }
 
 async function copyTextToClipboard(text) {
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   return page.evaluate(textValue => {
     return navigator.clipboard.writeText(textValue);
   }, text);
 }
 
 async function setMemorizeProperty(selectorName, propertyName) {
-  const page = scope.context.currentPage;
+  const page = await getActivePage();
   const selector = scope.context.currentSelectors[selectorName];
   const propValue = await page.$eval(selector, (el, prop) => {
     return el[prop];
@@ -592,16 +629,16 @@ function getMemorizeProperty(selectorName, propertyName) {
   return scope.memo[`${selectorName}:${propertyName}`];
 }
 
-function getPropertyValueBySelector(selectorName, propertyName) {
-  const page = scope.context.currentPage;
+async function getPropertyValueBySelector(selectorName, propertyName) {
+  const page = await getActivePage();
   const selector = scope.context.currentSelectors[selectorName];
   return page.$eval(selector, (el, prop) => {
     return el[prop];
   }, propertyName);
 }
 
-function setFocus(selectorName) {
-  const page = scope.context.currentPage;
+async function setFocus(selectorName) {
+  const page = await getActivePage();
   const selector = scope.context.currentSelectors[selectorName];
   return page.focus(selector);
 }
@@ -611,8 +648,8 @@ function runTimes(times, action) {
   return Promise.mapSeries(calls, c => c());
 }
 
-function setTextPositionTo(position) {
-  const page = scope.context.currentPage;
+async function setTextPositionTo(position) {
+  const page = await getActivePage();
   return page.evaluate(pos => {
     const inputField = window.msg_input_text;
     const textLength = inputField.value.length || 1;
@@ -648,6 +685,13 @@ async function makeJsonRequest({
     data.body = JSON.stringify(body);
   }
   return fetch(url, data).then(res => res.json());
+}
+
+async function waitForToBeHidden(selectorName) {
+  await initBrowser();
+  const itemSelector = scope.context.currentSelectors[selectorName];
+  const page = await getActivePage();
+  await page.waitFor(selector => !document.querySelector(selector), { timeout: 3000 }, itemSelector);
 }
 
 module.exports = {
@@ -697,5 +741,6 @@ module.exports = {
   setTodayDate,
   increaseTodayDateByMinutes,
   setTodayBotDate,
-  increaseTodayBotDateByMinutes
+  increaseTodayBotDateByMinutes,
+  waitForToBeHidden
 };

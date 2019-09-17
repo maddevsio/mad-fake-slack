@@ -1,4 +1,3 @@
-@only
 Feature: 
     As a user, I want to edit my last message
 
@@ -56,5 +55,14 @@ Feature:
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov         |
             | Message body   | second message edited |
-
     
+    Scenario: Cancel editing my message
+        And I send "first message" to chat
+        And I press the "ArrowUp" keyboard button
+        And I type " edited"
+        When I click on "button" with text "Cancel" without navigation
+        And I'm waiting for "Inline Message Editor" to be hidden
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+

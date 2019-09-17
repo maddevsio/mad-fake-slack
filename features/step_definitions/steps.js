@@ -222,3 +222,7 @@ Given('I send {string} to chat', async (text) => {
   await actions.typeText(text);
   await actions.pressTheButton('Enter');
 });
+
+When('I reload the page', async () => {
+  await actions.reloadPage();
+});

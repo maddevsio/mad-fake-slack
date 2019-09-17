@@ -1,4 +1,3 @@
-let id = 0;
 const isServer = typeof module !== 'undefined';
 let moment;
 let Handlebars;
@@ -69,6 +68,7 @@ function escapeExpression(string, possible = /[&<"'=]/) {
 
 
 const helpers = {
+  id: 0,
   json(context) {
     return JSON.stringify(context);
   },
@@ -100,8 +100,8 @@ const helpers = {
     return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
   },
   makeTs() {
-    id += 1;
-    return helpers.createTs(id);
+    helpers.id += 1;
+    return helpers.createTs(helpers.id);
   },
   createTs(incrementId) {
     const dateNow = Date.now();

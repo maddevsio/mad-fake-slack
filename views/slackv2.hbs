@@ -282,8 +282,11 @@
       context.message = message;
       messages.push(context.message);
       shrinkMessagesListIfNeeded({ containerEl, templateName, context });
+      Handlebars.renderTemplate({ containerEl, templateName, context, options });
+      return context.message;
     }
-    return Handlebars.renderTemplate({ containerEl, templateName, context, options });
+    Handlebars.renderTemplate({ containerEl, templateName, context, options });
+    return null;
   }
 
   Handlebars.renderAtIndex = function renderAtIndex(index, containerEl, templateName, context) {

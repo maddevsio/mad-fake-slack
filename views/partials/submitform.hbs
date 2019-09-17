@@ -323,7 +323,7 @@
         }
       };
 
-      Handlebars.render(msgContainer, "message", context);
+      let message = Handlebars.render(msgContainer, "message", context);
       Handlebars.userUtils.scrollToLastMessage();
       msgInputText.value = "";
       const formData = Array.from(data.entries()).reduce((o, [k, v]) => {
@@ -331,6 +331,9 @@
         return o;
       }, {});
       const result = await Handlebars.userUtils.postJson(msgForm.action, formData);
+      if (result.ok) {
+        message.ts = result.ts;
+      }
     }
   });
 </script>

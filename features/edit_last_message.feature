@@ -75,3 +75,14 @@ Feature:
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov |
             | Message body   | first message |
+
+    Scenario: Changes in the message are persistent
+        And I send "first message" to chat
+        And I press the "ArrowUp" keyboard button
+        And I type " edited"
+        And I click on "button" with text "⏎ Save Changes" without navigation
+        And I'm waiting for "Inline Message Editor" to be hidden
+        When I reload the page
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov        |
+            | Message body   | first message edited |

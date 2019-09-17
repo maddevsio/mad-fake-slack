@@ -156,7 +156,7 @@ When('I should see {string} multiline {string} with:', WithRetryOptions, async (
   expect(lastItem).toStrictEqual(options);
 });
 
-When('I\'m waiting for {string} to be hidden', async (selectorName) => {
+When('I\'m waiting for {string} to be hidden', WithRetryOptions, async (selectorName) => {
   await actions.waitForToBeHidden(selectorName);
 });
 

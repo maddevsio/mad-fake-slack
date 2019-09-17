@@ -192,6 +192,9 @@
 <script name="statustyping" type="text/x-handlebars-template">
   {{{include "partials" "statustyping"}}}
 </script>
+<script name="message_edit" type="text/x-handlebars-template">
+  {{{include "partials" "message_edit"}}}
+</script>
 <script>
   function textAreaAdjust(el) {
     el.style.height = 'auto';
@@ -212,6 +215,14 @@
     constants: {{{ json constants }}},
     getSelectedChannel() {
       return Handlebars.context.selectedChannel || Handlebars.context.selectedUser || Handlebars.context.selectedApp;
+    },
+    getLastMyMessageIndex() {
+      const reversedMsgs = Handlebars.context.messages.slice().reverse();
+      const msgIndex = reversedMsgs.findIndex(msg => msg.user_id == Handlebars.context.me.id);
+      if (msgIndex >= 0) {
+        return Handlebars.context.messages.length - 1 - msgIndex;
+      }
+      return null;
     }
   };
 
@@ -220,6 +231,19 @@
   Handlebars.renderTemplate = function renderTemplate({ containerEl, templateName, context, options = { position: 'beforeend' } }) {
     const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } })
     containerEl.insertAdjacentHTML(options.position, html);
+    return containerEl.children[containerEl.children.length - 1];
+  }
+
+  Handlebars.renderTemplateAtIndex = function renderTemplate({ index, containerEl, templateName, context }) {
+    const html = Handlebars.templates[templateName](context, { data: { global: Handlebars.context.constants } });
+    let before = containerEl.children[index];
+    let position = 'beforebegin';
+    if (!before) {
+      before = containerEl;
+      position = 'beforeend';
+    }
+    before.insertAdjacentHTML(position, html);
+    return containerEl.children[index];
   }
 
   function removeFirstMessage(containerEl) {
@@ -258,15 +282,29 @@
       context.message = message;
       messages.push(context.message);
       shrinkMessagesListIfNeeded({ containerEl, templateName, context });
+      Handlebars.renderTemplate({ containerEl, templateName, context, options });
+      return context.message;
     }
     Handlebars.renderTemplate({ containerEl, templateName, context, options });
+    return null;
+  }
+
+  Handlebars.renderAtIndex = function renderAtIndex(index, containerEl, templateName, context) {
+    return Handlebars.renderTemplateAtIndex({ index, containerEl, templateName, context });
   }
 
   Handlebars.userUtils = {
     scrollToLastMessage() {
       const lastMessage = document.querySelector('.list__item:last-child');
       if (lastMessage) {
-          lastMessage.scrollIntoView()
+          lastMessage.scrollIntoView(false);
+      }
+    },
+    scrollToMessageAtIndex(index) {
+      const msgContainer = window.messages_container;
+      const lastMessage = msgContainer.children[index];
+      if (lastMessage) {
+        lastMessage.scrollIntoView(false);
       }
     },
     cleanEventListeners(el) {

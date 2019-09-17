@@ -92,6 +92,10 @@ Given('I click on {string} with text {string}', async (selectorName, text) => {
   await actions.clickOn(selectorName, { text });
 });
 
+Given('I click on {string} with text {string} without navigation', async (selectorName, text) => {
+  await actions.clickOn(selectorName, { text }, true);
+});
+
 Then('User {string} should receive messages:', WithRetryOptions, async (userName, dataTable) => {
   const rows = dataTable.rows();
   const expected = rows.map(row => [...row, true]);
@@ -146,10 +150,14 @@ Then('I should see {string} multiline message with:', async (position, dataTable
   expect(actualTexts).toStrictEqual(Object.values(options));
 });
 
-When('I should see {string} multiline {string} with:', async (position, itemSelectorName, dataTable) => {
+When('I should see {string} multiline {string} with:', WithRetryOptions, async (position, itemSelectorName, dataTable) => {
   const options = dataTable.rowsHash();
   const lastItem = await actions.getItemContentsByParams(options, itemSelectorName, { position });
   expect(lastItem).toStrictEqual(options);
+});
+
+When('I\'m waiting for {string} to be hidden', WithRetryOptions, async (selectorName) => {
+  await actions.waitForToBeHidden(selectorName);
 });
 
 Given('I\'ll wait a little', async () => {
@@ -213,4 +221,8 @@ Then('I restart the server with default envs', () => {
 Given('I send {string} to chat', async (text) => {
   await actions.typeText(text);
   await actions.pressTheButton('Enter');
+});
+
+When('I reload the page', async () => {
+  await actions.reloadPage();
 });

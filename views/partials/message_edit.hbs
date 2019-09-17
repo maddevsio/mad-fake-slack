@@ -1,0 +1,40 @@
+{{! template-lint-disable no-inline-styles }}
+<div class="list__item">
+  <div class="c-message c-message--light">
+    <div class="c-message__gutter">
+      <a target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"
+        class="c-link c-message__avatar c-avatar c-avatar--interactive" href="/team/{{message.team.id}}"
+        style="height: 36px; line-height: 36px; width: 36px;">
+        <img class="c-avatar__image" src={{message.user.profile.image_original}} alt="">
+      </a>
+    </div>
+    <div class="c-message__content">
+      <div class="c-message__editor">
+        <div class="c-message__editor__input_container">
+          <div
+            class="c-message__editor__input c-texty_input--multi_line c-texty_input ql-container c-texty_input--has_content">
+            <div class="ql-editor" contenteditable="true" data-gramm="false" dir="auto" role="textbox" tabindex="0"
+              aria-label="Edit message" aria-multiline="true" aria-autocomplete="list"
+              aria-expanded="false" spellcheck="true">
+              <p>{{formatMessage message.text}}</p>
+            </div>
+            <div class="ql-buttons">
+              <button class="c-button-unstyled c-texty_input__button c-texty_input__button_emoji" type="button"
+                aria-label="Emoji menu" aria-haspopup="true">
+                <i class="im im-smiley-o ts-icon ts_icon_mentions"></i>
+              </button>
+            </div>
+            <div class="ql-placeholder" aria-hidden="true" role="presentation" tabindex="-1" style="">Edit message</div>
+          </div>
+        </div>
+        <div class="c-message__editor__footer">
+          <button id="emd_cancel_button" class="c-button c-button--outline c-button--small null--outline null--small" type="button">Cancel</button>
+          <button id="emd_save_button" class="c-button c-button--primary c-button--small c-message__editor__save null--primary null--small"
+            type="button">
+            ⏎ Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

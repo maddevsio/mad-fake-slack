@@ -115,6 +115,30 @@ class DbManager {
         };
         return messages[id];
       },
+      findMessageByTs: ts => {
+        this.initMessages(channelId);
+        const message = this.db.messages[channelId][ts];
+        if (message) {
+          const user = this.db.users.filter(u => u.id === message.user_id)[0];
+          const team = this.db.teams.filter(t => t.id === user.team_id)[0];
+          return {
+            ...message,
+            user,
+            team
+          };
+        }
+        return message;
+      },
+      updateMessage: message => {
+        this.initMessages(channelId);
+        if (!this.db.messages[channelId][message.ts]) {
+          throw new Error('Message not found');
+        }
+        this.db.messages[channelId][message.ts] = {
+          ...message,
+          edited: true
+        };
+      },
       messages: total => {
         this.initMessages(channelId);
         return Object.values(this.db.messages[channelId])

@@ -968,6 +968,7 @@
     -moz-transition: background 50ms, color 50ms;
     transition: background 50ms, color 50ms;
     border-radius: 6px 0 0 6px;
+    height: calc(100% - 22px);
   }
 
   #primary_file_button .im {
@@ -1271,7 +1272,6 @@
     tab-size: 4;
     -moz-tab-size: 4;
     text-align: left;
-    white-space: pre-wrap;
     word-wrap: break-word;
   }
 
@@ -1874,4 +1874,156 @@ pre {
     border-radius: 4px;
     background: #f8f8f8;
 }
+
+.c-message__editor {
+    margin: 8px 0 0;
+}
+
+.c-message__editor__input_container {
+    position: relative;
+}
+
+.c-message__editor__input {
+    background: rgba(255,255,255,1);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgba(29,28,29,.5);
+    min-height: 36px;
+    min-width: 1px;
+    padding-left: 7px;
+    padding-top: 0;
+    padding-bottom: 5px;
+    margin: 0;
+    border: solid 1px;
+}
+
+.c-message__editor__input.focus {
+    border-color: rgba(18,100,163,1);
+    outline: none;
+    outline-offset: 0;
+}
+
+.c-texty_input--multi_line .ql-editor {
+  min-height: 22px;
+  line-height: 1.43423;
+  font-size: 15px;
+  width: calc(100% - 36px);
+  padding-right: 36px;
+  padding-top: 6px;
+  height: auto;
+  padding: 0;
+}
+
+.c-texty_input .ql-editor {
+  font-variant-ligatures: none;
+  line-height: 1.46668;
+  overflow: auto;
+  box-sizing: content-box;
+  -webkit-tab-size: 8;
+  -moz-tab-size: 8;
+  tab-size: 8;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.c-message__editor__input .ql-editor {
+  padding-top: 6px;
+}
+
+.ql-editor p {
+  margin: 0;
+  padding: 0;
+}
+
+.c-message__editor__input .ql-buttons {
+  bottom: 7px;
+}
+
+.c-texty_input .ql-buttons {
+  bottom: 9px;
+  height: 20px;
+  position: absolute;
+  right: 10px;
+}
+
+.c-texty_input__button_emoji,
+.c-texty_input__button_mention {
+  color: rgba(134,134,134,1);
+  height: 20px;
+  right: 0;
+  width: 20px;
+}
+
+.c-texty_input .ql-placeholder {
+  line-height: 1.46668;
+  font-size: 15px;
+  width: calc(100% - 36px);
+  padding-right: 36px;
+  left: 7px;
+  top: 6px;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: rgba(29,28,29,1);
+  display: none;
+  -webkit-filter: grayscale(100%);
+  -ms-filter: grayscale(100%);
+  filter: grayscale(100%);
+  font-style: normal;
+  left: 8px;
+  max-height: 100%;
+  opacity: .5;
+  pointer-events: none;
+  position: absolute;
+  right: 8px;
+}
+
+.c-message__editor__footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.c-message__editor__footer>* {
+  margin-top: 8px;
+}
+
+.c-button--outline, .c-button--outline:link, .c-button--outline:visited {
+  color: rgba(29,28,29,1);
+}
+.c-button--outline {
+  transition: all 80ms linear;
+  background: rgba(255,255,255,1);
+  border: 1px solid rgba(29,28,29,0.3);
+  background-clip: padding-box;
+  font-weight: 700;
+}
+
+.c-message__editor__save {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.c-message__editor__footer>* {
+    margin-top: 8px;
+}
+
+.c-button--small {
+    font-size: 13px;
+    height: 28px;
+    min-width: 56px;
+    padding: 0 12px 1px;
+}
+
+.c-button--primary {
+    transition: all 80ms linear;
+    background: #007a5a;
+    color: #fff;
+    font-weight: 900;
+    box-shadow: none;
+}
+
 </style>

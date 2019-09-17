@@ -60,11 +60,172 @@
   </button>
 </form>
 <script>
+  function setEndOfContenteditable(contentEditableElement) {
+      var range, selection;
+      if (document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
+      {
+        range = document.createRange();//Create a range (a range is a like the selection but invisible)
+        range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+        selection = window.getSelection();//get the selection object (allows you to change selection)
+        selection.removeAllRanges();//remove any selections already made
+        selection.addRange(range);//make the range you have just created the visible selection
+      }
+      else if (document.selection)//IE 8 and lower
+      {
+        range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
+        range.moveToElementText(contentEditableElement);//Select the entire contents of the element with the range
+        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+        range.select();//Select the range (make it the visible selection
+      }
+  }
+
+  class InlineEditLastMessage {
+    constructor(container, messageInput) {
+      this.container = container;
+      this.messageInput = messageInput;
+      this.editEl = null;
+      this.editMode = false;
+    }
+
+    handlerEditInput = (e) => {
+      Handlebars.userUtils.scrollToLastMessage();
+    }
+
+    handlerEditKeyDown = (e) => {
+      if (e.keyCode == 27) {
+        e.preventDefault();
+        this.cancel();
+        setTimeout(() => {
+          this.messageInput.focus();
+        }, 0);
+      }
+    }
+
+    handlerCancel = (e) => {
+      e.preventDefault();
+      this.cancel();
+    }
+
+    handlerSave = (e) => {
+      e.preventDefault();
+      this.done();
+    }
+
+    setupEvents() {
+      if (this.editorEl) {
+        this.editorEl.addEventListener('input', this.handlerEditInput);
+        this.editorEl.addEventListener('keydown', this.handlerEditKeyDown);
+      }
+      if (this.cancelBtn) {
+        this.cancelBtn.addEventListener('click', this.handlerCancel);
+      }
+      if(this.saveBtn) {
+        this.saveBtn.addEventListener('click', this.handlerSave);
+      }
+    }
+
+    cleanupEvents() {
+      if (this.editorEl) {
+        this.editorEl.removeEventListener('input', this.handlerEditInput);
+        this.editorEl.removeEventListener('keydown', this.handlerEditKeyDown);
+      }
+      if (this.cancelBtn) {
+        this.cancelBtn.removeEventListener('click', this.handlerCancel);
+      }
+      if (this.saveBtn) {
+        this.saveBtn.removeEventListener('click', this.handlerSave);
+      }
+    }
+
+    getLastMessage() {
+      const lastMessageIndex = Handlebars.context.getLastMyMessageIndex();
+      return [Handlebars.context.messages[lastMessageIndex], lastMessageIndex];
+    }
+
+    setFocus() {
+      if (this.editorEl) {
+        this.editorEl.focus();
+        setEndOfContenteditable(this.editorEl);
+      }
+    }
+
+    setupElements([message, index]) {
+      this.editEl = this.renderMessage([message, index]);
+      this.editorEl = this.editEl.querySelector('.ql-editor');
+      this.cancelBtn = window.emd_cancel_button;
+      this.saveBtn = window.emd_save_button;
+    }
+
+    renderMessage([message, index]) {
+      return Handlebars.renderAtIndex(index, this.container, "message_edit", { message });
+    }
+
+    scrollToIndex(index) {
+      Handlebars.userUtils.scrollToMessageAtIndex(index);
+    }
+
+    async sendUpdate({ text, ts }) {
+      const selectedChannel = Handlebars.context.getSelectedChannel();
+      if (!text || !text.trim()) {
+        throw new Error('Text is required');
+      }
+      const result = await Handlebars.userUtils.postJson('/api/chat.update', {
+        text,
+        ts,
+        channel: selectedChannel.id
+      });
+      if (!result.ok) {
+        throw new Error(result.error);
+      }
+    }
+
+    edit() {
+      const [lastMessage, lastMessageIndex] = this.getLastMessage();
+      if (!lastMessage) return;
+      this.replaceMsgMessageEl = this.container.children[lastMessageIndex];
+      this.replaceMsgMessageEl.remove();
+      this.setupElements([lastMessage, lastMessageIndex]);
+      this.setupEvents();
+      this.scrollToIndex(lastMessageIndex);
+      this.setFocus();
+      this.editMode = true;
+    }
+
+    cancel() {
+      const [lastMessage] = this.getLastMessage();
+      this.complete();
+    }
+
+    done() {
+      const [lastMessage] = this.getLastMessage();
+      lastMessage.text = this.editorEl.textContent;
+      this.sendUpdate(lastMessage).then(() => this.complete());
+    }
+
+    complete() {
+      this.cleanupEvents();
+      if (this.editEl) {
+        this.editEl.remove();
+        this.editEl = null;
+        this.editorEl = null;
+      }
+      const [lastMessage, lastMessageIndex] = this.getLastMessage();
+      Handlebars.renderAtIndex(lastMessageIndex, this.container, "message", { message: lastMessage });
+      Handlebars.userUtils.scrollToMessageAtIndex(lastMessageIndex);
+      this.editMode = false;
+    }
+
+    isInEditMode() {
+      return this.editMode;
+    }
+  }
 
   const msgForm = window.msg_form;
   const msgInputText = window.msg_input_text;
   const msgContainer = window.messages_container;
   const msgInputArea = window.msg_input;
+  let inlineEditor = null;
   function updateTextAreaHeight() {
     msgInputArea.setAttribute('style', `height:1px;`);
     const h = msgInputText.scrollHeight;
@@ -95,6 +256,15 @@
   });
 
   msgInputText.addEventListener('keydown', (e) => {
+    if (e.keyCode === 38) {
+      e.preventDefault();
+      if (!inlineEditor) {
+        inlineEditor = new InlineEditLastMessage(msgContainer, msgInputText);
+      }
+      if (!inlineEditor.isInEditMode()) {
+        inlineEditor.edit();
+      }
+    }
     if (e.keyCode === 13) {
       e.preventDefault();
       if (e.ctrlKey || e.shiftKey) {
@@ -153,7 +323,7 @@
         }
       };
 
-      Handlebars.render(msgContainer, "message", context);
+      let message = Handlebars.render(msgContainer, "message", context);
       Handlebars.userUtils.scrollToLastMessage();
       msgInputText.value = "";
       const formData = Array.from(data.entries()).reduce((o, [k, v]) => {
@@ -161,6 +331,9 @@
         return o;
       }, {});
       const result = await Handlebars.userUtils.postJson(msgForm.action, formData);
+      if (result.ok) {
+        message.ts = result.ts;
+      }
     }
   });
 </script>

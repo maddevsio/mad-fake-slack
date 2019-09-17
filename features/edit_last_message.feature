@@ -47,6 +47,9 @@ Feature:
             | type    | message     |
             | text    | from Valera |
             | channel | general     |
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera      |
+            | Message body   | from Valera |
         And I send "second message" to chat
         When I press the "ArrowUp" keyboard button
         And I type " edited"

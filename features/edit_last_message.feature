@@ -66,3 +66,12 @@ Feature:
             | Message sender | Valera Petrov |
             | Message body   | first message |
 
+    Scenario: Cancel editing my message by pressing Escape button
+        And I send "first message" to chat
+        And I press the "ArrowUp" keyboard button
+        And I type " edited"
+        When I press the "Escape" keyboard button
+        And I'm waiting for "Inline Message Editor" to be hidden
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |

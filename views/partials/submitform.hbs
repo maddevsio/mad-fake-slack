@@ -93,12 +93,20 @@
     }
 
     handlerEditKeyDown = (e) => {
-      if (e.keyCode == 27) {
-        e.preventDefault();
-        this.cancel();
-        setTimeout(() => {
-          this.messageInput.focus();
-        }, 0);
+      switch (e.keyCode) {
+        case 27: {
+          e.preventDefault();
+          this.cancel();
+          this.focusMessageInput();
+        }
+        case 13: {
+          e.preventDefault();
+          this.done();
+          this.focusMessageInput();
+        }
+        default: {
+          break;
+        }
       }
     }
 
@@ -110,6 +118,12 @@
     handlerSave = (e) => {
       e.preventDefault();
       this.done();
+    }
+
+    focusMessageInput() {
+      setTimeout(() => {
+        this.messageInput.focus();
+      }, 0);
     }
 
     setupEvents() {

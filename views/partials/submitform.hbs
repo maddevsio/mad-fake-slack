@@ -101,8 +101,13 @@
         }
         case 13: {
           e.preventDefault();
-          this.done();
-          this.focusMessageInput();
+          if (e.ctrlKey || e.shiftKey) {
+            e.currentTarget.focus();
+            pasteIntoContentEditable('\n');
+          } else {
+            this.done();
+            this.focusMessageInput();
+          }
         }
         default: {
           break;
@@ -246,6 +251,20 @@
     if (h) {
       msgInputArea.setAttribute('style', `height:${h > 180 ? 180 : h}px;`);
       Handlebars.userUtils.scrollToLastMessage();
+    }
+  }
+
+  function pasteIntoContentEditable(text) {
+    if (window.getSelection) {
+      const sel = window.getSelection();
+      if (sel.getRangeAt) {
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+      }
+    } else if (document.selection && document.selection.createRange) {
+      document.selection.createRange().text = text;
     }
   }
 

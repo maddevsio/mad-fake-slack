@@ -7,8 +7,7 @@ Feature: Breaks in the middle of inline edited message
         And I am on "fake slack ui" page
 
     Scenario: Finish editing the last sent message by pressing Enter
-        And I type "first message"
-        And I press the "Enter" keyboard button
+        And I send "first message" to chat
         And I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov |
             | Message body   | first message |

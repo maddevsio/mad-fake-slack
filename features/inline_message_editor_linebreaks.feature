@@ -18,7 +18,7 @@ Feature: Breaks in the middle of inline edited message
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov        |
             | Message body   | first message edited |
-    @only
+
     Scenario: Edit inline message with additional line
         And I send "first line" to chat
         And I should see "last" multiline "Message item" with:
@@ -30,6 +30,6 @@ Feature: Breaks in the middle of inline edited message
         And I press the "Enter" keyboard button
         And I'm waiting for "Inline Message Editor" to be hidden
         Then I should see "last" multiline "Message item" with:
-            | Message sender | Valera Petrov             | 
-            | Message body   | first line \n second line |
+            | Message sender | Valera Petrov           | 
+            | Message body   | first line\nsecond line |
         

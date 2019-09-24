@@ -13,11 +13,11 @@
         <div class="c-message__editor__input_container">
           <div
             class="c-message__editor__input c-texty_input--multi_line c-texty_input ql-container c-texty_input--has_content">
+            {{! template-lint-disable block-indentation }}
             <div class="ql-editor" contenteditable="true" data-gramm="false" dir="auto" role="textbox" tabindex="0"
               aria-label="Edit message" aria-multiline="true" aria-autocomplete="list"
-              aria-expanded="false" spellcheck="true">
-              <p>{{formatMessage message.text}}</p>
-            </div>
+              aria-expanded="false" spellcheck="true"
+            >{{formatMessage message.text}}</div>
             <div class="ql-buttons">
               <button class="c-button-unstyled c-texty_input__button c-texty_input__button_emoji" type="button"
                 aria-label="Emoji menu" aria-haspopup="true">

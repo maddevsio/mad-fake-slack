@@ -592,11 +592,11 @@ async function getItemContentsByParams(options, itemSelectorName, { position = '
         (accum, itemChildSelectorName) => {
           const itemChildSelector = selectorsFromContext[itemChildSelectorName];
           const itemChildEl = item.querySelector(itemChildSelector);
-          const itemContent = (itemChildEl && (itemChildEl.textContent || itemChildEl.value || itemChildEl.innerHTML || itemChildEl.innerText)) || '<not exists>';
+          const itemContent = (itemChildEl && (itemChildEl.innerText || itemChildEl.value || itemChildEl.innerHTML || itemChildEl.textContent)) || '<not exists>';
           return {
             ...accum,
             // eslint-disable-next-line no-useless-escape
-            [itemChildSelectorName]: itemContent.replace(new RegExp('\\s+', 'g'), ' ')
+            [itemChildSelectorName]: itemContent.replace(new RegExp(' +', 'g'), ' ')
               .replace(new RegExp(String.fromCharCode(160), 'g'), ' ')
               .trim()
           };

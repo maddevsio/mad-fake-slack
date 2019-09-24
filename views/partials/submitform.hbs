@@ -80,6 +80,30 @@
       }
   }
 
+  function getCaretCharacterOffsetWithin(element) {
+    let caretOffset = 0;
+    let doc = element.ownerDocument || element.document;
+    let win = doc.defaultView || doc.parentWindow;
+    let sel;
+    if (typeof win.getSelection != "undefined") {
+      sel = win.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = win.getSelection().getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        caretOffset = preCaretRange.toString().length;
+      }
+    } else if ((sel = doc.selection) && sel.type != "Control") {
+      const textRange = sel.createRange();
+      const preCaretTextRange = doc.body.createTextRange();
+      preCaretTextRange.moveToElementText(element);
+      preCaretTextRange.setEndPoint("EndToEnd", textRange);
+      caretOffset = preCaretTextRange.text.length;
+    }
+    return caretOffset;
+  }
+
   class InlineEditLastMessage {
     constructor(container, messageInput) {
       this.container = container;
@@ -103,6 +127,10 @@
           e.preventDefault();
           if (e.ctrlKey || e.shiftKey) {
             e.currentTarget.focus();
+            const position = getCaretCharacterOffsetWithin(e.currentTarget);
+            if(position >= e.currentTarget.innerText.length && !e.currentTarget.innerText.endsWith('\n')) {
+              pasteIntoContentEditable('\n');
+            }
             pasteIntoContentEditable('\n');
           } else {
             this.done();
@@ -218,7 +246,7 @@
 
     done() {
       const [lastMessage] = this.getLastMessage();
-      lastMessage.text = this.editorEl.textContent;
+      lastMessage.text = this.editorEl.innerText;
       this.sendUpdate(lastMessage).then(() => this.complete());
     }
 

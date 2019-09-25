@@ -7,7 +7,7 @@
 	"appPort": [9001, 9222],
 	"runArgs": [
 		"-v", "/var/run/docker.sock:/var/run/docker.sock", 
-		"-e", "CONTAINER_TIMEOUT_SECONDS=1800",
+		"-e", "CONTAINER_TIMEOUT_SECONDS=1800"
 	],
 	// Uncomment the next line if you want to add in default container specific settings.json values
 	// "settings":  { "workbench.colorTheme": "Quiet Light" },

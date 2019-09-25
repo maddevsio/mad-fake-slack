@@ -125,7 +125,12 @@ const helpers = {
   formatMessage(text) {
     let message = escapeExpression(text.trim());
     const formatter = new Formatter(escapeExpression);
-    message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '\n');
+    message = formatter.format(message).replace(/(\r\n|\n)/gm, '<br>');
+    return new Handlebars.SafeString(message);
+  },
+  formatInlineMessage(text) {
+    let message = escapeExpression(text.trim());
+    message = message.split('\n').map(line => `<p>${line.trimEnd('\r').trimStart('\r')}</p>`).join('');
     return new Handlebars.SafeString(message);
   },
   getTsDiffInSeconds(firstTs, secondTs) {

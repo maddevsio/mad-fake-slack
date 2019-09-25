@@ -127,11 +127,7 @@
           e.preventDefault();
           if (e.ctrlKey || e.shiftKey) {
             e.currentTarget.focus();
-            const position = getCaretCharacterOffsetWithin(e.currentTarget);
-            if(position >= e.currentTarget.innerText.length && !e.currentTarget.innerText.endsWith('\n')) {
-              pasteIntoContentEditable('\n');
-            }
-            pasteIntoContentEditable('\n');
+            pasteIntoContentEditable();
           } else {
             this.done();
             this.focusMessageInput();
@@ -246,7 +242,8 @@
 
     done() {
       const [lastMessage] = this.getLastMessage();
-      lastMessage.text = this.editorEl.innerText;
+      const text = Array.from(this.editorEl.children).map(line => line.innerText).filter(el => el.innerText !== '\r').join('\n');
+      lastMessage.text = text;
       this.sendUpdate(lastMessage).then(() => this.complete());
     }
 
@@ -282,14 +279,46 @@
     }
   }
 
-  function pasteIntoContentEditable(text) {
+  function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+  }
+  function insertBefore(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode);
+  }
+
+  function pasteIntoContentEditable() {
     if (window.getSelection) {
       const sel = window.getSelection();
       if (sel.getRangeAt) {
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(document.createTextNode(text));
-        range.collapse(false);
+        const cursorPos = sel.anchorOffset;
+        const selectedNode = sel.focusNode.matches && sel.focusNode.matches('div.ql-editor') ? sel.focusNode.lastChild : sel.focusNode;
+        const allContents = selectedNode.innerHTML;
+        if (cursorPos < allContents.length) {
+          const contentsBeforeCursor = allContents.substring(0, cursorPos);
+          const contentsAfterCursor = allContents.substring(cursorPos, allContents.length);
+          let p;
+          if (cursorPos === 0) {
+            p = document.createElement('p');
+            p.appendChild(document.createElement('br'));
+          } else {
+            selectedNode.innerHTML = contentsBeforeCursor;
+            p = document.createElement('p');
+            p.innerHTML = contentsAfterCursor;
+          }
+          selectedNode.insertAdjacentElement('afterend', p);
+          const range = document.createRange();
+          range.selectNodeContents(p);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          p = document.createElement('p');
+          p.appendChild(document.createElement('br'));
+          range.insertNode(p);
+          range.collapse(false);
+        }
       }
     } else if (document.selection && document.selection.createRange) {
       document.selection.createRange().text = text;

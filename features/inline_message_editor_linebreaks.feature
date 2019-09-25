@@ -59,3 +59,19 @@ Feature: Breaks in the middle of inline edited message
         And Message has the following HTML content at "last" position in "Message body":
             | html content               |
             | first line<br> second line |
+
+    Scenario: Re-editing message with new line should not break previous breaklines
+        And I type "first line"
+        And I press the "Shift + Enter" keyboard button
+        And I type "second line"
+        And I press the "Enter" keyboard button
+        When I press the "ArrowUp" keyboard button
+        And I press the "Shift + Enter" keyboard button
+        And I type "new line"
+        And I press the "Enter" keyboard button
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov                     |
+            | Message body   | first line\nsecond line\nnew line |
+        And Message has the following HTML content at "last" position in "Message body":
+            | html content                          |
+            | first line\nsecond line\nnew line |

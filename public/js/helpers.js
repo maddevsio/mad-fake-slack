@@ -125,7 +125,7 @@ const helpers = {
   formatMessage(text) {
     let message = escapeExpression(text.trim());
     const formatter = new Formatter(escapeExpression);
-    message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
+    message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '\n');
     return new Handlebars.SafeString(message);
   },
   getTsDiffInSeconds(firstTs, secondTs) {

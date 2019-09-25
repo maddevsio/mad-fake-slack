@@ -32,4 +32,18 @@ Feature: Breaks in the middle of inline edited message
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov           | 
             | Message body   | first line\nsecond line |
+
+    Scenario: Add new line using Ctrl+Enter
+        And I send "first line" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first line    |
+        When I press the "ArrowUp" keyboard button
+        And I press the "Control + Enter" keyboard button
+        And I type "second line"
+        And I press the "Enter" keyboard button
+        And I'm waiting for "Inline Message Editor" to be hidden
+        Then I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov           |
+            | Message body   | first line\nsecond line |
         

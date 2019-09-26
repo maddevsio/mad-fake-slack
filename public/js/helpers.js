@@ -125,12 +125,13 @@ const helpers = {
   formatMessage(text) {
     let message = escapeExpression(text.trim());
     const formatter = new Formatter(escapeExpression);
-    message = formatter.format(message).replace(/(\r\n|\n)/gm, '<br>');
+    message = formatter.format(message);
+    message = message.split('\n').map(line => line === '' ? '<span class="c-mrkdwn__br"></span>' : `${line}<br>`).join('');
     return new Handlebars.SafeString(message);
   },
   formatInlineMessage(text) {
     let message = escapeExpression(text.trim());
-    message = message.split('\n').map(line => `<p>${line.trimEnd('\r').trimStart('\r')}</p>`).join('');
+    message = message.split('\n').map(line => (line === '' ? '<p><br></p>' : `<p>${line}</p>`)).join('');
     return new Handlebars.SafeString(message);
   },
   getTsDiffInSeconds(firstTs, secondTs) {

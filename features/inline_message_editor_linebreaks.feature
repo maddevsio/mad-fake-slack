@@ -46,7 +46,7 @@ Feature: Breaks in the middle of inline edited message
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov           |
             | Message body   | first line\nsecond line |
-
+   
     Scenario: Insert break in the middle of typed message
         And I send "first line second line" to chat
         When I press the "ArrowUp" keyboard button
@@ -57,8 +57,8 @@ Feature: Breaks in the middle of inline edited message
             | Message sender | Valera Petrov           |
             | Message body   | first line\nsecond line |
         And Message has the following HTML content at "last" position in "Message body":
-            | html content               |
-            | first line<br> second line |
+            | html content              |
+            | first line<br>second line |
 
     Scenario: Re-editing message with new line should not break previous breaklines
         And I type "first line"
@@ -73,5 +73,5 @@ Feature: Breaks in the middle of inline edited message
             | Message sender | Valera Petrov                     |
             | Message body   | first line\nsecond line\nnew line |
         And Message has the following HTML content at "last" position in "Message body":
-            | html content                      |
-            | first line\nsecond line\nnew line |
+            | html content                          |
+            | first line<br>second line<br>new line |

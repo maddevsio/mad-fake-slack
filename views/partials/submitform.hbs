@@ -61,12 +61,14 @@
 </form>
 <script>
   function setEndOfContenteditable(contentEditableElement) {
-      var range, selection;
+      let range;
+      let selection;
       if (document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
       {
         range = document.createRange();//Create a range (a range is a like the selection but invisible)
-        range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+        range.selectNodeContents(contentEditableElement.lastChild || contentEditableElement);//Select the entire contents of the element with the range
         range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+
         selection = window.getSelection();//get the selection object (allows you to change selection)
         selection.removeAllRanges();//remove any selections already made
         selection.addRange(range);//make the range you have just created the visible selection
@@ -126,7 +128,6 @@
         case 13: {
           e.preventDefault();
           if (e.ctrlKey || e.shiftKey) {
-            e.currentTarget.focus();
             pasteIntoContentEditable();
           } else {
             this.done();
@@ -188,8 +189,11 @@
 
     setFocus() {
       if (this.editorEl) {
-        this.editorEl.focus();
-        setEndOfContenteditable(this.editorEl);
+        if (!this.editorEl.lastChild) {
+          this.editorEl.appendChild(document.createElement('p'));
+        }
+        this.editorEl.lastChild.focus();
+        setEndOfContenteditable(this.editorEl.lastChild);
       }
     }
 
@@ -286,38 +290,64 @@
     referenceNode.parentNode.insertBefore(newNode, referenceNode);
   }
 
+  function selectElement(selection, el, start = true) {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(start);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
   function pasteIntoContentEditable() {
     if (window.getSelection) {
-      const sel = window.getSelection();
+      let sel = window.getSelection();
       if (sel.getRangeAt) {
+        let parentNode;
+        let selectedNode = sel.focusNode;
+        const isEditor = selectedNode.matches && selectedNode.matches('.ql-editor');
+        const isLine = selectedNode.matches && selectedNode.matches('p');
+        const isText = selectedNode.nodeName === '#text';
+
+        if (isEditor) {
+          parentNode = selectedNode.firstChild;
+          selectedNode = parentNode.lastChild;
+        } else if (isText) {
+          parentNode = selectedNode.parentNode;
+        } else if (isLine) {
+          parentNode = selectedNode;
+          selectedNode = parentNode.lastChild;
+        } else {
+          parentNode = selectedNode.parentNode;
+        }
+
         const cursorPos = sel.anchorOffset;
-        const selectedNode = sel.focusNode.matches && sel.focusNode.matches('div.ql-editor') ? sel.focusNode.lastChild : sel.focusNode;
-        const allContents = selectedNode.innerHTML;
+        const allContents = selectedNode.nodeName === '#text' ? selectedNode.textContent : selectedNode.innerHTML;
         if (cursorPos < allContents.length) {
           const contentsBeforeCursor = allContents.substring(0, cursorPos);
           const contentsAfterCursor = allContents.substring(cursorPos, allContents.length);
           let p;
+          let range;
           if (cursorPos === 0) {
             p = document.createElement('p');
             p.appendChild(document.createElement('br'));
+            parentNode.insertAdjacentElement('beforebegin', p);
+            selectElement(sel, parentNode);
           } else {
-            selectedNode.innerHTML = contentsBeforeCursor;
+            parentNode.innerText = contentsBeforeCursor;
             p = document.createElement('p');
             p.innerHTML = contentsAfterCursor;
+            parentNode.insertAdjacentElement('afterend', p);
+            selectElement(sel, p);
           }
-          selectedNode.insertAdjacentElement('afterend', p);
-          const range = document.createRange();
-          range.selectNodeContents(p);
+        } else {
+          p = document.createElement('p');
+          p.appendChild(document.createElement('br'));
+          parentNode.insertAdjacentElement('afterend', p);
+          range = document.createRange();
+          range.selectNodeContents(p.lastChild);
           range.collapse(true);
           sel.removeAllRanges();
           sel.addRange(range);
-        } else {
-          const range = sel.getRangeAt(0);
-          range.deleteContents();
-          p = document.createElement('p');
-          p.appendChild(document.createElement('br'));
-          range.insertNode(p);
-          range.collapse(false);
         }
       }
     } else if (document.selection && document.selection.createRange) {

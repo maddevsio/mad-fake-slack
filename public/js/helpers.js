@@ -126,7 +126,7 @@ const helpers = {
     let message = escapeExpression(text.trim());
     const formatter = new Formatter(escapeExpression);
     message = formatter.format(message);
-    message = message.split('\n').map(line => line === '' ? '<span class="c-mrkdwn__br"></span>' : `${line}<br>`).join('');
+    message = message.split('\n').map((line, index, arr) => line === '' ? '<span class="c-mrkdwn__br"></span>' : `${line}${index < arr.length - 1 ? '<br>' : ''}`).join('');
     return new Handlebars.SafeString(message);
   },
   formatInlineMessage(text) {

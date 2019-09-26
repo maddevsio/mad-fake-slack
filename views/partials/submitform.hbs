@@ -246,7 +246,13 @@
 
     done() {
       const [lastMessage] = this.getLastMessage();
-      const text = Array.from(this.editorEl.children).map(line => line.innerText).filter(el => el.innerText !== '\r').join('\n');
+      const lines = Array.from(this.editorEl.children).map(line => {
+        if(line.innerHtml === '\n') {
+          return '\n';
+        }
+        return `${line.innerText.trim()}\n`;
+      });
+      const text = lines.join('');
       lastMessage.text = text;
       this.sendUpdate(lastMessage).then(() => this.complete());
     }

@@ -246,16 +246,16 @@ class MdFormatter {
     this.formatters = {
       PREFORMATTED(block) {
         if (block.content.trim()) {
-          return `<pre class="c-mrkdwn__pre">${block.content.replace(/^(\n|\r\n)|(\n|\r\n)$/g, '')}</pre>`;
+          return `<pre class="c-mrkdwn__pre">${MdFormatter.breakLinesToBr(block.content)}</pre>`;
         }
         return block.text;
       },
       CODE(block) {
         return MdFormatter.formatBlockWithoutBreakLine(block,
-          b => `<code class="c-mrkdwn__code">${b.content}</code>`);
+          b => `<code class="c-mrkdwn__code">${MdFormatter.removeBreakLines(b.content)}</code>`);
       },
       QUOTE(block) {
-        return `<blockquote class="c-mrkdwn__quote">${MdFormatter.replaceSpaces(block.content)}</blockquote>`;
+        return `<blockquote class="c-mrkdwn__quote">${MdFormatter.breakLinesToBr(MdFormatter.replaceSpaces(block.content))}</blockquote>`;
       },
       STRIKE(block) {
         return MdFormatter.formatBlockWithoutBreakLine(block,
@@ -286,6 +286,24 @@ class MdFormatter {
     const SpaceReplacePattern = '&nbsp;<wbr>';
     const fixMultipleSpacesIn = t => t.match(/  +/) ? t.replace(/ /g, SpaceReplacePattern) : t;
     return text !== ' ' ? fixMultipleSpacesIn(text) : text;
+  }
+
+  static breakLinesToBr(text) {
+    return text.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '').split('\n').map((line, index, arr) => {
+      const isCurrentEmpty = line === '' || line === '\r';
+
+      if (isCurrentEmpty) {
+        if (index === 0) return '';
+        return '<br>';
+      }
+
+      return `${line.replace(/(\r|\n|\r\n)/ig, '')}${index < arr.length - 1 ? '<br>' : ''}`;
+    })
+      .join('');
+  }
+
+  static removeBreakLines(text) {
+    return text.replace(/(\n|\r|\r\n)/g, '');
   }
 
   applyFormatting(prevBlock, currBlock) {

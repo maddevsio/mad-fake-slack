@@ -126,7 +126,23 @@ const helpers = {
     let message = escapeExpression(text.trim());
     const formatter = new Formatter(escapeExpression);
     message = formatter.format(message);
-    message = message.split('\n').map((line, index, arr) => line === '' ? '<span class="c-mrkdwn__br"></span>' : `${line}${index < arr.length - 1 ? '<br>' : ''}`).join('');
+
+    message = message.split('\n').map(
+      (line, index, arr) => {
+        const SpanBeaker = '<span class="c-mrkdwn__br"></span>';
+        const prevItem = arr[index - 1];
+        const isCurrentEmpty = line === '\r' || line === '';
+        const isPrevBr = (prevItem && prevItem.startsWith('<span class="c-mrkdwn__br"')) || false;
+
+        if (isCurrentEmpty) {
+          // eslint-disable-next-line no-param-reassign
+          arr[index] = SpanBeaker;
+          return SpanBeaker;
+        }
+
+        return `${index > 0 && !isPrevBr ? '<br>' : ''}${line.replace(/(\r|\n|\r\n)/ig, '')}`;
+      }
+    ).join('');
     return new Handlebars.SafeString(message);
   },
   formatInlineMessage(text) {

@@ -123,26 +123,21 @@ const helpers = {
     return trueOption;
   },
   formatMessage(text) {
-    let message = escapeExpression(text.trim());
+    let message = escapeExpression(text);
     const formatter = new Formatter(escapeExpression);
     message = formatter.format(message);
-
-    message = message.split('\n').map(
-      (line, index, arr) => {
-        const SpanBeaker = '<span class="c-mrkdwn__br"></span>';
-        const prevItem = arr[index - 1];
-        const isCurrentEmpty = line === '\r' || line === '';
-        const isPrevBr = (prevItem && prevItem.startsWith('<span class="c-mrkdwn__br"')) || false;
-
-        if (isCurrentEmpty) {
-          // eslint-disable-next-line no-param-reassign
-          arr[index] = SpanBeaker;
-          return SpanBeaker;
-        }
-
-        return `${index > 0 && !isPrevBr ? '<br>' : ''}${line.replace(/(\r|\n|\r\n)/ig, '')}`;
+    const trimBr = line => line && line.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '');
+    const format = (line, index, arr) => {
+      const nextIsEmpty = trimBr(arr[index + 1]) === '';
+      const currentIsEmpty = trimBr(line) === '';
+      const currentIsPre = line.startsWith('<pre');
+      if (!currentIsEmpty) {
+        const lineBreaker = index < arr.length - 1 && !currentIsPre ? '<br>' : '';
+        return nextIsEmpty ? trimBr(line) : `${trimBr(line)}${lineBreaker}`;
       }
-    ).join('');
+      return index > 0 ? '<span class="c-mrkdwn__br"></span>' : '';
+    };
+    message = trimBr(message).split('\n').map(format).join('');
     return new Handlebars.SafeString(message);
   },
   formatInlineMessage(text) {

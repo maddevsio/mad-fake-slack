@@ -57,8 +57,8 @@ Feature: Breaks in the middle of inline edited message
             | Message sender | Valera Petrov           |
             | Message body   | first line\nsecond line |
         And Message has the following HTML content at "last" position in "Message body":
-            | html content              |
-            | first line<br>second line |
+            | html content               |
+            | first line<br> second line |
 
     Scenario: Re-editing message with new line should not break previous breaklines
         And I type "first line"

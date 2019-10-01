@@ -289,17 +289,17 @@ class MdFormatter {
   }
 
   static breakLinesToBr(text) {
-    return text.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '').split('\n').map((line, index, arr) => {
-      const isCurrentEmpty = line === '' || line === '\r';
-
-      if (isCurrentEmpty) {
-        if (index === 0) return '';
-        return '<br>';
+    const trimBr = line => line && line.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '');
+    const format = (line, index, arr) => {
+      const nextIsEmpty = trimBr(arr[index + 1]) === '';
+      const currentIsEmpty = trimBr(line) === '';
+      if (!currentIsEmpty) {
+        const lineBreaker = index < arr.length - 1 ? '<br>' : '';
+        return nextIsEmpty ? trimBr(line) : `${trimBr(line)}${lineBreaker}`;
       }
-
-      return `${line.replace(/(\r|\n|\r\n)/ig, '')}${index < arr.length - 1 ? '<br>' : ''}`;
-    })
-      .join('');
+      return index > 0 ? '<br>' : '';
+    };
+    return trimBr(text).split('\n').map(format).join('');
   }
 
   static removeBreakLines(text) {
@@ -310,12 +310,7 @@ class MdFormatter {
     let currBlockFormatted = this.formatters[currBlock.type](currBlock);
     const prevBlockEmpty = prevBlock && prevBlock.text.match(/^( +)$/g);
     const prevBlockIsText = prevBlock && prevBlock.type === TEXT_TYPE;
-    const prevBlockIsPreformatted = prevBlock && prevBlock.type === PREFORMATTED_TYPE;
-    const currBlockIsText = currBlock && currBlock.type === TEXT_TYPE;
     const isCurrentBlockQuote = currBlock.type === QUOTE_TYPE;
-    if (prevBlockIsPreformatted && currBlockIsText) {
-      return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
-    }
     if (prevBlockIsText && prevBlockEmpty && isCurrentBlockQuote) {
       return MdFormatter.replaceSpaces(currBlock.text);
     }

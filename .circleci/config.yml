@@ -36,6 +36,9 @@ jobs:
 
       - run: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm i
 
+      - store_artifacts:
+          path: ~/mad-fake-slack/screenshots
+
       - save_cache:
           paths:
             - node_modules

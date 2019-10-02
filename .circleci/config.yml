@@ -3,12 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/node:10.16.0
-
     working_directory: ~/mad-fake-slack
-
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -33,16 +30,11 @@ jobs:
             sudo dpkg -i google-chrome.deb
             sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
             rm google-chrome.deb
-
       - run: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm i
-
-      - store_artifacts:
-          path: ~/mad-fake-slack/screenshots
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
       - run: npm run test:integration
-
+      - store_artifacts:
+          path: ~/mad-fake-slack/screenshots

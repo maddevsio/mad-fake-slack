@@ -4,9 +4,11 @@ const {
   AfterAll,
   Before,
   BeforeAll,
-  setDefaultTimeout
+  setDefaultTimeout,
+  Status
 } = require('cucumber');
 
+const path = require('path');
 const Promise = require('bluebird');
 const scope = require('./support/scope');
 const services = require('./support/services');
@@ -46,7 +48,17 @@ Before(async () => {
   await cleanupPage();
 });
 
-After(async () => {
+After(async (testCase) => {
+  if (scope.browser && testCase.result.status === Status.FAILED) {
+    const pages = await scope.browser.pages();
+    await Promise.mapSeries(pages,
+      p => p.screenshot(
+        {
+          path: path.join(process.cwd(), 'screenshots', `failed${Date.now()}.png`),
+          fullPage: true
+        }
+      ));
+  }
   await cleanupAppUsers();
   await cleanupPage();
 });

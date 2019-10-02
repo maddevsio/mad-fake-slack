@@ -64,3 +64,6 @@ typings/
 
 reports/*
 !reports/.keep
+
+screenshots/*
+!screenshots/.keep

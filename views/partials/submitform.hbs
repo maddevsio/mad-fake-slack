@@ -61,12 +61,14 @@
 </form>
 <script>
   function setEndOfContenteditable(contentEditableElement) {
-      var range, selection;
+      let range;
+      let selection;
       if (document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
       {
         range = document.createRange();//Create a range (a range is a like the selection but invisible)
-        range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+        range.selectNodeContents(contentEditableElement.lastChild || contentEditableElement);//Select the entire contents of the element with the range
         range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+
         selection = window.getSelection();//get the selection object (allows you to change selection)
         selection.removeAllRanges();//remove any selections already made
         selection.addRange(range);//make the range you have just created the visible selection
@@ -78,6 +80,30 @@
         range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
         range.select();//Select the range (make it the visible selection
       }
+  }
+
+  function getCaretCharacterOffsetWithin(element) {
+    let caretOffset = 0;
+    let doc = element.ownerDocument || element.document;
+    let win = doc.defaultView || doc.parentWindow;
+    let sel;
+    if (typeof win.getSelection != "undefined") {
+      sel = win.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = win.getSelection().getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        caretOffset = preCaretRange.toString().length;
+      }
+    } else if ((sel = doc.selection) && sel.type != "Control") {
+      const textRange = sel.createRange();
+      const preCaretTextRange = doc.body.createTextRange();
+      preCaretTextRange.moveToElementText(element);
+      preCaretTextRange.setEndPoint("EndToEnd", textRange);
+      caretOffset = preCaretTextRange.text.length;
+    }
+    return caretOffset;
   }
 
   class InlineEditLastMessage {
@@ -93,12 +119,24 @@
     }
 
     handlerEditKeyDown = (e) => {
-      if (e.keyCode == 27) {
-        e.preventDefault();
-        this.cancel();
-        setTimeout(() => {
-          this.messageInput.focus();
-        }, 0);
+      switch (e.keyCode) {
+        case 27: {
+          e.preventDefault();
+          this.cancel();
+          this.focusMessageInput();
+        }
+        case 13: {
+          e.preventDefault();
+          if (e.ctrlKey || e.shiftKey) {
+            pasteIntoContentEditable();
+          } else {
+            this.done();
+            this.focusMessageInput();
+          }
+        }
+        default: {
+          break;
+        }
       }
     }
 
@@ -110,6 +148,12 @@
     handlerSave = (e) => {
       e.preventDefault();
       this.done();
+    }
+
+    focusMessageInput() {
+      setTimeout(() => {
+        this.messageInput.focus();
+      }, 0);
     }
 
     setupEvents() {
@@ -145,8 +189,11 @@
 
     setFocus() {
       if (this.editorEl) {
-        this.editorEl.focus();
-        setEndOfContenteditable(this.editorEl);
+        if (!this.editorEl.lastChild) {
+          this.editorEl.appendChild(document.createElement('p'));
+        }
+        this.editorEl.lastChild.focus();
+        setEndOfContenteditable(this.editorEl.lastChild);
       }
     }
 
@@ -199,7 +246,10 @@
 
     done() {
       const [lastMessage] = this.getLastMessage();
-      lastMessage.text = this.editorEl.textContent;
+      const lines = Array.from(this.editorEl.children)
+                         .map(line => line.innerText.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, ''));
+      const text = lines.join('\n');
+      lastMessage.text = text;
       this.sendUpdate(lastMessage).then(() => this.complete());
     }
 
@@ -232,6 +282,78 @@
     if (h) {
       msgInputArea.setAttribute('style', `height:${h > 180 ? 180 : h}px;`);
       Handlebars.userUtils.scrollToLastMessage();
+    }
+  }
+
+  function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+  }
+  function insertBefore(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode);
+  }
+
+  function selectElement(selection, el, start = true) {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(start);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  function pasteIntoContentEditable() {
+    if (window.getSelection) {
+      let sel = window.getSelection();
+      if (sel.getRangeAt) {
+        let parentNode;
+        let selectedNode = sel.focusNode;
+        const isEditor = selectedNode.matches && selectedNode.matches('.ql-editor');
+        const isLine = selectedNode.matches && selectedNode.matches('p');
+        const isText = selectedNode.nodeName === '#text';
+
+        if (isEditor) {
+          parentNode = selectedNode.firstChild;
+          selectedNode = parentNode.lastChild;
+        } else if (isText) {
+          parentNode = selectedNode.parentNode;
+        } else if (isLine) {
+          parentNode = selectedNode;
+          selectedNode = parentNode.lastChild;
+        } else {
+          parentNode = selectedNode.parentNode;
+        }
+
+        const cursorPos = sel.anchorOffset;
+        const allContents = selectedNode.nodeName === '#text' ? selectedNode.textContent : selectedNode.innerHTML;
+        if (cursorPos < allContents.length) {
+          const contentsBeforeCursor = allContents.substring(0, cursorPos);
+          const contentsAfterCursor = allContents.substring(cursorPos, allContents.length);
+          let p;
+          let range;
+          if (cursorPos === 0) {
+            p = document.createElement('p');
+            p.appendChild(document.createElement('br'));
+            parentNode.insertAdjacentElement('beforebegin', p);
+            selectElement(sel, parentNode);
+          } else {
+            parentNode.innerText = contentsBeforeCursor;
+            p = document.createElement('p');
+            p.innerHTML = contentsAfterCursor;
+            parentNode.insertAdjacentElement('afterend', p);
+            selectElement(sel, p);
+          }
+        } else {
+          p = document.createElement('p');
+          p.appendChild(document.createElement('br'));
+          parentNode.insertAdjacentElement('afterend', p);
+          range = document.createRange();
+          range.selectNodeContents(p.lastChild);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    } else if (document.selection && document.selection.createRange) {
+      document.selection.createRange().text = text;
     }
   }
 

@@ -123,9 +123,26 @@ const helpers = {
     return trueOption;
   },
   formatMessage(text) {
-    let message = escapeExpression(text.trim());
+    let message = escapeExpression(text);
     const formatter = new Formatter(escapeExpression);
-    message = formatter.format(message).replace(/(\r\n|\n|\r)/gm, '<br>');
+    message = formatter.format(message);
+    const trimBr = line => line && line.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '');
+    const format = (line, index, arr) => {
+      const nextIsEmpty = trimBr(arr[index + 1]) === '';
+      const currentIsEmpty = trimBr(line) === '';
+      const currentIsPre = line.startsWith('<pre');
+      if (!currentIsEmpty) {
+        const lineBreaker = index < arr.length - 1 && !currentIsPre ? '<br>' : '';
+        return nextIsEmpty ? trimBr(line) : `${trimBr(line)}${lineBreaker}`;
+      }
+      return index > 0 ? '<span class="c-mrkdwn__br"></span>' : '';
+    };
+    message = trimBr(message).split('\n').map(format).join('');
+    return new Handlebars.SafeString(message);
+  },
+  formatInlineMessage(text) {
+    let message = escapeExpression(text.trim());
+    message = message.split('\n').map(line => (line === '' ? '<p><br></p>' : `<p>${line}</p>`)).join('');
     return new Handlebars.SafeString(message);
   },
   getTsDiffInSeconds(firstTs, secondTs) {

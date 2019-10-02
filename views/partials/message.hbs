@@ -32,9 +32,9 @@
           </a>
         </div>
       {{/if}}
-      <span class="c-message__body {{inlineIf (eq message.hideHeader true) "c-message__body--shrink" }}" dir="auto">
-        {{formatMessage message.text}}
-      </span>
+      {{! template-lint-disable block-indentation }}
+      <span class="c-message__body {{inlineIf (eq message.hideHeader true) "c-message__body--shrink" }}"
+            dir="auto">{{formatMessage message.text}}</span>
     </div>
   </div>
 </div>

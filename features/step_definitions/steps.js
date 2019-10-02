@@ -165,7 +165,8 @@ Given('I\'ll wait a little', async () => {
 });
 
 Then('Message has the following HTML content at {string} position in {string}:', async (position, selectorName, dataTable) => {
-  const [expectedHtml] = dataTable.rows()[0];
+  const data = typeof dataTable === 'string' ? dataTable : dataTable.rows()[0];
+  const expectedHtml = Array.isArray(data) ? data[0] : data;
   const actualHtml = await actions.getHtmlByPosition(selectorName, position || 'last');
   expect(actualHtml).toStrictEqual(expectedHtml);
 });

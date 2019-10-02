@@ -41,10 +41,10 @@ Feature: Preformatted message formatting
         And I type "two```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
-            | Message body | one \n\n\ntwo |
+            | Message body | one \n\ntwo |
         And Message has the following HTML content at "last" position in "Message body":
             | html content                                         |
-            | <pre class="c-mrkdwn__pre">one <br><br><br>two</pre> |
+            | <pre class="c-mrkdwn__pre">one <br><br>two</pre> |
 
     Scenario: Two words on different lines as preformatted
         And I type "```one```"
@@ -118,10 +118,11 @@ Feature: Preformatted message formatting
         And I type "```"
         When I press the "Enter" keyboard button
         Then I should see "last" multiline message with:
-            | Message body | one\n\n\n\ntwo |
+            | Message body | one\ntwo |
         And Message has the following HTML content at "last" position in "Message body":
-            | html content                                                                     |
-            | <pre class="c-mrkdwn__pre">one</pre><br><br><pre class="c-mrkdwn__pre">two</pre> |
+            """
+<pre class="c-mrkdwn__pre">one</pre><span class="c-mrkdwn__br"></span><span class="c-mrkdwn__br"></span><pre class="c-mrkdwn__pre">two</pre>
+            """
     
     Scenario: Preserve spaces at start and at the end of block and between words
         And I type "```    one two  three ```"
@@ -175,5 +176,5 @@ Feature: Preformatted message formatting
         When I press the "Enter" keyboard button
         Then I should see "``````" in "Message body"
         And Message has the following HTML content at "last" position in "Message body":
-            | html content               |
-            | ```<br><br><br><br><br>``` |
+            | html content                                                                                                                                   |
+            | ```<span class="c-mrkdwn__br"></span><span class="c-mrkdwn__br"></span><span class="c-mrkdwn__br"></span><span class="c-mrkdwn__br"></span>``` |

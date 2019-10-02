@@ -246,16 +246,16 @@ class MdFormatter {
     this.formatters = {
       PREFORMATTED(block) {
         if (block.content.trim()) {
-          return `<pre class="c-mrkdwn__pre">${block.content.replace(/^(\n|\r\n)|(\n|\r\n)$/g, '')}</pre>`;
+          return `<pre class="c-mrkdwn__pre">${MdFormatter.breakLinesToBr(block.content)}</pre>`;
         }
         return block.text;
       },
       CODE(block) {
         return MdFormatter.formatBlockWithoutBreakLine(block,
-          b => `<code class="c-mrkdwn__code">${b.content}</code>`);
+          b => `<code class="c-mrkdwn__code">${MdFormatter.removeBreakLines(b.content)}</code>`);
       },
       QUOTE(block) {
-        return `<blockquote class="c-mrkdwn__quote">${MdFormatter.replaceSpaces(block.content)}</blockquote>`;
+        return `<blockquote class="c-mrkdwn__quote">${MdFormatter.breakLinesToBr(MdFormatter.replaceSpaces(block.content))}</blockquote>`;
       },
       STRIKE(block) {
         return MdFormatter.formatBlockWithoutBreakLine(block,
@@ -288,16 +288,29 @@ class MdFormatter {
     return text !== ' ' ? fixMultipleSpacesIn(text) : text;
   }
 
+  static breakLinesToBr(text) {
+    const trimBr = line => line && line.replace(/^(\r|\n|\r\n)/ig, '').replace(/(\r|\n|\r\n)$/ig, '');
+    const format = (line, index, arr) => {
+      const nextIsEmpty = trimBr(arr[index + 1]) === '';
+      const currentIsEmpty = trimBr(line) === '';
+      if (!currentIsEmpty) {
+        const lineBreaker = index < arr.length - 1 ? '<br>' : '';
+        return nextIsEmpty ? trimBr(line) : `${trimBr(line)}${lineBreaker}`;
+      }
+      return index > 0 ? '<br>' : '';
+    };
+    return trimBr(text).split('\n').map(format).join('');
+  }
+
+  static removeBreakLines(text) {
+    return text.replace(/(\n|\r|\r\n)/g, '');
+  }
+
   applyFormatting(prevBlock, currBlock) {
     let currBlockFormatted = this.formatters[currBlock.type](currBlock);
     const prevBlockEmpty = prevBlock && prevBlock.text.match(/^( +)$/g);
     const prevBlockIsText = prevBlock && prevBlock.type === TEXT_TYPE;
-    const prevBlockIsPreformatted = prevBlock && prevBlock.type === PREFORMATTED_TYPE;
-    const currBlockIsText = currBlock && currBlock.type === TEXT_TYPE;
     const isCurrentBlockQuote = currBlock.type === QUOTE_TYPE;
-    if (prevBlockIsPreformatted && currBlockIsText) {
-      return currBlockFormatted.replace(/^(\n|\r\n)/g, '');
-    }
     if (prevBlockIsText && prevBlockEmpty && isCurrentBlockQuote) {
       return MdFormatter.replaceSpaces(currBlock.text);
     }

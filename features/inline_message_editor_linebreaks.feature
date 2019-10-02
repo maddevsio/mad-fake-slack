@@ -46,13 +46,14 @@ Feature: Breaks in the middle of inline edited message
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov           |
             | Message body   | first line\nsecond line |
-   
+
     Scenario: Insert break in the middle of typed message
         And I send "first line second line" to chat
         When I press the "ArrowUp" keyboard button
         And I press the "ArrowLeft" keyboard button "12" times
         And I press the "Shift + Enter" keyboard button
         And I press the "Enter" keyboard button
+        And I'm waiting for "Inline Message Editor" to be hidden
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov           |
             | Message body   | first line\nsecond line |
@@ -69,6 +70,7 @@ Feature: Breaks in the middle of inline edited message
         And I press the "Shift + Enter" keyboard button
         And I type "new line"
         And I press the "Enter" keyboard button
+        And I'm waiting for "Inline Message Editor" to be hidden
         Then I should see "last" multiline "Message item" with:
             | Message sender | Valera Petrov                     |
             | Message body   | first line\nsecond line\nnew line |

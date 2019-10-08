@@ -120,3 +120,9 @@ Feature:
       And I type " "
       When I press the "ArrowUp" keyboard button
       Then I should not see "Inline Message Editor"
+
+    Scenario: Don't show editor message for textbox which has any symbol in it
+      And I send "first message" to chat
+      And I type "a"
+      When I press the "ArrowUp" keyboard button
+      Then I should not see "Inline Message Editor"

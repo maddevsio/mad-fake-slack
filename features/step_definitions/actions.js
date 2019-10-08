@@ -694,6 +694,21 @@ async function waitForToBeHidden(selectorName) {
   await page.waitFor(selector => !document.querySelector(selector), { timeout: 3000 }, itemSelector);
 }
 
+async function typeMultilineMessage(text) {
+  const lines = text.split('\n');
+  await Promise.mapSeries(lines, async (line, index, length) => {
+    await typeText(line);
+    const canInsertLineBreak = index < length - 1;
+    if (canInsertLineBreak) {
+      await pressTheButton('Control + Enter');
+    }
+  });
+}
+
+async function shouldNotSee(selectorName) {
+  await this.waitForToBeHidden(selectorName);
+}
+
 module.exports = {
   wait,
   goToUrl,
@@ -742,5 +757,7 @@ module.exports = {
   increaseTodayDateByMinutes,
   setTodayBotDate,
   increaseTodayBotDateByMinutes,
-  waitForToBeHidden
+  waitForToBeHidden,
+  typeMultilineMessage,
+  shouldNotSee
 };

@@ -380,6 +380,8 @@
   msgInputText.addEventListener('keydown', (e) => {
     if (e.keyCode === 38) {
       e.preventDefault();
+      if (msgInputText.value) return;
+
       if (!inlineEditor) {
         inlineEditor = new InlineEditLastMessage(msgContainer, msgInputText);
       }

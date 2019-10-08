@@ -100,3 +100,17 @@ Feature:
         """
         When I press the "ArrowUp" keyboard button
         Then I should not see "Inline Message Editor"
+
+    Scenario: Should not block moving cursor to up
+      And I send "first message" to chat
+      And I type multiline message:
+        """
+        new first line
+        and then second line
+        and third line
+        """
+      And I memorize the "selectionStart" of "Input message"
+      When I press the "ArrowUp" keyboard button
+      And The "selectionStart" with type "Number" of the "Input message" must "toBeLessThan" last
+      And I press the "ArrowUp" keyboard button
+      Then The "selectionStart" with type "Number" of the "Input message" must "toBeLessThan" last

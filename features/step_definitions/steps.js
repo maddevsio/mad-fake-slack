@@ -227,3 +227,11 @@ Given('I send {string} to chat', async (text) => {
 When('I reload the page', async () => {
   await actions.reloadPage();
 });
+
+Given('I type multiline message:', async (docString) => {
+  await actions.typeMultilineMessage(docString);
+});
+
+Then('I should not see {string}', async (elementSelectorName) => {
+  await actions.shouldNotSee(elementSelectorName);
+});

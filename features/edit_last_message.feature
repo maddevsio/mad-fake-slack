@@ -114,3 +114,9 @@ Feature:
       And The "selectionStart" with type "Number" of the "Input message" must "toBeLessThan" last
       And I press the "ArrowUp" keyboard button
       Then The "selectionStart" with type "Number" of the "Input message" must "toBeLessThan" last
+
+    Scenario: Don't show editor message for textbox which has space symbol in it
+      And I send "first message" to chat
+      And I type " "
+      When I press the "ArrowUp" keyboard button
+      Then I should not see "Inline Message Editor"

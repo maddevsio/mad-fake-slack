@@ -30,6 +30,8 @@ module.exports = {
       2,
       180,
       8
-    ]
+    ],
+    "linebreak-style": 0,
+    "eslint linebreak-style": [0, "error", "windows"],
   }
 };

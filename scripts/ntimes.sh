@@ -1,1 +1,1 @@
-for run in {1..10}; do npm run test:integration && sleep 5; done
+for run in {1..10}; do npm run test:bdd && sleep 5; done

@@ -35,6 +35,6 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: npm run test:integration
+      - run: npm test
       - store_artifacts:
           path: ~/mad-fake-slack/screenshots

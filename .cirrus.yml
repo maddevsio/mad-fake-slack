@@ -10,4 +10,4 @@ task:
         dockerfile: .ci/node10/Dockerfile.linux
       xvfb_start_background_script: Xvfb :99 -ac -screen 0 1920x1080x24
   install_script: npm install --unsafe-perm
-  test_script: npm run test:integration
+  test_script: npm test

@@ -4,7 +4,7 @@
 ```
 Lifecycle scripts included in mad-fake-slack:
   test
-    npm run test:integration
+    npm run test:bdd
   start
     node index.js
   pretest
@@ -13,13 +13,13 @@ Lifecycle scripts included in mad-fake-slack:
 available via `npm run-script`:
   test:jest
     jest
-  test:integration
+  test:bdd
     npm run pretest && npx cucumber-js --fail-fast
-  test:integration:only
+  test:bdd:only
     npm run pretest && npx cucumber-js --fail-fast --tags=@only
   example:rtmbot
     SLACK_API=http://localhost:9001/api/ node examples/rtmbot/index.js
-  example:rtmbot:integration
+  example:rtmbot:bdd
     npm run pretest && SLACK_API=http://0.0.0.0:9001/api/ npm run test:jest -- --runInBand examples/rtmbot/
   lint:hbs
     ember-template-lint views/* views/**/*
@@ -34,17 +34,17 @@ available via `npm run-script`:
   codeclimate:analyze
     npm run codeclimate:analyze:format:$REPORT_FORMAT
 ```
-* `test:integration` - 
-  * [EN] Runs integration test for mad-fake-slack UI 
+* `test:bdd` - 
+  * [EN] Runs bdd test for mad-fake-slack UI 
   * [RU] Запускает интеграционные тесты для mad-fake-slack UI)
-* `test:integration:only` 
+* `test:bdd:only` 
   * [EN] As a command above, but runs scripts with a `@only` marker (useful for running a single scenario without specifying long paths) 
   * [RU] Как и предыдущая команда, только запускает сценарии помеченные марером `@only` (Очень полезно, если нужно запустить один или несколько разных сценариев, без необходимости указания длинных путей).
 * `example:rtmbot` - 
   * [EN] Runs example of rtm bot 
   * [RU] Запускает пример rtm бота
-* `example:rtmbot:integration` 
-  * [EN] Runs integration tests for rtm bot from `example` folder 
+* `example:rtmbot:bdd` 
+  * [EN] Runs bdd tests for rtm bot from `example` folder 
   * [RU] Запускает интеграционные тесты для бота из папки `examples`
 * `lint:hbs` 
   * [EN] Runs linter for hbs templates

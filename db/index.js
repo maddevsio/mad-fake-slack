@@ -138,6 +138,7 @@ class DbManager {
           ...message,
           edited: true
         };
+        return this.db.messages[channelId][message.ts];
       },
       messages: total => {
         this.initMessages(channelId);

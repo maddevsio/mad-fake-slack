@@ -4,9 +4,9 @@ const selectors = require('./selectors');
 const pages = require('./pages');
 const { user, ui } = require('./support/services');
 const { dbManager } = require('../../routes/managers');
-const { CustomJSONSchemaValidator } = require('./support/validators');
+const { CustomJSONSchemaValidator, CustomJSONSchemaValidatorAddRefs } = require('./support/validators');
 const Validator = CustomJSONSchemaValidator(require('jsonschema').Validator);
-const jsonSchemaValidator = new Validator();
+const jsonSchemaValidator = CustomJSONSchemaValidatorAddRefs(new Validator());
 const fetch = require('node-fetch');
 const Promise = require('bluebird');
 fetch.Promise = Promise;
@@ -499,10 +499,17 @@ function checkIsStatusMessagesReceivedByUserFromChannel(userName, rows) {
 function validateIncomingMessage(messageObject, schemaRows) {
   const { properties, required } = schemaRows.reduce((schema, row) => {
     const propName = row[0];
-    const item = { type: row[1] };
-    if (row[3]) {
-      item.format = row[3];
+    const item = {};
+
+    if (row[1].startsWith('/')) {
+      item.$ref = row[1];
+    } else {
+      item.type = row[1];
+      if (row[3]) {
+        item.format = row[3];
+      }
     }
+
     // eslint-disable-next-line no-param-reassign
     schema.properties[propName] = item;
     if (row[2] === 'true') {

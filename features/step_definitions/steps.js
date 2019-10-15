@@ -116,6 +116,29 @@ Then('User {string} should receive {string} payload with {string} type:', WithRe
   }
 });
 
+Then('User {string} should receive {string} payload of type {string} with fields:', (userName, messageDirection, payloadType, dataTable) => {
+  const rows = dataTable.rows();
+  const expected = dataTable.rowsHash();
+  delete expected.field;
+  if (messageDirection === 'incoming') {
+    const message = actions.getLastIncomingPayloadForUser(userName, payloadType);
+
+    const resolve = (path, obj) => {
+      return path.split('.').reduce((prev, curr) => {
+        return prev ? prev[curr] : null;
+      }, obj);
+    };
+
+    const actual = rows.reduce((accum, [key]) => {
+      // eslint-disable-next-line no-param-reassign
+      accum[key] = resolve(key, message);
+      return accum;
+    }, {});
+
+    expect(actual).toStrictEqual(expected);
+  }
+});
+
 Given('Fake slack db is empty', () => {
   actions.resetDb();
 });

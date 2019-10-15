@@ -72,13 +72,13 @@ function createResponse({
   );
 }
 
-function broadcastResponse({ response, channel, userId }) {
-  wsManager.broadcast(JSON.stringify(response.message), userId);
+function broadcastResponse({ payload, channel, userId }) {
+  wsManager.broadcast(JSON.stringify(payload), userId);
   if (utils.isOpenChannel(channel)) {
-    wsManager.broadcastToBots(JSON.stringify(response.message), userId);
+    wsManager.broadcastToBots(JSON.stringify(payload), userId);
   }
   if (utils.isBot(channel, dbManager)) {
-    wsManager.broadcastToBot(JSON.stringify(response.message), channel);
+    wsManager.broadcastToBot(JSON.stringify(payload), channel);
   }
 }
 
@@ -99,7 +99,7 @@ async function postMessageHandler(req, res) {
       text: req.body.text.trim(),
       hideHeader: message.hideHeader
     });
-    broadcastResponse({ response, userId: user.id, channel });
+    broadcastResponse({ payload: response.message, userId: user.id, channel });
     res.json(response);
   }
 }
@@ -170,18 +170,27 @@ function userInfoHandler(req, res) {
 
 function chatUpdateHandler(req, res) {
   const { channel, ts, text } = req.body;
-  const messageInDb = dbManager.channel(req.body.channel).findMessageByTs(ts);
+  const previousMessage = dbManager.channel(req.body.channel).findMessageByTs(ts);
   const user = dbManager.slackUser();
+  const team = dbManager.db.teams.filter(tm => tm.id === user.team_id)[0];
 
-  if (!messageInDb || messageInDb.user_id !== user.id || !text) {
+  if (!previousMessage || previousMessage.user_id !== user.id || !text) {
     res.json(responses.cant_update_message);
     return;
   }
 
-  dbManager.channel(req.body.channel).updateMessage({
-    ...messageInDb,
+  const message = dbManager.channel(req.body.channel).updateMessage({
+    ...previousMessage,
     text
   });
+
+  const payload = factories.createUpdateMessageEvent({
+    channel,
+    message,
+    previousMessage
+  }, { user, team });
+
+  broadcastResponse({ payload, userId: user.id, channel });
 
   res.json({
     ok: true,

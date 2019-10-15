@@ -29,3 +29,20 @@ Feature: Like a bot, I want to receive an event
             | previous_message | /ChatUpdatePreviousMessage | true     |                |
             | event_ts         | string                     | true     | slackts        |
             | ts               | string                     | true     | slackts        |
+
+    Scenario: Checking some props of "message_changed" subtype message
+        And I send "first message" to chat
+        And I should see "last" multiline "Message item" with:
+            | Message sender | Valera Petrov |
+            | Message body   | first message |
+        And I press the "ArrowUp" keyboard button
+        And I type " edited"
+        And I press the "Enter" keyboard button
+        And I'm waiting for "Inline Message Editor" to be hidden
+        Then I should see "first message edited" in "Message body"
+        And User "Valera" should receive "incoming" payload of type "message" with fields:
+            | field                 | value                |
+            | type                  | message              |
+            | subtype               | message_changed      |
+            | message.text          | first message edited |
+            | previous_message.text | first message        |

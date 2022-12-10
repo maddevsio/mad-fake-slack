@@ -45,7 +45,7 @@
   "homepage": "https://github.com/maddevsio/mad-fake-slack#readme",
   "dependencies": {
     "crypto": "^1.0.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-handlebars": "^3.1.0",
     "express-ws": "^4.0.0",
     "handlebars": "^4.3.0",
